@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import Link from "next/link";
 import { AvisoLegal } from "@/components/AvisoLegal";
+import { Cabecera } from "@/components/Cabecera";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
 import "./globals.css";
 
@@ -36,13 +36,7 @@ export default function RootLayout({
     <html lang="es">
       <body className="antialiased">
         <div className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col">
-          <header className="border-b border-borde px-4 py-4">
-            <Link href="/" className="inline-flex items-baseline gap-2">
-              <span className="text-2xl font-bold tracking-tight text-acento">
-                Pesca Sevilla
-              </span>
-            </Link>
-          </header>
+          <Cabecera />
 
           <main className="flex-1 px-4 py-6">{children}</main>
 

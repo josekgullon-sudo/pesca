@@ -1,8 +1,11 @@
+import { usuarioActual } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  const usuario = await usuarioActual();
+
   const [sitios, especies, aparejos, capturas] = await Promise.all([
     prisma.sitio.count(),
     prisma.especie.count(),
@@ -20,7 +23,8 @@ export default async function Home() {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <p className="text-lg font-semibold text-acento">Hola, {usuario.nombre}</p>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight">
           Dónde pescar en Sevilla
         </h1>
         <p className="mt-2 text-lg leading-relaxed text-texto-suave">
@@ -52,9 +56,9 @@ export default async function Home() {
       <section className="rounded-xl border border-borde bg-fondo-elevado p-4">
         <h2 className="text-lg font-bold">En construcción</h2>
         <p className="mt-2 leading-relaxed text-texto-suave">
-          De momento están montados la base de datos y los datos semilla. Las
-          pantallas de guía, diario y recomendador llegan en los siguientes
-          bloques.
+          Ya están la base de datos, los datos semilla y el acceso de los dos.
+          Las pantallas de guía, diario, ranking y recomendador llegan en los
+          siguientes bloques.
         </p>
       </section>
     </div>

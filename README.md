@@ -31,6 +31,28 @@ Usuarios que crea el seed:
 El seed **no pisa** usuarios que ya existan, así que se puede cambiar la
 contraseña sin miedo a que la próxima ejecución la revierta.
 
+## Acceso
+
+NextAuth con proveedor de credenciales y sesión en JWT. **No hay registro
+público**: los dos usuarios los crea el seed y no hay forma de dar de alta a
+nadie más desde la app.
+
+- El middleware (`src/middleware.ts`) deja fuera de la sesión únicamente
+  `/entrar` y los assets de la PWA. Todo lo demás pide login, **incluidas las
+  fotos de `/uploads`**: así una foto de una captura no es accesible por el
+  simple hecho de conocer su URL.
+- La sesión dura 90 días. La app se usa a la orilla del agua y sin cobertura;
+  que pidiera la contraseña justo cuando pica algo sería absurdo.
+- `src/lib/auth.config.ts` va separado de `src/lib/auth.ts` a propósito: el
+  middleware corre en runtime Edge y ahí no arranca Prisma, que usa un módulo
+  nativo. El middleware solo lee el JWT de la cookie, sin tocar la base de datos.
+
+Antes de desplegar, genera un `AUTH_SECRET` propio:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
 ## Scripts
 
 | Script               | Qué hace                                       |
