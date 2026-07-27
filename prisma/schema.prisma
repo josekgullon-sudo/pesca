@@ -1,0 +1,313 @@
+// Esquema de datos de la app de pesca (provincia de Sevilla).
+//
+// Portabilidad SQLite -> PostgreSQL:
+//   - No se usan `enum` de Prisma (SQLite no los soporta). Los campos de tipo
+//     enumerado son `String` y sus valores válidos viven en `src/lib/enums.ts`,
+//     que es la fuente de verdad para TypeScript.
+//   - No se usan arrays escalares (tampoco soportados en SQLite). `mejorEpoca`
+//     se guarda como JSON de números de mes en un `String`.
+//   - No se usan tipos nativos ni funciones específicas de un motor.
+// Para migrar basta con cambiar `provider` a "postgresql" y regenerar migraciones.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ---------------------------------------------------------------------------
+// Usuarios
+// ---------------------------------------------------------------------------
+
+model Usuario {
+  id           String  @id @default(cuid())
+  nombre       String
+  email        String  @unique
+  passwordHash String
+  avatarUrl    String?
+
+  capturas Captura[]
+  salidas  Salida[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Guía de sitios
+// ---------------------------------------------------------------------------
+
+model Sitio {
+  id     String @id @default(cuid())
+  slug   String @unique
+  nombre String
+
+  /// TipoSitio: embalse | rio | canal
+  tipo      String
+  municipio String
+  provincia String @default("Sevilla")
+
+  latitud  Float
+  longitud Float
+
+  descripcion String
+
+  /// Capacidad del embalse en hm³ (null en ríos y canales).
+  capacidadHm3 Float?
+
+  accesoDescripcion String
+  /// DificultadAcceso: facil | media | dificil
+  dificultadAcceso String
+
+  tieneSombra Boolean @default(false)
+  navegable   Boolean @default(false)
+
+  distanciaDesdeDosHermanasKm Float
+  tiempoCocheMin              Int
+
+  /// true si el sitio está en el listado de aguas donde SÍ se pueden pescar
+  /// las especies exóticas invasoras (black bass, lucio, carpa, trucha arcoíris).
+  esAreaDelimitadaEEI Boolean @default(false)
+
+  notasLegales     String @default("")
+  avisosSanitarios String @default("")
+
+  /// JSON con los números de mes (1-12) de la mejor época. Ej: "[3,4,5,10]".
+  mejorEpoca String @default("[]")
+
+  /// Ficha en embalses.net u otra fuente para consultar el nivel del agua.
+  urlNivelAgua String?
+
+  especies SitioEspecie[]
+  aparejos AparejoSitio[]
+  capturas Captura[]
+  salidas  Salida[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tipo])
+  @@index([municipio])
+}
+
+// ---------------------------------------------------------------------------
+// Guía de especies
+// ---------------------------------------------------------------------------
+
+model Especie {
+  id               String @id @default(cuid())
+  slug             String @unique
+  nombreComun      String
+  nombreCientifico String
+
+  esAutoctona Boolean @default(false)
+
+  /// EstadoLegal: pescable | devolucion_obligatoria | prohibida |
+  ///              invasora_area_delimitada | invasora_no_pescable
+  estadoLegal String
+
+  /// Talla mínima legal en cm (null si no aplica).
+  tallaMinimaCm Int?
+
+  /// Comestible: si | no | desaconsejado
+  comestible          String
+  notasComestibilidad String @default("")
+  notasLegales        String @default("")
+
+  imagenUrl   String?
+  descripcion String
+
+  /// Cómo y dónde buscarla (bloque libre para la ficha de especie).
+  comoPescarla String @default("")
+
+  sitios   SitioEspecie[]
+  aparejos AparejoEspecie[]
+  capturas Captura[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([estadoLegal])
+}
+
+/// Qué especies hay en qué sitio y con qué probabilidad. Es el corazón de la guía.
+model SitioEspecie {
+  sitioId   String
+  especieId String
+
+  sitio   Sitio   @relation(fields: [sitioId], references: [id], onDelete: Cascade)
+  especie Especie @relation(fields: [especieId], references: [id], onDelete: Cascade)
+
+  /// 1 (rara) a 5 (muy abundante)
+  abundancia Int
+
+  /// Probabilidad: alta | media | baja
+  probabilidadCaptura String
+
+  notas        String @default("")
+  mejorTecnica String @default("")
+
+  @@id([sitioId, especieId])
+  @@index([especieId])
+}
+
+// ---------------------------------------------------------------------------
+// Técnicas y aparejos
+// ---------------------------------------------------------------------------
+
+model Tecnica {
+  id          String @id @default(cuid())
+  slug        String @unique
+  /// spinning | fondo | superficie | feeder
+  nombre      String
+  descripcion String
+
+  capturas Captura[]
+}
+
+model Aparejo {
+  id     String @id @default(cuid())
+  slug   String @unique
+  nombre String
+
+  /// TipoAparejo: vinilo | senuelo_duro | cebo_natural | engodo | montaje
+  tipo String
+
+  descripcion    String
+  precioAproxEur Float?
+  imagenUrl      String?
+
+  especies AparejoEspecie[]
+  sitios   AparejoSitio[]
+  capturas Captura[]
+
+  @@index([tipo])
+}
+
+model AparejoEspecie {
+  aparejoId String
+  especieId String
+
+  aparejo Aparejo @relation(fields: [aparejoId], references: [id], onDelete: Cascade)
+  especie Especie @relation(fields: [especieId], references: [id], onDelete: Cascade)
+
+  /// 1 (funciona a veces) a 5 (el mejor)
+  efectividad Int
+  notas       String @default("")
+
+  @@id([aparejoId, especieId])
+  @@index([especieId])
+}
+
+model AparejoSitio {
+  aparejoId String
+  sitioId   String
+
+  aparejo Aparejo @relation(fields: [aparejoId], references: [id], onDelete: Cascade)
+  sitio   Sitio   @relation(fields: [sitioId], references: [id], onDelete: Cascade)
+
+  recomendado Boolean @default(true)
+  notas       String  @default("")
+
+  @@id([aparejoId, sitioId])
+  @@index([sitioId])
+}
+
+// ---------------------------------------------------------------------------
+// Diario: salidas y capturas
+// ---------------------------------------------------------------------------
+
+/// Una jornada de pesca. Agrupa las capturas de ese día en ese sitio.
+model Salida {
+  id        String @id @default(cuid())
+  usuarioId String
+  sitioId   String
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  sitio   Sitio   @relation(fields: [sitioId], references: [id])
+
+  fecha DateTime
+  /// "HH:MM" hora local.
+  horaInicio String?
+  horaFin    String?
+
+  notas String @default("")
+  /// 1 a 5
+  valoracion Int?
+
+  capturas Captura[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([usuarioId, fecha])
+  @@index([sitioId])
+}
+
+model Captura {
+  id        String  @id @default(cuid())
+  usuarioId String
+  sitioId   String
+  especieId String
+  salidaId  String?
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  sitio   Sitio   @relation(fields: [sitioId], references: [id])
+  especie Especie @relation(fields: [especieId], references: [id])
+  salida  Salida? @relation(fields: [salidaId], references: [id], onDelete: SetNull)
+
+  fecha DateTime
+  /// "HH:MM" hora local.
+  hora String
+
+  pesoGramos Int?
+  longitudCm Float?
+
+  aparejoId String?
+  tecnicaId String?
+  aparejo   Aparejo? @relation(fields: [aparejoId], references: [id], onDelete: SetNull)
+  tecnica   Tecnica? @relation(fields: [tecnicaId], references: [id], onDelete: SetNull)
+
+  /// Punto exacto tomado del GPS del móvil (puede faltar si no hubo señal).
+  latitud  Float?
+  longitud Float?
+
+  fotos FotoCaptura[]
+
+  liberado Boolean @default(true)
+
+  temperaturaC     Float?
+  condicionesMeteo String?
+  nivelAgua        String?
+
+  notas String @default("")
+
+  /// Identificador que genera el cliente offline para evitar duplicados al sincronizar.
+  clienteUuid String? @unique
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  /// Momento en que la captura llegó al servidor desde el diario offline.
+  syncedAt DateTime?
+
+  @@index([usuarioId, fecha])
+  @@index([especieId])
+  @@index([sitioId])
+  @@index([salidaId])
+}
+
+model FotoCaptura {
+  id        String  @id @default(cuid())
+  capturaId String
+  captura   Captura @relation(fields: [capturaId], references: [id], onDelete: Cascade)
+
+  url         String
+  esPrincipal Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([capturaId])
+}

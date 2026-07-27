@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+/*
+ * Paleta: verdes de ribera y azules apagados de agua de embalse.
+ * Está pensada para leerse a pleno sol de Sevilla, así que el contraste entre
+ * texto y fondo es alto a propósito. El modo oscuro es para las salidas al
+ * amanecer y baja el brillo sin perder legibilidad.
+ */
+
+@theme {
+  /* Verde de ribera: el color de marca */
+  --color-ribera-50: #f1f7f2;
+  --color-ribera-100: #dceade;
+  --color-ribera-200: #bad6bf;
+  --color-ribera-300: #8fba97;
+  --color-ribera-400: #629a6d;
+  --color-ribera-500: #447d50;
+  --color-ribera-600: #33633d;
+  --color-ribera-700: #2a4f32;
+  --color-ribera-800: #23402a;
+  --color-ribera-900: #1d3524;
+  --color-ribera-950: #0f1e14;
+
+  /* Azul apagado de agua embalsada */
+  --color-agua-50: #f0f5f7;
+  --color-agua-100: #dbe7ec;
+  --color-agua-200: #b9d0da;
+  --color-agua-300: #8bb0c1;
+  --color-agua-400: #5b8ba2;
+  --color-agua-500: #416f87;
+  --color-agua-600: #345971;
+  --color-agua-700: #2d495c;
+  --color-agua-800: #293e4d;
+  --color-agua-900: #263643;
+  --color-agua-950: #14222c;
+
+  /* Arena y junco: neutros cálidos, más agradables que el gris puro */
+  --color-junco-50: #faf9f6;
+  --color-junco-100: #f2efe7;
+  --color-junco-200: #e4dfd0;
+  --color-junco-300: #cec6b0;
+  --color-junco-400: #b3a888;
+  --color-junco-500: #9c8e6c;
+  --color-junco-600: #857659;
+  --color-junco-700: #6c5f4a;
+  --color-junco-800: #5a4f40;
+  --color-junco-900: #4d4438;
+  --color-junco-950: #29231c;
+
+  /* Semáforo legal */
+  --color-semaforo-verde: #2f7a45;
+  --color-semaforo-ambar: #b06a05;
+  --color-semaforo-rojo: #b3261e;
+
+  /* Fuentes del sistema: cero descargas, se ve al instante sin cobertura y en
+     móvil son las más legibles que hay (San Francisco en iOS, Roboto en Android). */
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif;
+
+  /* Área táctil mínima: se usa con las manos mojadas */
+  --spacing-touch: 3.25rem;
+}
+
+:root {
+  --fondo: var(--color-junco-50);
+  --fondo-elevado: #ffffff;
+  --texto: #17211a;
+  --texto-suave: #4d5a51;
+  --borde: var(--color-junco-200);
+  --acento: var(--color-ribera-600);
+  --acento-texto: #ffffff;
+
+  --semaforo-verde-fondo: #e4f2e7;
+  --semaforo-verde-texto: #1d5730;
+  --semaforo-ambar-fondo: #fbf0da;
+  --semaforo-ambar-texto: #7a4a02;
+  --semaforo-rojo-fondo: #fbe6e4;
+  --semaforo-rojo-texto: #8a1c16;
+
+  color-scheme: light;
+}
+
+:root[data-tema="oscuro"],
+html.oscuro {
+  --fondo: #101714;
+  --fondo-elevado: #18211d;
+  --texto: #e8eee9;
+  --texto-suave: #a3b1a8;
+  --borde: #2b3831;
+  --acento: var(--color-ribera-400);
+  --acento-texto: #0f1e14;
+
+  --semaforo-verde-fondo: #14301d;
+  --semaforo-verde-texto: #9fd9b0;
+  --semaforo-ambar-fondo: #362405;
+  --semaforo-ambar-texto: #f0c47a;
+  --semaforo-rojo-fondo: #37100d;
+  --semaforo-rojo-texto: #f2a9a3;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --fondo: #101714;
+    --fondo-elevado: #18211d;
+    --texto: #e8eee9;
+    --texto-suave: #a3b1a8;
+    --borde: #2b3831;
+    --acento: var(--color-ribera-400);
+    --acento-texto: #0f1e14;
+
+    --semaforo-verde-fondo: #14301d;
+    --semaforo-verde-texto: #9fd9b0;
+    --semaforo-ambar-fondo: #362405;
+    --semaforo-ambar-texto: #f0c47a;
+    --semaforo-rojo-fondo: #37100d;
+    --semaforo-rojo-texto: #f2a9a3;
+
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-fondo: var(--fondo);
+  --color-fondo-elevado: var(--fondo-elevado);
+  --color-texto: var(--texto);
+  --color-texto-suave: var(--texto-suave);
+  --color-borde: var(--borde);
+  --color-acento: var(--acento);
+  --color-acento-texto: var(--acento-texto);
+
+  --color-verde-fondo: var(--semaforo-verde-fondo);
+  --color-verde-texto: var(--semaforo-verde-texto);
+  --color-ambar-fondo: var(--semaforo-ambar-fondo);
+  --color-ambar-texto: var(--semaforo-ambar-texto);
+  --color-rojo-fondo: var(--semaforo-rojo-fondo);
+  --color-rojo-texto: var(--semaforo-rojo-texto);
+}
+
+html {
+  /* Un pelín más grande de lo normal: se lee de pie, con sol y sin gafas. */
+  font-size: 17px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--fondo);
+  color: var(--texto);
+  font-family: var(--font-sans);
+  /* Deja sitio a la barra de navegación inferior en móvil. */
+  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Foco siempre visible: se navega con guantes y con prisa. */
+:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
