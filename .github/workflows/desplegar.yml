@@ -92,8 +92,28 @@ jobs:
           HOST_KEY: ${{ secrets.SSH_HOST_KEY }}
         run: |
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          printf '%s\n' "$CLAVE" > ~/.ssh/clave
+
+          # La llave se acepta de dos formas. Copiar un bloque de varias líneas
+          # de una terminal a un formulario web sale mal a menudo —se pierden
+          # saltos, se cuela sangría— y el error que da OpenSSH entonces es
+          # «error in libcrypto», que no dice nada. En base64 es una sola línea
+          # y no hay nada que estropear.
+          case "$CLAVE" in
+            -----BEGIN*) printf '%s\n' "$CLAVE" > ~/.ssh/clave ;;
+            *)           printf '%s' "$CLAVE" | tr -d ' \n' | base64 -d > ~/.ssh/clave ;;
+          esac
           chmod 600 ~/.ssh/clave
+
+          # Que la llave se pueda leer se comprueba aquí, no cuando falle la
+          # conexión: así el error dice qué secreto hay que rehacer.
+          if ! ssh-keygen -y -f ~/.ssh/clave > /dev/null 2>&1; then
+            echo "::error::El secreto SSH_CLAVE_PRIVADA no es una llave válida."
+            echo "En el servidor, genera la versión de una sola línea con:"
+            echo "    base64 -w0 /home/despliegue/.ssh/github"
+            echo "y pega ESA línea en el secreto."
+            exit 1
+          fi
+
           # La huella del servidor va fijada. Sin esto habría que aceptar
           # cualquier host que conteste, que es exactamente por donde entra un
           # ataque de intermediario.
