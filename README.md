@@ -24,6 +24,28 @@ npm run dev      # http://localhost:3000
 
 `npm run setup` es idempotente y no pisa un `.env` que ya exista.
 
+### Actualizar a la última versión
+
+```bash
+git pull
+npm ci        # NO npm install
+npm run dev
+```
+
+Usa **`npm ci`** y no `npm install` para actualizar. `npm install` reescribe
+`package-lock.json` si tu versión de npm no es exactamente la misma con la que
+se generó, y entonces el siguiente `git pull` se planta con
+«Your local changes to the following files would be overwritten by merge».
+`npm ci` instala justo lo que dice el lockfile y no lo toca.
+
+Si ya te ha pasado, el lockfile se regenera solo, así que se puede descartar sin
+perder nada:
+
+```bash
+git restore package-lock.json
+git pull
+```
+
 ### Probarlo en el móvil
 
 Como la app es mobile-first, lo suyo es abrirla en el teléfono. Con el móvil en
