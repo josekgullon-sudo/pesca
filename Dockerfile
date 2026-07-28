@@ -52,6 +52,9 @@ ENV DATABASE_URL="file:/app/datos/pesca.db"
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
+# `public/` está vacío (las imágenes van en datos/, ver src/lib/imagenes.ts),
+# pero tiene que existir o este COPY falla. Git no versiona directorios vacíos,
+# así que se sostiene con public/.gitkeep. No lo borres.
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
