@@ -22,6 +22,7 @@ import { hash } from "bcryptjs";
 import {
   AVISO_FUERA_DE_AREA_DELIMITADA,
   TEXTO_AREAS_DELIMITADAS_EEI,
+  URL_PORTAL_CAZA_Y_PESCA,
 } from "../src/lib/avisos";
 import { prisma } from "../src/lib/prisma";
 
@@ -34,11 +35,77 @@ const EN_AREA_DELIMITADA =
   `Listado completo de aguas: ${TEXTO_AREAS_DELIMITADAS_EEI}`;
 
 // ---------------------------------------------------------------------------
+// Provincias
+// ---------------------------------------------------------------------------
+
+/**
+ * Las ocho provincias andaluzas. Solo Sevilla sale publicada: es la única con
+ * los sitios cargados y la normativa contrastada.
+ *
+ * Para publicar otra hacen falta dos cosas, y en este orden:
+ *   1. Sus sitios, con especies y aparejos, en el array SITIOS de abajo.
+ *   2. Su lista de áreas delimitadas para especies exóticas invasoras, sacada
+ *      de la orden de vedas vigente. Cambia de una provincia a otra, y de ella
+ *      depende si un black bass se devuelve al agua o hay que sacrificarlo.
+ *
+ * Publicar una provincia a medias es peor que no publicarla: Google penaliza
+ * las páginas sin contenido propio, y una normativa equivocada le puede costar
+ * una multa a quien se fíe.
+ */
+type ProvinciaSeed = {
+  slug: string;
+  nombre: string;
+  comunidad: string;
+  latitud: number;
+  longitud: number;
+  publicada: boolean;
+  descripcion?: string;
+  areasDelimitadasEEI?: string;
+  notasLegales?: string;
+  urlOrdenDeVedas?: string;
+};
+
+const PROVINCIAS: ProvinciaSeed[] = [
+  {
+    slug: "sevilla",
+    nombre: "Sevilla",
+    comunidad: "Andalucía",
+    latitud: 37.5,
+    longitud: -5.8,
+    publicada: true,
+    descripcion:
+      "La provincia de Sevilla tiene once embalses grandes y tres tramos de río " +
+      "abiertos a la pesca, repartidos entre la Sierra Norte y la campiña. Los " +
+      "de la sierra —El Pintado, José Torán, Huesna, Cala— llevan agua limpia y " +
+      "fría, con mucho barbo y el mejor black bass de la provincia. Los de la " +
+      "campiña —Torre del Águila, Puebla de Cazalla— son de riego, con el nivel " +
+      "muy variable y carpa por todas partes. Y luego está el Guadaíra, a veinte " +
+      "minutos de la capital, que es donde se va cuando no hay tiempo para más.",
+    areasDelimitadasEEI: TEXTO_AREAS_DELIMITADAS_EEI,
+    notasLegales:
+      "Sevilla se rige por la orden de vedas de pesca continental de Andalucía. " +
+      "Es obligatorio llevar licencia de pesca continental andaluza en vigor y " +
+      "seguro de responsabilidad civil.",
+    urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA,
+  },
+  // --- Pendientes de datos. No se publican hasta tenerlos. ---
+  { slug: "huelva", nombre: "Huelva", comunidad: "Andalucía", latitud: 37.6, longitud: -6.9, publicada: false },
+  { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: false },
+  { slug: "malaga", nombre: "Málaga", comunidad: "Andalucía", latitud: 36.8, longitud: -4.6, publicada: false },
+  { slug: "cordoba", nombre: "Córdoba", comunidad: "Andalucía", latitud: 38.0, longitud: -4.8, publicada: false },
+  { slug: "jaen", nombre: "Jaén", comunidad: "Andalucía", latitud: 38.0, longitud: -3.4, publicada: false },
+  { slug: "granada", nombre: "Granada", comunidad: "Andalucía", latitud: 37.3, longitud: -3.4, publicada: false },
+  { slug: "almeria", nombre: "Almería", comunidad: "Andalucía", latitud: 37.2, longitud: -2.4, publicada: false },
+];
+
+// ---------------------------------------------------------------------------
 // Sitios
 // ---------------------------------------------------------------------------
 
 type SitioSeed = {
   slug: string;
+  /** Slug de la provincia a la que pertenece. */
+  provincia: string;
   nombre: string;
   tipo: "embalse" | "rio" | "canal";
   municipio: string;
@@ -62,6 +129,7 @@ type SitioSeed = {
 const SITIOS: SitioSeed[] = [
   {
     slug: "torre-del-aguila",
+    provincia: "sevilla",
     nombre: "Embalse de Torre del Águila",
     tipo: "embalse",
     municipio: "Utrera / El Palmar de Troya",
@@ -93,6 +161,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "jose-toran",
+    provincia: "sevilla",
     nombre: "Embalse José Torán",
     tipo: "embalse",
     municipio: "La Puebla de los Infantes",
@@ -125,6 +194,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "el-pintado",
+    provincia: "sevilla",
     nombre: "Embalse de El Pintado",
     tipo: "embalse",
     municipio: "Cazalla de la Sierra",
@@ -158,6 +228,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "la-minilla",
+    provincia: "sevilla",
     nombre: "Embalse de La Minilla",
     tipo: "embalse",
     municipio: "El Ronquillo / Castilblanco de los Arroyos",
@@ -189,6 +260,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "cala",
+    provincia: "sevilla",
     nombre: "Embalse de Cala",
     tipo: "embalse",
     municipio: "Sierra Norte (Real de la Jara / Santa Olalla del Cala)",
@@ -219,6 +291,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "gergal",
+    provincia: "sevilla",
     nombre: "Embalse del Gergal",
     tipo: "embalse",
     municipio: "Guillena",
@@ -248,6 +321,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "huesna",
+    provincia: "sevilla",
     nombre: "Embalse del Huesna",
     tipo: "embalse",
     municipio: "San Nicolás del Puerto",
@@ -279,6 +353,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "cazalla-de-la-sierra",
+    provincia: "sevilla",
     nombre: "Embalse de Cazalla de la Sierra",
     tipo: "embalse",
     municipio: "Cazalla de la Sierra",
@@ -308,6 +383,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "los-molinos",
+    provincia: "sevilla",
     nombre: "Embalse de Los Molinos",
     tipo: "embalse",
     municipio: "Castilblanco de los Arroyos",
@@ -334,6 +410,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "puebla-de-cazalla",
+    provincia: "sevilla",
     nombre: "Embalse de la Puebla de Cazalla",
     tipo: "embalse",
     municipio: "La Puebla de Cazalla",
@@ -363,6 +440,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "agrio",
+    provincia: "sevilla",
     nombre: "Embalse del Agrio",
     tipo: "embalse",
     municipio: "Aznalcóllar",
@@ -398,6 +476,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "guadaira-oromana",
+    provincia: "sevilla",
     nombre: "Río Guadaíra — Oromana",
     tipo: "rio",
     municipio: "Alcalá de Guadaíra",
@@ -434,6 +513,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "guadalquivir-cantillana-alcala-del-rio",
+    provincia: "sevilla",
     nombre: "Río Guadalquivir — de Cantillana a Alcalá del Río",
     tipo: "rio",
     municipio: "Cantillana / Villaverde del Río / Alcalá del Río",
@@ -467,6 +547,7 @@ const SITIOS: SitioSeed[] = [
   },
   {
     slug: "viar-melonares-cantillana",
+    provincia: "sevilla",
     nombre: "Río Viar — de Melonares a Cantillana",
     tipo: "rio",
     municipio: "Castilblanco de los Arroyos / Villaverde del Río / Cantillana",
@@ -1419,10 +1500,47 @@ async function main() {
     console.log(`  usuario ${u.email} creado`);
   }
 
+  // --- Provincias ----------------------------------------------------------
+  for (const p of PROVINCIAS) {
+    const data = {
+      nombre: p.nombre,
+      comunidad: p.comunidad,
+      latitud: p.latitud,
+      longitud: p.longitud,
+      publicada: p.publicada,
+      descripcion: p.descripcion ?? "",
+      areasDelimitadasEEI: p.areasDelimitadasEEI ?? "",
+      notasLegales: p.notasLegales ?? "",
+      urlOrdenDeVedas: p.urlOrdenDeVedas ?? null,
+    };
+    await prisma.provincia.upsert({
+      where: { slug: p.slug },
+      create: { slug: p.slug, ...data },
+      update: data,
+    });
+  }
+  const nPublicadas = PROVINCIAS.filter((p) => p.publicada).length;
+  console.log(
+    `  ${PROVINCIAS.length} provincias, ${nPublicadas} publicada${nPublicadas === 1 ? "" : "s"}`,
+  );
+
+  const provincias = new Map(
+    (await prisma.provincia.findMany({ select: { id: true, slug: true } })).map(
+      (p) => [p.slug, p.id],
+    ),
+  );
+
   // --- Sitios --------------------------------------------------------------
   for (const s of SITIOS) {
-    const { mejorEpoca, ...resto } = s;
-    const data = { ...resto, mejorEpoca: JSON.stringify(mejorEpoca) };
+    const { mejorEpoca, provincia, ...resto } = s;
+    const provinciaId = provincias.get(provincia);
+    if (!provinciaId) throw new Error(`No existe la provincia "${provincia}"`);
+
+    const data = {
+      ...resto,
+      provinciaId,
+      mejorEpoca: JSON.stringify(mejorEpoca),
+    };
     await prisma.sitio.upsert({
       where: { slug: s.slug },
       create: data,

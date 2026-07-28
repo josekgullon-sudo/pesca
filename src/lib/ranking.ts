@@ -1,6 +1,16 @@
 import { prisma } from "./prisma";
 
 /**
+ * Ámbito del ranking: toda España o una provincia. Se pasa a todas las
+ * consultas para no duplicar código entre /ranking y /[provincia]/ranking.
+ */
+export type Ambito = { provinciaId?: string };
+
+function filtroSitio(a: Ambito) {
+  return a.provinciaId ? { sitio: { provinciaId: a.provinciaId } } : {};
+}
+
+/**
  * Consultas del ranking.
  *
  * Se agrupa en SQL en vez de traerse todas las capturas y contar en memoria:
@@ -9,9 +19,9 @@ import { prisma } from "./prisma";
  */
 
 /** Las piezas más pesadas, sin distinguir especie. */
-export async function rankingPorPeso(limite = 10) {
+export async function rankingPorPeso(ambito: Ambito = {}, limite = 10) {
   return prisma.captura.findMany({
-    where: { pesoGramos: { not: null } },
+    where: { pesoGramos: { not: null }, ...filtroSitio(ambito) },
     orderBy: { pesoGramos: "desc" },
     take: limite,
     select: {
@@ -49,9 +59,12 @@ export type FilaEspecie = {
 };
 
 /** Cuántas van de cada especie y cuál es el récord de cada una. */
-export async function rankingPorEspecie(): Promise<FilaEspecie[]> {
+export async function rankingPorEspecie(
+  ambito: Ambito = {},
+): Promise<FilaEspecie[]> {
   const conteos = await prisma.captura.groupBy({
     by: ["especieId"],
+    where: filtroSitio(ambito),
     _count: { _all: true },
     orderBy: { _count: { especieId: "desc" } },
   });
@@ -72,7 +85,11 @@ export async function rankingPorEspecie(): Promise<FilaEspecie[]> {
     Promise.all(
       conteos.map((c) =>
         prisma.captura.findFirst({
-          where: { especieId: c.especieId, pesoGramos: { not: null } },
+          where: {
+            especieId: c.especieId,
+            pesoGramos: { not: null },
+            ...filtroSitio(ambito),
+          },
           orderBy: { pesoGramos: "desc" },
           select: {
             id: true,
@@ -124,11 +141,15 @@ export type FilaPescador = {
 };
 
 /** El marcador entre pescadores: quién lleva más, quién la más gorda. */
-export async function rankingPorPescador(limite = 25): Promise<FilaPescador[]> {
+export async function rankingPorPescador(
+  ambito: Ambito = {},
+  limite = 25,
+): Promise<FilaPescador[]> {
   // Solo quien tenga capturas: con registro abierto la tabla de usuarios crece
   // sola y no tiene sentido consultarla entera para pintar ceros.
   const conCapturas = await prisma.captura.groupBy({
     by: ["usuarioId"],
+    where: filtroSitio(ambito),
     _count: { _all: true },
     orderBy: { _count: { usuarioId: "desc" } },
     take: limite,
@@ -143,20 +164,26 @@ export async function rankingPorPescador(limite = 25): Promise<FilaPescador[]> {
   const filas = await Promise.all(
     usuarios.map(async (u) => {
       const [capturas, distintas, suma, mejor] = await Promise.all([
-        prisma.captura.count({ where: { usuarioId: u.id } }),
+        prisma.captura.count({
+          where: { usuarioId: u.id, ...filtroSitio(ambito) },
+        }),
         prisma.captura
           .findMany({
-            where: { usuarioId: u.id },
+            where: { usuarioId: u.id, ...filtroSitio(ambito) },
             distinct: ["especieId"],
             select: { especieId: true },
           })
           .then((r) => r.length),
         prisma.captura.aggregate({
-          where: { usuarioId: u.id },
+          where: { usuarioId: u.id, ...filtroSitio(ambito) },
           _sum: { pesoGramos: true },
         }),
         prisma.captura.findFirst({
-          where: { usuarioId: u.id, pesoGramos: { not: null } },
+          where: {
+            usuarioId: u.id,
+            pesoGramos: { not: null },
+            ...filtroSitio(ambito),
+          },
           orderBy: { pesoGramos: "desc" },
           select: {
             pesoGramos: true,
@@ -186,9 +213,10 @@ export async function rankingPorPescador(limite = 25): Promise<FilaPescador[]> {
 }
 
 /** Sitios con más capturas registradas. */
-export async function rankingPorSitio(limite = 8) {
+export async function rankingPorSitio(ambito: Ambito = {}, limite = 8) {
   const conteos = await prisma.captura.groupBy({
     by: ["sitioId"],
+    where: filtroSitio(ambito),
     _count: { _all: true },
     orderBy: { _count: { sitioId: "desc" } },
     take: limite,
@@ -197,7 +225,13 @@ export async function rankingPorSitio(limite = 8) {
 
   const sitios = await prisma.sitio.findMany({
     where: { id: { in: conteos.map((c) => c.sitioId) } },
-    select: { id: true, slug: true, nombre: true, tipo: true },
+    select: {
+      id: true,
+      slug: true,
+      nombre: true,
+      tipo: true,
+      provincia: { select: { slug: true } },
+    },
   });
   const porId = new Map(sitios.map((s) => [s.id, s]));
 

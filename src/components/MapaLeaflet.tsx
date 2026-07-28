@@ -15,6 +15,7 @@ export type SitioMapa = {
   latitud: number;
   longitud: number;
   avisoGrave: boolean;
+  provincia: string;
 };
 
 const COLOR_POR_TIPO: Record<string, string> = {
@@ -99,7 +100,7 @@ export default function MapaLeaflet({ sitios }: { sitios: SitioMapa[] }) {
               </span>
             )}
             <a
-              href={`/sitios/${s.slug}`}
+              href={`/${s.provincia}/${s.slug}`}
               className="mt-2 inline-block font-bold underline"
             >
               Ver la ficha

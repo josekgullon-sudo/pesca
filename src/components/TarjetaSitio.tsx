@@ -38,7 +38,13 @@ function esAvisoGrave(texto: string) {
  */
 const NO_SE_PUEDEN_BUSCAR = new Set(["prohibida", "invasora_no_pescable"]);
 
-export function TarjetaSitio({ sitio }: { sitio: SitioTarjeta }) {
+export function TarjetaSitio({
+  sitio,
+  provincia,
+}: {
+  sitio: SitioTarjeta;
+  provincia: string;
+}) {
   const principales = sitio.especies
     .filter((e) => !NO_SE_PUEDEN_BUSCAR.has(e.especie.estadoLegal))
     .sort((a, b) => b.abundancia - a.abundancia)
@@ -48,7 +54,7 @@ export function TarjetaSitio({ sitio }: { sitio: SitioTarjeta }) {
   return (
     <li>
       <Link
-        href={`/sitios/${sitio.slug}`}
+        href={`/${provincia}/${sitio.slug}`}
         className="flex h-full flex-col tarjeta overflow-hidden"
       >
         <BandaSitio

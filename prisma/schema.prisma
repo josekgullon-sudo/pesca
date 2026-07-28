@@ -41,6 +41,52 @@ model Usuario {
 }
 
 // ---------------------------------------------------------------------------
+// Provincias
+// ---------------------------------------------------------------------------
+
+/**
+ * Cada provincia es una landing propia (/sevilla, /huelva...) con sus sitios,
+ * su ranking y su normativa.
+ *
+ * `publicada` existe para no llenar Google de páginas vacías: una provincia sin
+ * sus sitios y sin su normativa verificada no sale a ninguna parte. Google
+ * penaliza las páginas puente, y en una web de pesca publicar normativa sin
+ * contrastar puede costarle una multa a alguien.
+ */
+model Provincia {
+  id     String @id @default(cuid())
+  slug   String @unique
+  nombre String
+
+  comunidad String
+
+  /// Centro aproximado, para encuadrar el mapa de la provincia.
+  latitud  Float
+  longitud Float
+
+  /// Texto de la landing. Es el contenido propio que la hace valer para Google.
+  descripcion String @default("")
+
+  /// Aguas donde SÍ se pueden pescar las especies exóticas invasoras. Cambia
+  /// de una provincia a otra, así que va aquí y no en un texto compartido.
+  areasDelimitadasEEI String @default("")
+
+  /// Normativa propia de la provincia y enlace al boletín donde se comprueba.
+  notasLegales    String  @default("")
+  urlOrdenDeVedas String?
+
+  /// Solo se publica lo que tiene sitios cargados y normativa verificada.
+  publicada Boolean @default(false)
+
+  sitios Sitio[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([publicada])
+}
+
+// ---------------------------------------------------------------------------
 // Guía de sitios
 // ---------------------------------------------------------------------------
 
@@ -52,7 +98,9 @@ model Sitio {
   /// TipoSitio: embalse | rio | canal
   tipo      String
   municipio String
-  provincia String @default("Sevilla")
+
+  provinciaId String
+  provincia   Provincia @relation(fields: [provinciaId], references: [id])
 
   latitud  Float
   longitud Float
@@ -69,6 +117,8 @@ model Sitio {
   tieneSombra Boolean @default(false)
   navegable   Boolean @default(false)
 
+  /// Referencia de cercanía desde la capital de la provincia. En Sevilla se
+  /// dejó medida desde Dos Hermanas, que es de donde salimos.
   distanciaDesdeDosHermanasKm Float
   tiempoCocheMin              Int
 
@@ -104,6 +154,7 @@ model Sitio {
 
   @@index([tipo])
   @@index([municipio])
+  @@index([provinciaId])
 }
 
 // ---------------------------------------------------------------------------

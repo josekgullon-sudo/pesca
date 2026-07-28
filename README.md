@@ -132,6 +132,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | Registro de capturas con foto y GPS            | Hecho          |
 | Ranking, galería y comparativa                 | Hecho          |
 | Registro abierto, moderación y páginas legales | Hecho          |
+| Estructura por provincias y ranking por ámbito | Hecho          |
+| SEO técnico (sitemap, datos estructurados)     | Pendiente      |
 | Recomendador "¿qué me llevo?"                  | Pendiente      |
 | PWA y funcionamiento offline                   | Pendiente      |
 | Registro de salidas                            | Pendiente      |
@@ -152,6 +154,41 @@ Las especies no tienen foto todavía. En vez de tirar de imágenes de internet,
 que además tienen dueño, se dibuja una silueta con el color del semáforo legal,
 así el listado se lee de un vistazo. Cuando haya fotos propias, basta con
 rellenar `Especie.imagenUrl`.
+
+## Provincias
+
+La web está organizada por provincia, que es como se busca en Google
+(«dónde pescar en Sevilla») y como está organizada la normativa.
+
+| URL                     | Qué es                               |
+| ----------------------- | ------------------------------------ |
+| `/`                     | Portada nacional con las provincias  |
+| `/sevilla`              | Landing de la provincia con sus sitios |
+| `/sevilla/jose-toran`   | Ficha de un sitio                    |
+| `/sevilla/mapa`         | Mapa de la provincia                 |
+| `/sevilla/ranking`      | Ranking de la provincia              |
+| `/ranking`              | Ranking nacional                     |
+| `/especies`             | Guía de especies (común a todas)     |
+
+### Añadir una provincia
+
+`Provincia.publicada` decide si sale o no. Las ocho andaluzas están creadas en
+el seed pero **solo Sevilla está publicada**: el resto responde 404 hasta que
+tenga datos. Es deliberado. Google penaliza las páginas puente —creadas solo
+para captar tráfico, sin contenido propio— y diez landings vacías hunden el
+dominio entero en vez de posicionarlo.
+
+Para publicar una provincia hacen falta dos cosas, en este orden:
+
+1. **Sus sitios**, en el array `SITIOS` de `prisma/seed.ts`, con sus especies y
+   sus aparejos.
+2. **Su lista de áreas delimitadas para especies exóticas invasoras**, sacada de
+   la orden de vedas vigente, en `areasDelimitadasEEI`. **Cambia de una
+   provincia a otra**, y de ella depende si un black bass se devuelve al agua o
+   hay obligación de sacrificarlo. Publicar esto mal le puede costar una multa a
+   quien se fíe.
+
+Después, `publicada: true` y `npm run actualizar`.
 
 ## Registro abierto: qué implica
 
@@ -185,7 +222,42 @@ piezas que no son opcionales:
 
 ## Fotos
 
-### Registro abierto: qué implica
+### Provincias
+
+La web está organizada por provincia, que es como se busca en Google
+(«dónde pescar en Sevilla») y como está organizada la normativa.
+
+| URL                     | Qué es                               |
+| ----------------------- | ------------------------------------ |
+| `/`                     | Portada nacional con las provincias  |
+| `/sevilla`              | Landing de la provincia con sus sitios |
+| `/sevilla/jose-toran`   | Ficha de un sitio                    |
+| `/sevilla/mapa`         | Mapa de la provincia                 |
+| `/sevilla/ranking`      | Ranking de la provincia              |
+| `/ranking`              | Ranking nacional                     |
+| `/especies`             | Guía de especies (común a todas)     |
+
+### Añadir una provincia
+
+`Provincia.publicada` decide si sale o no. Las ocho andaluzas están creadas en
+el seed pero **solo Sevilla está publicada**: el resto responde 404 hasta que
+tenga datos. Es deliberado. Google penaliza las páginas puente —creadas solo
+para captar tráfico, sin contenido propio— y diez landings vacías hunden el
+dominio entero en vez de posicionarlo.
+
+Para publicar una provincia hacen falta dos cosas, en este orden:
+
+1. **Sus sitios**, en el array `SITIOS` de `prisma/seed.ts`, con sus especies y
+   sus aparejos.
+2. **Su lista de áreas delimitadas para especies exóticas invasoras**, sacada de
+   la orden de vedas vigente, en `areasDelimitadasEEI`. **Cambia de una
+   provincia a otra**, y de ella depende si un black bass se devuelve al agua o
+   hay obligación de sacrificarlo. Publicar esto mal le puede costar una multa a
+   quien se fíe.
+
+Después, `publicada: true` y `npm run actualizar`.
+
+## Registro abierto: qué implica
 
 Con cualquiera pudiendo crear cuenta y subir fotos al disco del servidor, hay
 piezas que no son opcionales:

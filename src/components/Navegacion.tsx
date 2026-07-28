@@ -15,6 +15,9 @@ import { usePathname } from "next/navigation";
  * sitios, que es de donde se entra a él de todas formas.
  */
 
+/** Rutas que tienen su propia pestaña. Lo demás cuelga de una provincia. */
+const RUTAS_PROPIAS = ["/especies", "/capturas", "/ranking", "/entrar", "/registro", "/cuenta", "/normas", "/aviso-legal"];
+
 type Enlace = {
   href: string;
   etiqueta: string;
@@ -25,10 +28,12 @@ type Enlace = {
 const ENLACES: Enlace[] = [
   { href: "/", etiqueta: "Inicio", icono: IconoCasa, activo: (r) => r === "/" },
   {
-    href: "/sitios",
+    // El destino lo decide el servidor: con una sola provincia publicada va
+    // directo a ella, y con varias a la portada, que es donde está el listado.
+    href: "__sitios__",
     etiqueta: "Sitios",
     icono: IconoLista,
-    activo: (r) => r.startsWith("/sitios"),
+    activo: (r) => RUTAS_PROPIAS.every((x) => !r.startsWith(x)) && r !== "/",
   },
   {
     href: "/especies",
@@ -50,7 +55,7 @@ const ENLACES: Enlace[] = [
   },
 ];
 
-export function NavegacionCabecera() {
+export function NavegacionCabecera({ rutaSitios }: { rutaSitios: string }) {
   const ruta = usePathname();
   if (ruta.startsWith("/entrar")) return null;
 
@@ -59,10 +64,11 @@ export function NavegacionCabecera() {
       <ul className="flex items-center gap-1">
         {ENLACES.map(({ href, etiqueta, activo: esActivo }) => {
           const activo = esActivo(ruta);
+          const destino = href === "__sitios__" ? rutaSitios : href;
           return (
             <li key={href}>
               <Link
-                href={href}
+                href={destino}
                 aria-current={activo ? "page" : undefined}
                 className={`inline-flex min-h-11 items-center rounded-lg px-3 font-semibold ${
                   activo
@@ -80,7 +86,7 @@ export function NavegacionCabecera() {
   );
 }
 
-export function NavegacionInferior() {
+export function NavegacionInferior({ rutaSitios }: { rutaSitios: string }) {
   const ruta = usePathname();
   if (ruta.startsWith("/entrar")) return null;
 
@@ -92,10 +98,11 @@ export function NavegacionInferior() {
       <ul className="mx-auto flex max-w-3xl">
         {ENLACES.map(({ href, etiqueta, icono: Icono, activo: esActivo }) => {
           const activo = esActivo(ruta);
+          const destino = href === "__sitios__" ? rutaSitios : href;
           return (
             <li key={href} className="flex-1">
               <Link
-                href={href}
+                href={destino}
                 aria-current={activo ? "page" : undefined}
                 className={`flex min-h-touch flex-col items-center justify-center gap-0.5 py-2 text-xs font-semibold ${
                   activo ? "text-acento" : "text-texto-suave"

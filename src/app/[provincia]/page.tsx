@@ -11,21 +11,44 @@ import {
   type ParamsBusqueda,
 } from "@/lib/filtros-sitios";
 import { prisma } from "@/lib/prisma";
+import { cargarProvincia } from "@/lib/provincias";
 
-export const metadata: Metadata = { title: "Sitios" };
 export const dynamic = "force-dynamic";
 
-export default async function PaginaSitios({
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ provincia: string }>;
+}): Promise<Metadata> {
+  const { provincia } = await params;
+  const p = await prisma.provincia.findUnique({
+    where: { slug: provincia },
+    select: { nombre: true, descripcion: true },
+  });
+  if (!p) return { title: "Provincia" };
+
+  return {
+    title: `Dónde pescar en ${p.nombre}: embalses, ríos y especies`,
+    description:
+      p.descripcion.slice(0, 155) ||
+      `Guía de pesca de la provincia de ${p.nombre}.`,
+  };
+}
+
+export default async function PaginaProvincia({
+  params,
   searchParams,
 }: {
+  params: Promise<{ provincia: string }>;
   searchParams: Promise<ParamsBusqueda>;
 }) {
-  const params = await searchParams;
-  const filtros = leerFiltros(params);
+  const { provincia: slugProvincia } = await params;
+  const provincia = await cargarProvincia(slugProvincia);
+  const filtros = leerFiltros(await searchParams);
 
   const [sitios, especies] = await Promise.all([
     prisma.sitio.findMany({
-      where: construirWhere(filtros),
+      where: { ...construirWhere(filtros), provinciaId: provincia.id },
       // Lo más cerca primero: casi siempre es el criterio que decide.
       orderBy: { tiempoCocheMin: "asc" },
       select: {
@@ -51,7 +74,7 @@ export default async function PaginaSitios({
     // Solo las especies que están en algún sitio: no tiene sentido ofrecer un
     // filtro que no puede devolver nada.
     prisma.especie.findMany({
-      where: { sitios: { some: {} } },
+      where: { sitios: { some: { sitio: { provinciaId: provincia.id } } } },
       orderBy: { nombreComun: "asc" },
       select: { slug: true, nombreComun: true },
     }),
@@ -59,15 +82,23 @@ export default async function PaginaSitios({
 
   return (
     <div className="space-y-6">
+      {provincia.descripcion && (
+        <p className="max-w-prose text-lg leading-relaxed text-texto-suave">
+          {provincia.descripcion}
+        </p>
+      )}
+
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Sitios</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Dónde pescar en {provincia.nombre}
+          </h1>
           <p className="mt-1 text-texto-suave">
             Embalses y ríos de la provincia, del más cercano al más lejano.
           </p>
         </div>
         <Link
-          href={urlConFiltros("/sitios/mapa", filtros)}
+          href={urlConFiltros(`/${provincia.slug}/mapa`, filtros)}
           className="inline-flex min-h-touch shrink-0 items-center rounded-xl border-2 border-borde bg-fondo-elevado px-4 font-semibold"
         >
           Ver mapa
@@ -78,7 +109,9 @@ export default async function PaginaSitios({
           recorre la lista; en móvil van arriba, plegados. */}
       <div className="md:grid md:grid-cols-[17rem_1fr] md:items-start md:gap-8">
         <div className="md:sticky md:top-6">
-          <FiltrosSitios base="/sitios" filtros={filtros} especies={especies} />
+          <FiltrosSitios base={`/${provincia.slug}`}
+            filtros={filtros}
+            especies={especies} />
         </div>
 
         <div className="mt-6 md:mt-0">
@@ -91,7 +124,7 @@ export default async function PaginaSitios({
               No hay ningún sitio que cumpla eso.{" "}
               {hayFiltros(filtros) && (
                 <Link
-                  href="/sitios"
+                  href={`/${provincia.slug}`}
                   className="font-semibold text-acento underline underline-offset-2"
                 >
                   Quita los filtros
@@ -101,7 +134,7 @@ export default async function PaginaSitios({
           ) : (
             <ul className="grid gap-3 lg:grid-cols-2">
               {sitios.map((s) => (
-                <TarjetaSitio key={s.slug} sitio={s} />
+                <TarjetaSitio key={s.slug} sitio={s} provincia={provincia.slug} />
               ))}
             </ul>
           )}
@@ -109,6 +142,35 @@ export default async function PaginaSitios({
           <p className="mt-6 max-w-prose text-sm leading-relaxed text-texto-suave">
             {AVISO_ABUNDANCIAS_ESTIMADAS}
           </p>
+
+          {provincia.areasDelimitadasEEI && (
+            <section className="mt-8 rounded-xl border-2 border-ambar-texto/25 bg-ambar-fondo p-4 text-ambar-texto">
+              <h2 className="text-lg font-bold">
+                Áreas delimitadas para especies invasoras en {provincia.nombre}
+              </h2>
+              <p className="mt-2 leading-relaxed">
+                Black bass, lucio, carpa común y trucha arcoíris solo se pueden
+                pescar en estas aguas. Fuera de ellas hay obligación de
+                sacrificarlos y no devolverlos al agua.
+              </p>
+              <p className="mt-2 leading-relaxed">
+                {provincia.areasDelimitadasEEI}
+              </p>
+              {provincia.notasLegales && (
+                <p className="mt-2 leading-relaxed">{provincia.notasLegales}</p>
+              )}
+              {provincia.urlOrdenDeVedas && (
+                <a
+                  href={provincia.urlOrdenDeVedas}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex min-h-touch items-center rounded-lg bg-ambar-texto px-4 font-semibold text-ambar-fondo"
+                >
+                  Comprobar la orden de vedas vigente ↗
+                </a>
+              )}
+            </section>
+          )}
         </div>
       </div>
     </div>

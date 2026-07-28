@@ -23,12 +23,13 @@ import {
   type TipoSitio,
 } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
+import { cargarProvincia } from "@/lib/provincias";
 
 export const dynamic = "force-dynamic";
 
-async function cargarSitio(slug: string) {
-  return prisma.sitio.findUnique({
-    where: { slug },
+async function cargarSitio(provinciaSlug: string, slug: string) {
+  return prisma.sitio.findFirst({
+    where: { slug, provincia: { slug: provinciaSlug, publicada: true } },
     include: {
       especies: {
         include: { especie: true },
@@ -45,14 +46,19 @@ async function cargarSitio(slug: string) {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ provincia: string; sitio: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const sitio = await prisma.sitio.findUnique({
-    where: { slug },
-    select: { nombre: true },
+  const { provincia, sitio } = await params;
+  const datos = await prisma.sitio.findFirst({
+    where: { slug: sitio, provincia: { slug: provincia } },
+    select: { nombre: true, tipo: true, municipio: true, descripcion: true },
   });
-  return { title: sitio?.nombre ?? "Sitio" };
+  if (!datos) return { title: "Sitio" };
+
+  return {
+    title: `${datos.nombre}: qué se pesca y cómo llegar`,
+    description: datos.descripcion.slice(0, 155),
+  };
 }
 
 const CLASE_PROBABILIDAD: Record<Probabilidad, string> = {
@@ -121,10 +127,11 @@ function FilaEspecie({
 export default async function FichaSitio({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ provincia: string; sitio: string }>;
 }) {
-  const { slug } = await params;
-  const sitio = await cargarSitio(slug);
+  const { provincia: slugProvincia, sitio: slugSitio } = await params;
+  const provincia = await cargarProvincia(slugProvincia);
+  const sitio = await cargarSitio(slugProvincia, slugSitio);
   if (!sitio) notFound();
 
   const avisoGrave = sitio.avisosSanitarios
@@ -186,6 +193,14 @@ export default async function FichaSitio({
       )}
 
       <header className="mb-8">
+        <nav aria-label="Migas de pan" className="mb-2 text-sm">
+          <Link
+            href={`/${provincia.slug}`}
+            className="font-semibold text-acento underline underline-offset-2"
+          >
+            Pescar en {provincia.nombre}
+          </Link>
+        </nav>
         <p className="text-sm font-bold uppercase tracking-wide text-texto-suave">
           {ETIQUETA_TIPO_SITIO[sitio.tipo as TipoSitio]} · {sitio.municipio}
         </p>

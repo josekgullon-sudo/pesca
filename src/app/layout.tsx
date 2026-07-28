@@ -4,6 +4,7 @@ import { AvisoLegal } from "@/components/AvisoLegal";
 import { Cabecera } from "@/components/Cabecera";
 import { NavegacionInferior } from "@/components/Navegacion";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
+import { rutaDeSitios } from "@/lib/provincias";
 import "./globals.css";
 
 // No usamos fuentes web a propósito: la app se abre sin cobertura y con una
@@ -31,9 +32,11 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const rutaSitios = await rutaDeSitios();
+
   return (
     <html lang="es">
       <body className="antialiased">
@@ -60,7 +63,7 @@ export default function RootLayout({
             </p>
           </footer>
 
-          <NavegacionInferior />
+          <NavegacionInferior rutaSitios={rutaSitios} />
         </div>
       </body>
     </html>

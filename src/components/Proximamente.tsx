@@ -18,10 +18,10 @@ export function Proximamente({
         Todavía no está montada: llega en el {bloque}.
       </p>
       <Link
-        href="/sitios"
+        href="/"
         className="inline-flex min-h-touch items-center rounded-xl border-2 border-borde bg-fondo-elevado px-4 font-semibold"
       >
-        Volver a los sitios
+        Volver al inicio
       </Link>
     </div>
   );

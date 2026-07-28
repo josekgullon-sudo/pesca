@@ -15,7 +15,13 @@ async function cargar(id: string) {
     include: {
       usuario: { select: { id: true, nombre: true } },
       especie: true,
-      sitio: { select: { nombre: true, slug: true } },
+      sitio: {
+        select: {
+          nombre: true,
+          slug: true,
+          provincia: { select: { slug: true } },
+        },
+      },
       aparejo: { select: { nombre: true } },
       tecnica: { select: { nombre: true } },
       fotos: { orderBy: { esPrincipal: "desc" } },
@@ -113,7 +119,7 @@ export default async function FichaCaptura({
       <dl className="divide-y divide-borde tarjeta">
         <Fila titulo="Sitio">
           <Link
-            href={`/sitios/${captura.sitio.slug}`}
+            href={`/${captura.sitio.provincia.slug}/${captura.sitio.slug}`}
             className="font-semibold text-acento underline underline-offset-2"
           >
             {captura.sitio.nombre}

@@ -10,21 +10,40 @@ import {
   type ParamsBusqueda,
 } from "@/lib/filtros-sitios";
 import { prisma } from "@/lib/prisma";
+import { cargarProvincia } from "@/lib/provincias";
 
-export const metadata: Metadata = { title: "Mapa" };
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ provincia: string }>;
+}): Promise<Metadata> {
+  const { provincia } = await params;
+  const p = await prisma.provincia.findUnique({
+    where: { slug: provincia },
+    select: { nombre: true },
+  });
+  return {
+    title: `Mapa de pesca de ${p?.nombre ?? "la provincia"}`,
+    description: `Dónde están los embalses y ríos de ${p?.nombre ?? "la provincia"} para pescar.`,
+  };
+}
+
 export default async function PaginaMapa({
+  params,
   searchParams,
 }: {
+  params: Promise<{ provincia: string }>;
   searchParams: Promise<ParamsBusqueda>;
 }) {
-  const params = await searchParams;
-  const filtros = leerFiltros(params);
+  const { provincia: slugProvincia } = await params;
+  const provincia = await cargarProvincia(slugProvincia);
+  const filtros = leerFiltros(await searchParams);
 
   const [sitios, especies] = await Promise.all([
     prisma.sitio.findMany({
-      where: construirWhere(filtros),
+      where: { ...construirWhere(filtros), provinciaId: provincia.id },
       orderBy: { tiempoCocheMin: "asc" },
       select: {
         slug: true,
@@ -38,7 +57,7 @@ export default async function PaginaMapa({
       },
     }),
     prisma.especie.findMany({
-      where: { sitios: { some: {} } },
+      where: { sitios: { some: { sitio: { provinciaId: provincia.id } } } },
       orderBy: { nombreComun: "asc" },
       select: { slug: true, nombreComun: true },
     }),
@@ -55,20 +74,23 @@ export default async function PaginaMapa({
     avisoGrave: s.avisosSanitarios
       .toUpperCase()
       .includes("AVISO SANITARIO GRAVE"),
+    provincia: provincia.slug,
   }));
 
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Mapa</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Mapa de {provincia.nombre}
+          </h1>
           <p className="mt-1 text-texto-suave">
             {puntos.length === 1 ? "1 sitio" : `${puntos.length} sitios`} en la
             provincia.
           </p>
         </div>
         <Link
-          href={urlConFiltros("/sitios", filtros)}
+          href={urlConFiltros(`/${provincia.slug}`, filtros)}
           className="inline-flex min-h-touch shrink-0 items-center rounded-xl border-2 border-borde bg-fondo-elevado px-4 font-semibold"
         >
           Ver lista
@@ -78,7 +100,7 @@ export default async function PaginaMapa({
       <div className="md:grid md:grid-cols-[17rem_1fr] md:items-start md:gap-8">
         <div className="order-2 mt-6 md:order-1 md:mt-0 md:sticky md:top-6">
           <FiltrosSitios
-            base="/sitios/mapa"
+            base={`/${provincia.slug}/mapa`}
             filtros={filtros}
             especies={especies}
           />

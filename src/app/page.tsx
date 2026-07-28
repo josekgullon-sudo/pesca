@@ -6,6 +6,7 @@ import { usuarioOpcional } from "@/lib/auth";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import { ETIQUETA_TIPO_SITIO, type TipoSitio } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
+import { provinciasPublicadas } from "@/lib/provincias";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +19,11 @@ export default async function Home() {
   const usuario = await usuarioOpcional();
   const mes = mesActual();
 
-  const [sitios, ultimas, misCapturas, totalCapturas, especiesDistintas, mayor] =
+  const [provincias, sitios, ultimas, misCapturas, totalCapturas, especiesDistintas, mayor] =
     await Promise.all([
+      provinciasPublicadas(),
       prisma.sitio.findMany({
+        where: { provincia: { publicada: true } },
         orderBy: { tiempoCocheMin: "asc" },
         take: 20,
         select: {
@@ -33,6 +36,7 @@ export default async function Home() {
           imagenUrl: true,
           imagenAutor: true,
           imagenLicencia: true,
+          provincia: { select: { slug: true } },
         },
       }),
       prisma.captura.findMany({
@@ -112,10 +116,10 @@ export default async function Home() {
 
           <div className="absolute inset-x-0 bottom-0 p-4 md:p-6">
             <p className="text-sm font-bold uppercase tracking-widest text-white/85 [text-shadow:0_1px_3px_rgb(0_0_0/0.6)]">
-              {usuario ? `Hola, ${usuario.nombre}` : "Provincia de Sevilla"}
+              {usuario ? `Hola, ${usuario.nombre}` : "Guía de pesca continental"}
             </p>
             <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight text-white [text-shadow:0_2px_8px_rgb(0_0_0/0.55)] sm:text-4xl md:text-5xl">
-              {usuario ? "¿Nos vamos a pescar?" : "Dónde pescar en Sevilla"}
+              {usuario ? "¿Nos vamos a pescar?" : "Dónde pescar en España"}
             </h1>
           </div>
         </div>
@@ -123,8 +127,9 @@ export default async function Home() {
         <div className="px-4 pt-5 md:px-6">
           {!usuario && (
             <p className="max-w-prose text-lg leading-relaxed text-texto-suave">
-              {sitios.length} embalses y ríos con sus especies, qué llevar para
-              pescarlas y qué dice la ley de cada una. Se consulta sin cuenta.
+              Embalses y ríos con sus especies, qué llevar para pescarlas y qué
+              dice la ley de cada una, provincia por provincia. Se consulta sin
+              cuenta.
             </p>
           )}
 
@@ -224,47 +229,85 @@ export default async function Home() {
         </section>
       )}
 
-      {/* --- Sitios en su mejor época --- */}
-      <section>
-        <div className="mb-1 flex items-baseline justify-between gap-3">
-          <h2 className="text-xl font-bold">
-            {enTemporada.length >= 3 ? "Ahora mismo" : "Lo más cerca"}
-          </h2>
-          <Link
-            href="/sitios"
-            className="font-semibold text-acento underline underline-offset-2"
-          >
-            Ver los {sitios.length}
-          </Link>
-        </div>
-        <p className="mb-3 text-texto-suave">
-          {enTemporada.length >= 3
-            ? "Sitios que están en su mejor época este mes."
-            : "Los que menos coche te cuestan."}
+      {/* --- Provincias --- */}
+      <section id="provincias" className="scroll-mt-4">
+        <h2 className="text-xl font-bold">Elige provincia</h2>
+        <p className="mt-1 mb-3 max-w-prose text-texto-suave">
+          Cada provincia tiene su normativa y sus áreas delimitadas para
+          especies invasoras, así que van por separado.
         </p>
 
-        <ul className="grid gap-3 sm:grid-cols-3">
-          {destacados.map((s) => (
-            <li key={s.slug}>
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {provincias.map((p) => (
+            <li key={p.slug}>
               <Link
-                href={`/sitios/${s.slug}`}
-                className="flex h-full flex-col tarjeta overflow-hidden"
+                href={`/${p.slug}`}
+                className="flex h-full flex-col tarjeta p-4"
               >
-                <BandaSitio tipo={s.tipo} imagenUrl={s.imagenUrl} slug={s.slug} />
-                <div className="p-4">
-                  <h3 className="font-bold leading-tight">{s.nombre}</h3>
-                  <p className="mt-0.5 text-sm text-texto-suave">
-                    {ETIQUETA_TIPO_SITIO[s.tipo as TipoSitio]} · {s.municipio}
+                <h3 className="text-lg font-bold leading-tight">
+                  Pescar en {p.nombre}
+                </h3>
+                <p className="mt-0.5 text-sm text-texto-suave">
+                  {p.comunidad} ·{" "}
+                  {p._count.sitios === 1
+                    ? "1 sitio"
+                    : `${p._count.sitios} sitios`}
+                </p>
+                {p.descripcion && (
+                  <p className="mt-2 line-clamp-3 text-[0.95rem] leading-relaxed text-texto-suave">
+                    {p.descripcion}
                   </p>
-                  <p className="mt-2 font-bold tabular-nums text-acento">
-                    {s.tiempoCocheMin} min
-                  </p>
-                </div>
+                )}
               </Link>
             </li>
           ))}
         </ul>
+
+        <p className="mt-4 max-w-prose text-sm leading-relaxed text-texto-suave">
+          Vamos añadiendo provincias según conseguimos comprobar su normativa en
+          el boletín oficial correspondiente. Publicar una a medias sería peor
+          que no publicarla.
+        </p>
       </section>
+
+      {/* --- Sitios destacados de la provincia con datos --- */}
+      {destacados.length > 0 && (
+        <section>
+          <div className="mb-1 flex items-baseline justify-between gap-3">
+            <h2 className="text-xl font-bold">
+              {enTemporada.length >= 3 ? "Ahora mismo" : "Para empezar"}
+            </h2>
+          </div>
+          <p className="mb-3 text-texto-suave">
+            {enTemporada.length >= 3
+              ? "Sitios que están en su mejor época este mes."
+              : "Algunos de los sitios de la guía."}
+          </p>
+
+          <ul className="grid gap-3 sm:grid-cols-3">
+            {destacados.map((s) => (
+              <li key={s.slug}>
+                <Link
+                  href={`/${s.provincia.slug}/${s.slug}`}
+                  className="flex h-full flex-col tarjeta overflow-hidden"
+                >
+                  <BandaSitio tipo={s.tipo} imagenUrl={s.imagenUrl} slug={s.slug} />
+                  <div className="p-4">
+                    <h3 className="font-bold leading-tight">{s.nombre}</h3>
+                    <p className="mt-0.5 text-sm text-texto-suave">
+                      {ETIQUETA_TIPO_SITIO[s.tipo as TipoSitio]} · {s.municipio}
+                    </p>
+                    <p className="mt-2 font-bold tabular-nums text-acento">
+                      {s.tiempoCocheMin} min
+                    </p>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
     </div>
   );
 }

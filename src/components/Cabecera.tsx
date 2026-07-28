@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { salir } from "@/app/entrar/actions";
 import { auth } from "@/lib/auth";
+import { rutaDeSitios } from "@/lib/provincias";
 import { NavegacionCabecera } from "./Navegacion";
 
 export async function Cabecera() {
-  const sesion = await auth();
+  const [sesion, rutaSitios] = await Promise.all([auth(), rutaDeSitios()]);
   const nombre = sesion?.user?.name;
 
   return (
@@ -18,7 +19,7 @@ export async function Cabecera() {
         </Link>
 
         {/* En escritorio la navegación va aquí; en móvil, en la barra de abajo. */}
-        <NavegacionCabecera />
+        <NavegacionCabecera rutaSitios={rutaSitios} />
 
         {nombre ? (
           <div className="flex shrink-0 items-center gap-2">

@@ -25,7 +25,8 @@ async function cargarEspecie(slug: string) {
     where: { slug },
     include: {
       sitios: {
-        include: { sitio: true },
+        where: { sitio: { provincia: { publicada: true } } },
+        include: { sitio: { include: { provincia: true } } },
         orderBy: { abundancia: "desc" },
       },
       aparejos: {
@@ -163,7 +164,7 @@ export default async function FichaEspecie({
                   {especie.sitios.map((se) => (
                     <li key={se.sitioId}>
                       <Link
-                        href={`/sitios/${se.sitio.slug}`}
+                        href={`/${se.sitio.provincia.slug}/${se.sitio.slug}`}
                         className="flex h-full flex-col tarjeta p-4"
                       >
                         <div className="flex items-start justify-between gap-3">
