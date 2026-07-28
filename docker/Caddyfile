@@ -1,0 +1,21 @@
+# Caddy pide y renueva el certificado solo. No hay que tocar nada más.
+{$DOMINIO} {
+	encode zstd gzip
+
+	# Las imágenes llevan nombre aleatorio y no se reescriben nunca, así que se
+	# pueden cachear para siempre. Van detrás de la app, no de Caddy, porque la
+	# app decide quién puede verlas.
+	@media path /media/*
+	header @media Cache-Control "public, max-age=31536000, immutable"
+
+	header {
+		# Cabeceras de seguridad básicas.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "SAMEORIGIN"
+		-Server
+	}
+
+	reverse_proxy app:3000
+}

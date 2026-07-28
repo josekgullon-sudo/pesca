@@ -1,0 +1,45 @@
+# Despliegue completo: la app y un Caddy delante que saca el certificado solo.
+#
+#   docker compose up -d --build
+#
+# Caddy pide y renueva el certificado de Let's Encrypt sin configurar nada más
+# que el dominio. Hace falta HTTPS sí o sí: sin él el navegador no da acceso a
+# la cámara ni al GPS, que es media app.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      # La base de datos y las fotos viven en el volumen, no en la imagen.
+      DATABASE_URL: "file:/app/datos/pesca.db"
+      AUTH_SECRET: "${AUTH_SECRET:?falta AUTH_SECRET en el fichero .env}"
+      AUTH_TRUST_HOST: "true"
+      SEED_PASSWORD: "${SEED_PASSWORD:-cambiala-ya}"
+      # Pon "no" cuando no quieras que el seed se ejecute en cada arranque.
+      SEMBRAR_AL_ARRANCAR: "${SEMBRAR_AL_ARRANCAR:-si}"
+    volumes:
+      - datos:/app/datos
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMINIO: "${DOMINIO:?falta DOMINIO en el fichero .env}"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  # Lo único irreemplazable: base de datos y fotos. Es lo que hay que copiar.
+  datos:
+  caddy_data:
+  caddy_config:
