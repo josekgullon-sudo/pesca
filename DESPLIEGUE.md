@@ -16,6 +16,77 @@ opciones:
 - **Que no se duerma.** Los planes gratuitos que apagan el servidor cuando no
   hay visitas arruinan el posicionamiento: Google encuentra la web caída.
 
+## Paso a paso en un VPS recién comprado
+
+Vale para Hostinger, Hetzner, DigitalOcean o cualquiera con Ubuntu o Debian.
+
+```bash
+# 1. Entrar
+ssh root@LA-IP-DE-TU-SERVIDOR
+
+# 2. Docker (el instalador oficial vale para Ubuntu y Debian)
+curl -fsSL https://get.docker.com | sh
+
+# 3. Swap, si el servidor tiene menos de 2 GB de RAM.
+#    Sin esto, compilar Next.js se queda sin memoria y el proceso muere sin
+#    decir por qué. Es el fallo más común al desplegar.
+free -h
+fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+# 4. Cortafuegos
+ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw --force enable
+
+# 5. El proyecto. Si el repositorio es privado, git pedirá tu usuario de GitHub
+#    y un token personal (Settings → Developer settings → Personal access tokens).
+git clone https://github.com/josekgullon-sudo/pesca.git
+cd pesca
+git checkout claude/fishing-app-sevilla-mdhbzr
+
+# 6. Configuración. El AUTH_SECRET se genera solo; no lo copies de ningún sitio.
+cat > .env <<EOF
+DOMINIO=tu-dominio.es
+AUTH_SECRET=$(openssl rand -base64 32)
+SEED_PASSWORD=una-contraseña-larga-tuya
+EOF
+
+# 7. Levantar
+docker compose up -d --build
+```
+
+La primera vez tarda varios minutos: compila la imagen entera.
+
+Para ver los registros y comprobar que ha ido bien:
+
+```bash
+docker compose logs -f app
+```
+
+### Verlo antes de tener el dominio
+
+Si el dominio todavía no apunta al servidor, Caddy no podrá sacar el
+certificado. Para comprobar mientras tanto que todo arranca:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.pruebas.yml up -d --build app
+```
+
+Y abre `http://LA-IP-DE-TU-SERVIDOR:3000`. **Es solo para probar**: sin HTTPS no
+hay cámara ni GPS y la contraseña viaja en claro. En cuanto el dominio apunte,
+`docker compose down` y arriba con el compose normal.
+
+### El dominio
+
+En el panel de tu proveedor de dominios, un registro `A`:
+
+| Tipo | Nombre | Valor                   |
+| ---- | ------ | ----------------------- |
+| A    | `@`    | la IP de tu servidor    |
+| A    | `www`  | la IP de tu servidor    |
+
+Tarda entre unos minutos y unas horas. Cuando resuelva, Caddy pide el
+certificado solo la primera vez que alguien entre.
+
 ## Lo recomendado: un VPS pequeño
 
 Un servidor de 4-6 € al mes sobra de largo. Sirve cualquiera con Docker:

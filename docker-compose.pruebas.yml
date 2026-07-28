@@ -1,0 +1,13 @@
+# Para ver la web en el servidor antes de tener el dominio apuntando.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.pruebas.yml up -d --build app
+#
+# Publica el puerto 3000 directamente, sin Caddy y sin HTTPS. Sirve para
+# comprobar que todo arranca, pero NO para usarla de verdad: sin certificado el
+# navegador no da acceso a la cámara ni al GPS, y la contraseña viaja en claro.
+# En cuanto el dominio apunte al servidor, levanta el compose normal.
+
+services:
+  app:
+    ports:
+      - "3000:3000"
