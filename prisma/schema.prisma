@@ -85,8 +85,14 @@ model Sitio {
   /// Ficha en embalses.net u otra fuente para consultar el nivel del agua.
   urlNivelAgua String?
 
-  /// Foto de cabecera. La ponemos nosotros desde la propia app.
+  /// Foto de cabecera. La baja `npm run fotos` de Wikimedia Commons, donde
+  /// casi todos los embalses y ríos españoles tienen fotos libres.
   imagenUrl String?
+  /// Autoría y licencia de la foto. Si viene de Commons hay obligación de
+  /// atribuirla, así que viaja con ella y se pinta donde se muestre.
+  imagenAutor    String?
+  imagenLicencia String?
+  imagenFuente   String?
 
   especies SitioEspecie[]
   aparejos AparejoSitio[]

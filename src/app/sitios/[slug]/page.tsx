@@ -153,6 +153,38 @@ export default async function FichaSitio({
 
   return (
     <article>
+      {/* Foto de cabecera cuando la hay, con su crédito: las de Commons son
+          Creative Commons con obligación de atribuir. */}
+      {sitio.imagenUrl && (
+        <figure className="mb-6 -mx-4 md:-mx-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={sitio.imagenUrl}
+            alt={sitio.nombre}
+            className="h-52 w-full object-cover sm:h-72 md:rounded-xl"
+          />
+          {sitio.imagenAutor && (
+            <figcaption className="px-4 pt-2 text-xs text-texto-suave md:px-0">
+              Foto: {sitio.imagenAutor}
+              {sitio.imagenLicencia && ` · ${sitio.imagenLicencia}`}
+              {sitio.imagenFuente && (
+                <>
+                  {" · "}
+                  <a
+                    href={sitio.imagenFuente}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    Wikimedia Commons ↗
+                  </a>
+                </>
+              )}
+            </figcaption>
+          )}
+        </figure>
+      )}
+
       <header className="mb-8">
         <p className="text-sm font-bold uppercase tracking-wide text-texto-suave">
           {ETIQUETA_TIPO_SITIO[sitio.tipo as TipoSitio]} · {sitio.municipio}

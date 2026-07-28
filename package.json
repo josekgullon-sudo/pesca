@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit",
     "setup": "node scripts/setup.mjs",
     "dev:movil": "next dev -H 0.0.0.0",
-    "fotos": "tsx scripts/fotos-especies.mjs",
+    "fotos": "tsx scripts/fotos.mjs",
     "predev": "prisma migrate deploy",
     "actualizar": "npm run db:deploy && npm run db:seed"
   },

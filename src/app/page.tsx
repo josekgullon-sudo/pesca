@@ -31,6 +31,8 @@ export default async function Home() {
           tiempoCocheMin: true,
           mejorEpoca: true,
           imagenUrl: true,
+          imagenAutor: true,
+          imagenLicencia: true,
         },
       }),
       prisma.captura.findMany({
@@ -73,18 +75,40 @@ export default async function Home() {
   });
   const destacados = (enTemporada.length >= 3 ? enTemporada : sitios).slice(0, 3);
 
+  // Para la portada, la foto de uno de los sitios que están en su mejor época.
+  const fotoPortada =
+    destacados.find((s) => s.imagenUrl) ?? sitios.find((s) => s.imagenUrl) ?? null;
+
   return (
     <div className="space-y-10 [&>section:not(:first-child)]:px-0">
       {/* --- Portada: ilustración a sangre con el titular encima --- */}
       <section className="-mx-4 -mt-6 md:-mx-6 md:-mt-10">
         <div className="relative">
-          <Portada className="h-56 w-full sm:h-72 md:h-80" />
+          {/* Si algún sitio tiene ya su foto, la portada la usa; si no, la
+              ilustración. Así la web mejora sola según se van bajando fotos. */}
+          {fotoPortada ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={fotoPortada.imagenUrl ?? ""}
+              alt={fotoPortada.nombre}
+              className="h-56 w-full object-cover sm:h-72 md:h-80"
+            />
+          ) : (
+            <Portada className="h-56 w-full sm:h-72 md:h-80" />
+          )}
 
           {/* Degradado para que el texto se lea sobre cualquier parte del dibujo */}
           <div
             aria-hidden
             className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/70 via-black/25 to-transparent"
           />
+
+          {fotoPortada?.imagenAutor && (
+            <p className="absolute top-2 right-3 text-[0.65rem] text-white/60">
+              {fotoPortada.nombre} · {fotoPortada.imagenAutor}
+              {fotoPortada.imagenLicencia && ` · ${fotoPortada.imagenLicencia}`}
+            </p>
+          )}
 
           <div className="absolute inset-x-0 bottom-0 p-4 md:p-6">
             <p className="text-sm font-bold uppercase tracking-widest text-white/85 [text-shadow:0_1px_3px_rgb(0_0_0/0.6)]">
