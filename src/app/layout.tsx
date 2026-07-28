@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { Cabecera } from "@/components/Cabecera";
+import { NavegacionInferior } from "@/components/NavegacionInferior";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
 import "./globals.css";
 
@@ -47,6 +48,8 @@ export default function RootLayout({
               de uso personal.
             </p>
           </footer>
+
+          <NavegacionInferior />
         </div>
       </body>
     </html>

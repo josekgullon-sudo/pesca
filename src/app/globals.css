@@ -71,6 +71,9 @@
   --acento: var(--color-ribera-600);
   --acento-texto: #ffffff;
 
+  --chip-fondo: var(--color-junco-100);
+  --chip-texto: var(--color-junco-800);
+
   --semaforo-verde-fondo: #e4f2e7;
   --semaforo-verde-texto: #1d5730;
   --semaforo-ambar-fondo: #fbf0da;
@@ -90,6 +93,9 @@ html.oscuro {
   --borde: #2b3831;
   --acento: var(--color-ribera-400);
   --acento-texto: #0f1e14;
+
+  --chip-fondo: #22302a;
+  --chip-texto: #c3d3c8;
 
   --semaforo-verde-fondo: #14301d;
   --semaforo-verde-texto: #9fd9b0;
@@ -111,6 +117,9 @@ html.oscuro {
     --acento: var(--color-ribera-400);
     --acento-texto: #0f1e14;
 
+    --chip-fondo: #22302a;
+    --chip-texto: #c3d3c8;
+
     --semaforo-verde-fondo: #14301d;
     --semaforo-verde-texto: #9fd9b0;
     --semaforo-ambar-fondo: #362405;
@@ -130,6 +139,9 @@ html.oscuro {
   --color-borde: var(--borde);
   --color-acento: var(--acento);
   --color-acento-texto: var(--acento-texto);
+
+  --color-chip-fondo: var(--chip-fondo);
+  --color-chip-texto: var(--chip-texto);
 
   --color-verde-fondo: var(--semaforo-verde-fondo);
   --color-verde-texto: var(--semaforo-verde-texto);
@@ -168,4 +180,9 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Safari sigue pintando el triangulito del <details> con su propio marcador. */
+summary::-webkit-details-marker {
+  display: none;
 }

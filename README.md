@@ -86,6 +86,23 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | `npm run db:seed`    | Ejecuta el seed (es idempotente)               |
 | `npm run db:studio`  | Prisma Studio para curiosear la base de datos  |
 
+## Qué hay construido
+
+| Sección                                       | Estado         |
+| --------------------------------------------- | -------------- |
+| Base de datos, schema y datos semilla          | Hecho          |
+| Acceso de los dos usuarios                     | Hecho          |
+| Guía de sitios: listado, filtros, mapa y ficha | Hecho          |
+| Guía de especies con semáforo legal            | Pendiente      |
+| Registro de capturas con foto y GPS            | Pendiente      |
+| Galería, estadísticas, ranking y comparativa   | Pendiente      |
+| Recomendador "¿qué me llevo?"                  | Pendiente      |
+| PWA y funcionamiento offline                   | Pendiente      |
+| Registro de salidas                            | Pendiente      |
+
+El mapa usa Leaflet con teselas de OpenStreetMap, sin API key. Necesita
+conexión: cachear las teselas para uso offline es parte del bloque de PWA.
+
 ## Base de datos
 
 `prisma/schema.prisma` está escrito para poder saltar a PostgreSQL sin dolor:

@@ -1,0 +1,111 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { FiltrosSitios } from "@/components/FiltrosSitios";
+import { TarjetaSitio } from "@/components/TarjetaSitio";
+import { AVISO_ABUNDANCIAS_ESTIMADAS } from "@/lib/avisos";
+import {
+  construirWhere,
+  hayFiltros,
+  leerFiltros,
+  urlConFiltros,
+  type ParamsBusqueda,
+} from "@/lib/filtros-sitios";
+import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = { title: "Sitios" };
+export const dynamic = "force-dynamic";
+
+export default async function PaginaSitios({
+  searchParams,
+}: {
+  searchParams: Promise<ParamsBusqueda>;
+}) {
+  const params = await searchParams;
+  const filtros = leerFiltros(params);
+
+  const [sitios, especies] = await Promise.all([
+    prisma.sitio.findMany({
+      where: construirWhere(filtros),
+      // Lo más cerca primero: casi siempre es el criterio que decide.
+      orderBy: { tiempoCocheMin: "asc" },
+      select: {
+        slug: true,
+        nombre: true,
+        tipo: true,
+        municipio: true,
+        dificultadAcceso: true,
+        tiempoCocheMin: true,
+        distanciaDesdeDosHermanasKm: true,
+        tieneSombra: true,
+        avisosSanitarios: true,
+        esAreaDelimitadaEEI: true,
+        especies: {
+          select: {
+            abundancia: true,
+            especie: { select: { nombreComun: true, estadoLegal: true } },
+          },
+        },
+      },
+    }),
+    // Solo las especies que están en algún sitio: no tiene sentido ofrecer un
+    // filtro que no puede devolver nada.
+    prisma.especie.findMany({
+      where: { sitios: { some: {} } },
+      orderBy: { nombreComun: "asc" },
+      select: { slug: true, nombreComun: true },
+    }),
+  ]);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Sitios</h1>
+          <p className="mt-1 text-texto-suave">
+            Embalses y ríos de la provincia, del más cercano al más lejano.
+          </p>
+        </div>
+        <Link
+          href={urlConFiltros("/sitios/mapa", filtros)}
+          className="inline-flex min-h-touch shrink-0 items-center rounded-xl border-2 border-borde bg-fondo-elevado px-4 font-semibold"
+        >
+          Ver mapa
+        </Link>
+      </div>
+
+      <FiltrosSitios base="/sitios" filtros={filtros} especies={especies} />
+
+      <div>
+        <p className="mb-3 font-semibold text-texto-suave">
+          {sitios.length === 1
+            ? "1 sitio"
+            : `${sitios.length} sitios`}
+        </p>
+
+        {sitios.length === 0 ? (
+          <p className="rounded-xl border border-borde bg-fondo-elevado p-4 leading-relaxed">
+            No hay ningún sitio que cumpla eso.{" "}
+            {hayFiltros(filtros) && (
+              <Link
+                href="/sitios"
+                className="font-semibold text-acento underline underline-offset-2"
+              >
+                Quita los filtros
+              </Link>
+            )}
+          </p>
+        ) : (
+          <ul className="space-y-3">
+            {sitios.map((s) => (
+              <TarjetaSitio key={s.slug} sitio={s} />
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <p className="text-sm leading-relaxed text-texto-suave">
+        {AVISO_ABUNDANCIAS_ESTIMADAS}
+      </p>
+    </div>
+  );
+}
