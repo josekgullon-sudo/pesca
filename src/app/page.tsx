@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BandaSitio } from "@/components/BandaSitio";
 import { FotoEspecie } from "@/components/FotoEspecie";
+import { MapaSitios } from "@/components/MapaSitios";
 import { Portada } from "@/components/Portada";
 import { usuarioOpcional } from "@/lib/auth";
+import { AVISO_COORDENADAS_APROXIMADAS } from "@/lib/avisos";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import { ETIQUETA_TIPO_SITIO, type TipoSitio } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
@@ -52,6 +54,9 @@ export default async function Home() {
           municipio: true,
           tiempoCocheMin: true,
           mejorEpoca: true,
+          latitud: true,
+          longitud: true,
+          avisosSanitarios: true,
           imagenUrl: true,
           imagenAutor: true,
           imagenLicencia: true,
@@ -97,6 +102,22 @@ export default async function Home() {
     }
   });
   const destacados = (enTemporada.length >= 3 ? enTemporada : sitios).slice(0, 3);
+
+  // Los puntos del mapa de la portada. Se pintan todos los sitios cargados, no
+  // solo los destacados: el mapa vale precisamente para ver el conjunto.
+  const puntos = sitios.map((s) => ({
+    slug: s.slug,
+    nombre: s.nombre,
+    tipo: s.tipo,
+    municipio: s.municipio,
+    tiempoCocheMin: s.tiempoCocheMin,
+    latitud: s.latitud,
+    longitud: s.longitud,
+    avisoGrave: s.avisosSanitarios
+      .toUpperCase()
+      .includes("AVISO SANITARIO GRAVE"),
+    provincia: s.provincia.slug,
+  }));
 
   // Para la portada, la foto de uno de los sitios que están en su mejor época.
   const fotoPortada =
@@ -246,6 +267,42 @@ export default async function Home() {
             peor que no publicarla.
           </p>
         </section>
+
+        {/* --- El mapa, en la portada. Buscar dónde pescar es una pregunta
+            geográfica: la mayoría quiere ver qué tiene cerca antes que leer
+            una lista ordenada por minutos en coche. --- */}
+        {puntos.length > 0 && (
+          <section>
+            <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+              <div>
+                <h2 className="titulo-seccion font-bold">Dónde están</h2>
+                <p className="mt-1 text-lg text-texto-suave">
+                  {puntos.length === 1
+                    ? "El sitio de la guía en el mapa."
+                    : `Los ${puntos.length} sitios de la guía en el mapa.`}{" "}
+                  Pulsa un punto para abrir su ficha.
+                </p>
+              </div>
+              {rutaSitios !== "/" && (
+                <Link
+                  href={`${rutaSitios}/mapa`}
+                  className="font-semibold text-acento underline underline-offset-4"
+                >
+                  Abrir el mapa completo
+                </Link>
+              )}
+            </div>
+
+            <div className="h-[24rem] overflow-hidden rounded-2xl border border-borde md:h-[32rem]">
+              <MapaSitios sitios={puntos} />
+            </div>
+
+            <p className="mt-3 max-w-prose text-sm leading-relaxed text-texto-suave">
+              {AVISO_COORDENADAS_APROXIMADAS} El mapa necesita conexión: las
+              teselas vienen de OpenStreetMap.
+            </p>
+          </section>
+        )}
 
         {/* --- Sitios destacados de la provincia con datos --- */}
         {destacados.length > 0 && (

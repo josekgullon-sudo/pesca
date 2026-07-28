@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FotoEspecie } from "@/components/FotoEspecie";
+import { RankingGuia } from "@/components/RankingGuia";
 import { EtiquetaLegal } from "@/components/SemaforoLegal";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import {
@@ -40,10 +41,28 @@ export async function Ranking({
   const hayAlgo = porEspecie.length > 0;
 
   return (
-    <div className="space-y-10">
+    <div className="contenedor space-y-12 py-10 md:py-14">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{titulo}</h1>
-        <p className="mt-1 max-w-prose text-texto-suave">{entradilla}</p>
+        <h1 className="titulo-pagina font-bold">{titulo}</h1>
+        <p className="mt-3 max-w-prose text-lg leading-relaxed text-texto-suave">
+          {entradilla}
+        </p>
+      </div>
+
+      {/* Lo que dice la guía va siempre, haya capturas o no. Antes, sin
+          capturas, esta página era un cartel de «todavía no hay nada»: el
+          visitante se iba y Google no tenía qué indexar. La información para
+          responder «dónde voy a por un black bass» ya la teníamos cargada. */}
+      <RankingGuia ambito={ambito} />
+
+      <div className="border-t border-borde pt-12">
+        <h2 className="titulo-seccion font-bold">
+          Lo que ha pescado la gente
+        </h2>
+        <p className="mt-2 max-w-prose leading-relaxed text-texto-suave">
+          Esta parte la escriben los pescadores: sale de las capturas que se
+          registran en el diario, con su foto y su peso.
+        </p>
       </div>
 
       {!hayAlgo ? (
@@ -51,7 +70,8 @@ export async function Ranking({
           <p className="text-lg font-bold">Todavía no hay capturas</p>
           <p className="mx-auto mt-2 max-w-md leading-relaxed text-texto-suave">
             En cuanto se registre la primera, aquí saldrán las piezas más
-            gordas, el récord de cada especie y quién va ganando.
+            gordas, el récord de cada especie y quién va ganando. Y con ellas se
+            irán corrigiendo las abundancias que trae la guía de fábrica.
           </p>
           <Link
             href="/capturas/nueva"

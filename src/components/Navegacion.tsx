@@ -10,23 +10,37 @@ import { usePathname } from "next/navigation";
  * otra: el pulgar no llega arriba del todo. En escritorio va en la cabecera,
  * que es donde la busca todo el mundo, y la de abajo desaparece.
  *
- * Son cinco pestañas y no seis a propósito: con seis, a 390 px de ancho, las
- * etiquetas se tocaban unas con otras. El mapa se abre desde el listado de
- * sitios, que es de donde se entra a él de todas formas.
+ * El mapa tiene pestaña propia: buscar sitio de pesca es una pregunta
+ * geográfica —«qué tengo cerca»— y tenerlo escondido dentro del listado
+ * obligaba a dar dos pasos para lo primero que mucha gente quiere hacer. En
+ * móvil, para que quepan sin tocarse, «Inicio» sale de la barra de abajo: al
+ * inicio se vuelve con la marca de la cabecera, que es donde lo busca todo el
+ * mundo.
  */
 
 /** Rutas que tienen su propia pestaña. Lo demás cuelga de una provincia. */
 const RUTAS_PROPIAS = ["/especies", "/capturas", "/ranking", "/entrar", "/registro", "/cuenta", "/normas", "/aviso-legal"];
+
+/** El destino del mapa lo decide el servidor, igual que el de los sitios. */
+const MARCA_MAPA = "__mapa__";
 
 type Enlace = {
   href: string;
   etiqueta: string;
   icono: (p: { activo: boolean }) => React.ReactElement;
   activo: (ruta: string) => boolean;
+  /** Fuera de la barra inferior: en móvil no caben las seis. */
+  soloEscritorio?: boolean;
 };
 
 const ENLACES: Enlace[] = [
-  { href: "/", etiqueta: "Inicio", icono: IconoCasa, activo: (r) => r === "/" },
+  {
+    href: "/",
+    etiqueta: "Inicio",
+    icono: IconoCasa,
+    activo: (r) => r === "/",
+    soloEscritorio: true,
+  },
   {
     // El destino lo decide el servidor: con una sola provincia publicada va
     // directo a ella, y con varias a la portada, que es donde está el listado.
@@ -34,6 +48,12 @@ const ENLACES: Enlace[] = [
     etiqueta: "Sitios",
     icono: IconoLista,
     activo: (r) => RUTAS_PROPIAS.every((x) => !r.startsWith(x)) && r !== "/",
+  },
+  {
+    href: MARCA_MAPA,
+    etiqueta: "Mapa",
+    icono: IconoMapa,
+    activo: (r) => r.endsWith("/mapa"),
   },
   {
     href: "/especies",
@@ -55,6 +75,17 @@ const ENLACES: Enlace[] = [
   },
 ];
 
+function destinoDe(href: string, rutaSitios: string) {
+  if (href === "__sitios__") return rutaSitios;
+  // Con una sola provincia publicada, rutaSitios es "/sevilla" y el mapa está
+  // en "/sevilla/mapa". Con varias es "/", y entonces el mapa se elige desde
+  // la portada, que es donde está el listado de provincias.
+  if (href === MARCA_MAPA) {
+    return rutaSitios === "/" ? "/#provincias" : `${rutaSitios}/mapa`;
+  }
+  return href;
+}
+
 export function NavegacionCabecera({ rutaSitios }: { rutaSitios: string }) {
   const ruta = usePathname();
   if (ruta.startsWith("/entrar")) return null;
@@ -64,7 +95,7 @@ export function NavegacionCabecera({ rutaSitios }: { rutaSitios: string }) {
       <ul className="flex items-center gap-1">
         {ENLACES.map(({ href, etiqueta, activo: esActivo }) => {
           const activo = esActivo(ruta);
-          const destino = href === "__sitios__" ? rutaSitios : href;
+          const destino = destinoDe(href, rutaSitios);
           return (
             <li key={href}>
               <Link
@@ -96,24 +127,26 @@ export function NavegacionInferior({ rutaSitios }: { rutaSitios: string }) {
       className="sticky bottom-0 z-[500] border-t border-borde bg-fondo-elevado pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       <ul className="mx-auto flex max-w-3xl">
-        {ENLACES.map(({ href, etiqueta, icono: Icono, activo: esActivo }) => {
-          const activo = esActivo(ruta);
-          const destino = href === "__sitios__" ? rutaSitios : href;
-          return (
-            <li key={href} className="flex-1">
-              <Link
-                href={destino}
-                aria-current={activo ? "page" : undefined}
-                className={`flex min-h-touch flex-col items-center justify-center gap-0.5 py-2 text-xs font-semibold ${
-                  activo ? "text-acento" : "text-texto-suave"
-                }`}
-              >
-                <Icono activo={activo} />
-                {etiqueta}
-              </Link>
-            </li>
-          );
-        })}
+        {ENLACES.filter((e) => !e.soloEscritorio).map(
+          ({ href, etiqueta, icono: Icono, activo: esActivo }) => {
+            const activo = esActivo(ruta);
+            const destino = destinoDe(href, rutaSitios);
+            return (
+              <li key={href} className="flex-1">
+                <Link
+                  href={destino}
+                  aria-current={activo ? "page" : undefined}
+                  className={`flex min-h-touch flex-col items-center justify-center gap-0.5 px-0.5 py-2 text-[0.7rem] font-semibold ${
+                    activo ? "text-acento" : "text-texto-suave"
+                  }`}
+                >
+                  <Icono activo={activo} />
+                  {etiqueta}
+                </Link>
+              </li>
+            );
+          },
+        )}
       </ul>
     </nav>
   );
@@ -189,6 +222,25 @@ function IconoDiario({ activo }: PropsIcono) {
       <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
       <path d="M3.5 9.5h17" stroke={activo ? "var(--fondo)" : "currentColor"} />
       <path d="M8 3v3M16 3v3" />
+    </svg>
+  );
+}
+
+function IconoMapa({ activo }: PropsIcono) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 3.5 3.5 6v14.5L9 18l6 2.5 5.5-2.5V3.5L15 6Z" />
+      <path d="M9 3.5V18M15 6v14.5" />
+      <circle cx="12" cy="10" r="1.4" fill={activo ? "currentColor" : "none"} />
     </svg>
   );
 }
