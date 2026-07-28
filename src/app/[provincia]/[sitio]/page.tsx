@@ -9,6 +9,7 @@ import { BandaSitio } from "@/components/BandaSitio";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { MejorEpoca } from "@/components/MejorEpoca";
 import { EtiquetaLegal } from "@/components/SemaforoLegal";
+import { SubirFoto } from "@/components/SubirFoto";
 import {
   AVISO_ABUNDANCIAS_ESTIMADAS,
   AVISO_COORDENADAS_APROXIMADAS,
@@ -25,6 +26,7 @@ import {
   type TipoSitio,
 } from "@/lib/enums";
 import { metadatosDePagina } from "@/lib/marca";
+import { usuarioOpcional } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
 import { schemaMigas, schemaSitio } from "@/lib/schema";
@@ -149,7 +151,10 @@ export default async function FichaSitio({
 }) {
   const { provincia: slugProvincia, sitio: slugSitio } = await params;
   const provincia = await cargarProvincia(slugProvincia);
-  const sitio = await cargarSitio(slugProvincia, slugSitio);
+  const [sitio, usuario] = await Promise.all([
+    cargarSitio(slugProvincia, slugSitio),
+    usuarioOpcional(),
+  ]);
   if (!sitio) notFound();
 
   const avisoGrave = sitio.avisosSanitarios
@@ -455,6 +460,15 @@ export default async function FichaSitio({
           )}
 
           <AvisoLegal variante="destacado" />
+
+          {usuario?.esAdmin && (
+            <SubirFoto
+              tipo="sitio"
+              slug={sitio.slug}
+              nombre={sitio.nombre}
+              tieneFoto={Boolean(sitio.imagenUrl)}
+            />
+          )}
         </div>
       </section>
 

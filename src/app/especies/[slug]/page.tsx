@@ -5,6 +5,7 @@ import { AvisoLegal } from "@/components/AvisoLegal";
 import { BarraAbundancia } from "@/components/BarraAbundancia";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { FotoEspecie } from "@/components/FotoEspecie";
+import { SubirFoto } from "@/components/SubirFoto";
 import { SemaforoLegal } from "@/components/SemaforoLegal";
 import { AVISO_ABUNDANCIAS_ESTIMADAS } from "@/lib/avisos";
 import {
@@ -18,6 +19,7 @@ import {
   type TipoSitio,
 } from "@/lib/enums";
 import { metadatosDePagina } from "@/lib/marca";
+import { usuarioOpcional } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { schemaEspecie, schemaMigas } from "@/lib/schema";
 
@@ -85,7 +87,10 @@ export default async function FichaEspecie({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const especie = await cargarEspecie(slug);
+  const [especie, usuario] = await Promise.all([
+    cargarEspecie(slug),
+    usuarioOpcional(),
+  ]);
   if (!especie) notFound();
 
   const noSeBusca = NO_SE_PUEDEN_BUSCAR.has(especie.estadoLegal);
@@ -331,6 +336,15 @@ export default async function FichaEspecie({
           )}
 
           <AvisoLegal variante="destacado" />
+
+          {usuario?.esAdmin && (
+            <SubirFoto
+              tipo="especie"
+              slug={especie.slug}
+              nombre={especie.nombreComun}
+              tieneFoto={Boolean(especie.imagenUrl)}
+            />
+          )}
         </aside>
       </div>
     </article>
