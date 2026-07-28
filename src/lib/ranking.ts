@@ -124,8 +124,19 @@ export type FilaPescador = {
 };
 
 /** El marcador entre pescadores: quién lleva más, quién la más gorda. */
-export async function rankingPorPescador(): Promise<FilaPescador[]> {
+export async function rankingPorPescador(limite = 25): Promise<FilaPescador[]> {
+  // Solo quien tenga capturas: con registro abierto la tabla de usuarios crece
+  // sola y no tiene sentido consultarla entera para pintar ceros.
+  const conCapturas = await prisma.captura.groupBy({
+    by: ["usuarioId"],
+    _count: { _all: true },
+    orderBy: { _count: { usuarioId: "desc" } },
+    take: limite,
+  });
+  if (conCapturas.length === 0) return [];
+
   const usuarios = await prisma.usuario.findMany({
+    where: { id: { in: conCapturas.map((c) => c.usuarioId) } },
     select: { id: true, nombre: true },
   });
 

@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { usuarioActual } from "@/lib/auth";
 import { borrarImagen, ErrorImagen, guardarImagen } from "@/lib/imagenes";
+import {
+  comprobarLimite,
+  LIMITE_CAPTURAS,
+  textoEspera,
+} from "@/lib/limites";
 import { prisma } from "@/lib/prisma";
 
 export type EstadoCaptura = { error: string } | null;
@@ -36,6 +41,19 @@ export async function crearCaptura(
   const especieId = texto(fd, "especieId");
   if (!sitioId) return { error: "Elige el sitio." };
   if (!especieId) return { error: "Elige la especie." };
+
+  // Con registro abierto, cualquiera puede subir fotos al disco del servidor.
+  // El límite va por usuario y no por IP: la sesión ya identifica a quién es.
+  const espera = comprobarLimite(
+    `capturas:${usuario.id}`,
+    LIMITE_CAPTURAS.maximo,
+    LIMITE_CAPTURAS.ventanaMs,
+  );
+  if (espera > 0) {
+    return {
+      error: `Has registrado muchas capturas seguidas. Espera ${textoEspera(espera)}.`,
+    };
+  }
 
   const fecha = texto(fd, "fecha");
   const hora = texto(fd, "hora");
@@ -135,8 +153,11 @@ export async function borrarCaptura(formData: FormData) {
     select: { usuarioId: true, fotos: { select: { url: true } } },
   });
 
-  // Cada uno borra lo suyo. Son dos, pero el diario es de cada cual.
-  if (!captura || captura.usuarioId !== usuario.id) {
+  // Cada uno borra lo suyo. Los admin, además, cualquiera: con registro
+  // abierto hace falta poder retirar lo que no debería estar.
+  const puedeBorrar =
+    captura && (captura.usuarioId === usuario.id || usuario.esAdmin);
+  if (!captura || !puedeBorrar) {
     redirect("/capturas");
   }
 

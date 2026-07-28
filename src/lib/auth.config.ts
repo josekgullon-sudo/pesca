@@ -17,7 +17,7 @@ export const RUTA_LOGIN = "/entrar";
  * servidor (guardar y borrar capturas) comprueban la sesión por su cuenta,
  * porque viajan como POST a la página en la que estás, que sí es pública.
  */
-const RUTAS_QUE_PIDEN_SESION = ["/capturas/nueva"];
+const RUTAS_QUE_PIDEN_SESION = ["/capturas/nueva", "/cuenta"];
 
 export const authConfig = {
   pages: {
@@ -38,8 +38,8 @@ export const authConfig = {
       const haySesion = Boolean(auth?.user);
       const { pathname } = request.nextUrl;
 
-      if (pathname.startsWith(RUTA_LOGIN)) {
-        // Si ya has entrado, no tiene sentido volver a ver el login.
+      if (pathname.startsWith(RUTA_LOGIN) || pathname.startsWith("/registro")) {
+        // Si ya has entrado, no tiene sentido ver el login ni el registro.
         if (haySesion) return Response.redirect(new URL("/", request.nextUrl));
         return true;
       }
@@ -55,12 +55,14 @@ export const authConfig = {
       if (user) {
         token.id = user.id;
         token.name = user.name;
+        token.rol = (user as { rol?: string }).rol ?? "usuario";
       }
       return token;
     },
     session({ session, token }) {
       if (token.id) session.user.id = token.id as string;
       if (token.name) session.user.name = token.name;
+      session.user.rol = (token.rol as string) ?? "usuario";
       return session;
     },
   },

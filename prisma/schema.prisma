@@ -29,6 +29,10 @@ model Usuario {
   passwordHash String
   avatarUrl    String?
 
+  /// RolUsuario: usuario | admin. Los admin pueden borrar capturas ajenas,
+  /// que en una web con registro abierto hace falta para poder moderar.
+  rol String @default("usuario")
+
   capturas Captura[]
   salidas  Salida[]
 

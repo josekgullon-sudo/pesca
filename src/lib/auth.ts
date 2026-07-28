@@ -43,6 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: usuario.nombre,
           email: usuario.email,
           image: usuario.avatarUrl,
+          rol: usuario.rol,
         };
       },
     }),
@@ -54,6 +55,7 @@ export type UsuarioSesion = {
   nombre: string;
   email: string;
   avatarUrl: string | null;
+  esAdmin: boolean;
 };
 
 /**
@@ -68,6 +70,7 @@ export async function usuarioOpcional(): Promise<UsuarioSesion | null> {
     nombre: sesion.user.name ?? "",
     email: sesion.user.email ?? "",
     avatarUrl: sesion.user.image ?? null,
+    esAdmin: sesion.user.rol === "admin",
   };
 }
 

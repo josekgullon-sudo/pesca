@@ -1380,9 +1380,11 @@ const APAREJO_SITIO: FilaAparejoSitio[] = [
 // Usuarios
 // ---------------------------------------------------------------------------
 
+// Las dos cuentas iniciales son administradoras: con el registro abierto hace
+// falta que alguien pueda retirar lo que no debería estar.
 const USUARIOS = [
-  { nombre: "José", email: "jose@pesca.local" },
-  { nombre: "Pareja", email: "pareja@pesca.local" },
+  { nombre: "José", email: "jose@pesca.local", rol: "admin" },
+  { nombre: "Pareja", email: "pareja@pesca.local", rol: "admin" },
 ];
 
 /**
@@ -1403,7 +1405,14 @@ async function main() {
   for (const u of USUARIOS) {
     const existente = await prisma.usuario.findUnique({ where: { email: u.email } });
     if (existente) {
-      console.log(`  usuario ${u.email} ya existe, no se toca`);
+      // La contraseña no se toca, pero el rol sí: si el seed dice que es
+      // admin, que lo sea aunque la cuenta ya existiera.
+      if (existente.rol !== u.rol) {
+        await prisma.usuario.update({ where: { id: existente.id }, data: { rol: u.rol } });
+        console.log(`  usuario ${u.email} ya existe, ahora es ${u.rol}`);
+      } else {
+        console.log(`  usuario ${u.email} ya existe, no se toca`);
+      }
       continue;
     }
     await prisma.usuario.create({ data: { ...u, passwordHash } });

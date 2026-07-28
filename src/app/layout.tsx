@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { Cabecera } from "@/components/Cabecera";
 import { NavegacionInferior } from "@/components/Navegacion";
@@ -45,9 +46,17 @@ export default function RootLayout({
             <div className="max-w-prose">
               <AvisoLegal />
             </div>
-            <p className="mt-4 text-xs text-texto-suave">
-              Datos legales contrastados a {FECHA_DATOS_LEGALES}. Proyecto
-              personal, sin ánimo de lucro.
+            <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-texto-suave">
+              <span>
+                Datos legales contrastados a {FECHA_DATOS_LEGALES}. Proyecto
+                personal, sin ánimo de lucro.
+              </span>
+              <Link href="/normas" className="underline underline-offset-2">
+                Normas de uso
+              </Link>
+              <Link href="/aviso-legal" className="underline underline-offset-2">
+                Aviso legal y privacidad
+              </Link>
             </p>
           </footer>
 

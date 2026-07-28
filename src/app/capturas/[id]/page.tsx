@@ -13,7 +13,7 @@ async function cargar(id: string) {
   return prisma.captura.findUnique({
     where: { id },
     include: {
-      usuario: { select: { nombre: true } },
+      usuario: { select: { id: true, nombre: true } },
       especie: true,
       sitio: { select: { nombre: true, slug: true } },
       aparejo: { select: { nombre: true } },
@@ -46,6 +46,7 @@ export default async function FichaCaptura({
   if (!captura) notFound();
 
   const esMia = usuario !== null && captura.usuarioId === usuario.id;
+  const puedeBorrar = esMia || (usuario?.esAdmin ?? false);
 
   return (
     <article className="mx-auto max-w-3xl space-y-6">
@@ -72,8 +73,13 @@ export default async function FichaCaptura({
           {captura.especie.nombreComun}
         </h1>
         <p className="mt-1 text-lg text-texto-suave">
-          {captura.usuario.nombre} · {formatearFecha(captura.fecha)} a las{" "}
-          {captura.hora}
+          <Link
+            href={`/capturas?usuario=${captura.usuario.id}`}
+            className="font-semibold text-acento underline underline-offset-2"
+          >
+            {captura.usuario.nombre}
+          </Link>{" "}
+          · {formatearFecha(captura.fecha)} a las {captura.hora}
         </p>
       </header>
 
@@ -177,14 +183,14 @@ export default async function FichaCaptura({
           Volver al diario
         </Link>
 
-        {esMia && (
+        {puedeBorrar && (
           <form action={borrarCaptura}>
             <input type="hidden" name="id" value={captura.id} />
             <button
               type="submit"
               className="inline-flex min-h-touch items-center rounded-xl border-2 border-rojo-texto/30 bg-rojo-fondo px-5 font-semibold text-rojo-texto"
             >
-              Borrar
+              {esMia ? "Borrar" : "Borrar (moderación)"}
             </button>
           </form>
         )}

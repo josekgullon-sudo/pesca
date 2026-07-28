@@ -21,15 +21,22 @@ export async function Cabecera() {
         <NavegacionCabecera />
 
         {nombre ? (
-          <form action={salir} className="shrink-0">
-            <button
-              type="submit"
-              className="min-h-touch rounded-lg px-3 text-left text-sm font-semibold text-texto-suave md:min-h-11"
+          <div className="flex shrink-0 items-center gap-2">
+            <Link
+              href="/cuenta"
+              className="min-h-11 rounded-lg px-2 py-1 text-sm font-semibold text-texto underline underline-offset-2"
             >
-              <span className="block text-texto">{nombre}</span>
-              <span className="block underline underline-offset-2">Salir</span>
-            </button>
-          </form>
+              {nombre}
+            </Link>
+            <form action={salir}>
+              <button
+                type="submit"
+                className="min-h-11 rounded-lg px-2 text-sm font-semibold text-texto-suave underline underline-offset-2"
+              >
+                Salir
+              </button>
+            </form>
+          </div>
         ) : (
           <Link
             href="/entrar"

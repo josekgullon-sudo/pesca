@@ -214,7 +214,14 @@ export default async function PaginaRanking() {
                   <tbody>
                     {porPescador.map((p) => (
                       <tr key={p.id} className="border-b border-borde last:border-0">
-                        <td className="px-4 py-3 font-bold">{p.nombre}</td>
+                        <td className="px-4 py-3 font-bold">
+                          <Link
+                            href={`/capturas?usuario=${p.id}`}
+                            className="text-acento underline underline-offset-2"
+                          >
+                            {p.nombre}
+                          </Link>
+                        </td>
                         <td className="px-4 py-3 text-right tabular-nums">
                           {p.capturas}
                         </td>

@@ -5,8 +5,8 @@ sitios, especies y aparejos con la información legal de cada especie, un
 **diario** de capturas y un **ranking**.
 
 **Se lee entera sin cuenta.** Guía, mapa, capturas y ranking son públicos.
-Entrar solo hace falta para registrar capturas, y las cuentas las crea el seed:
-no hay registro público.
+Crear una cuenta solo hace falta para registrar capturas, y el **registro está
+abierto a cualquiera**.
 
 ## Stack
 
@@ -78,9 +78,8 @@ contraseña sin miedo a que la próxima ejecución la revierta.
 
 ## Acceso
 
-NextAuth con proveedor de credenciales y sesión en JWT. **No hay registro
-público**: los dos usuarios los crea el seed y no hay forma de dar de alta a
-nadie más desde la web.
+NextAuth con proveedor de credenciales y sesión en JWT. El registro es abierto:
+cualquiera puede crear una cuenta en `/registro`.
 
 - **Leer es público.** Guía, mapa, especies, capturas y ranking se ven sin
   entrar, fotos incluidas. La lista de rutas que sí piden sesión está en
@@ -96,6 +95,8 @@ nadie más desde la web.
   público.
 - La sesión dura 90 días. La app se usa a la orilla del agua y sin cobertura;
   que pidiera la contraseña justo cuando pica algo sería absurdo.
+- **El email nunca aparece en una URL** ni se muestra a nadie. Los filtros por
+  persona van por id.
 - `src/lib/auth.config.ts` va separado de `src/lib/auth.ts` a propósito: el
   middleware corre en runtime Edge y ahí no arranca Prisma, que usa un módulo
   nativo. El middleware solo lee el JWT de la cookie, sin tocar la base de datos.
@@ -130,6 +131,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | Guía de especies con semáforo legal            | Hecho          |
 | Registro de capturas con foto y GPS            | Hecho          |
 | Ranking, galería y comparativa                 | Hecho          |
+| Registro abierto, moderación y páginas legales | Hecho          |
 | Recomendador "¿qué me llevo?"                  | Pendiente      |
 | PWA y funcionamiento offline                   | Pendiente      |
 | Registro de salidas                            | Pendiente      |
@@ -151,9 +153,69 @@ que además tienen dueño, se dibuja una silueta con el color del semáforo lega
 así el listado se lee de un vistazo. Cuando haya fotos propias, basta con
 rellenar `Especie.imagenUrl`.
 
+## Registro abierto: qué implica
+
+Con cualquiera pudiendo crear cuenta y subir fotos al disco del servidor, hay
+piezas que no son opcionales:
+
+- **Moderación.** `Usuario.rol` puede ser `usuario` o `admin`. Un admin puede
+  borrar cualquier captura; el resto, solo las suyas. El seed deja las dos
+  cuentas iniciales como admin. Para hacer admin a alguien más:
+  `npx prisma studio` y cambiar su `rol`.
+- **Límites de uso** (`src/lib/limites.ts`): 3 cuentas por IP y hora, 10
+  intentos de login por IP cada cuarto de hora y 40 capturas por usuario y hora.
+  Es una ventana deslizante en memoria, que vale para un único proceso de Node;
+  con varios procesos habría que moverla a la base de datos o a Redis.
+- **Borrado de cuenta** desde `/cuenta`: se lleva la cuenta, las capturas y las
+  fotos del disco. Lo exige el derecho de supresión del RGPD.
+- **Normas de uso** en `/normas` y **aviso legal y privacidad** en
+  `/aviso-legal`.
+
+### Pendiente antes de abrirla al público
+
+1. **Rellenar los datos del responsable** en `src/app/aviso-legal/page.tsx`.
+   Están marcados con `[COMPLETAR]` y la página avisa mientras falten. Una web
+   pública que recoge emails, fotos y ubicaciones está sujeta al RGPD y a la
+   LSSI, y conviene que alguien que sepa revise el texto.
+2. **No hay verificación por email.** Cualquiera puede registrarse con un email
+   que no es suyo, y no hay forma de recuperar la contraseña si se olvida.
+   Ambas cosas necesitan un servidor de correo (SMTP o similar).
+3. **La moderación es manual y a posteriori.** No hay cola de revisión ni forma
+   de que un visitante denuncie una captura.
+
 ## Fotos
 
-### Fotos de las especies
+### Registro abierto: qué implica
+
+Con cualquiera pudiendo crear cuenta y subir fotos al disco del servidor, hay
+piezas que no son opcionales:
+
+- **Moderación.** `Usuario.rol` puede ser `usuario` o `admin`. Un admin puede
+  borrar cualquier captura; el resto, solo las suyas. El seed deja las dos
+  cuentas iniciales como admin. Para hacer admin a alguien más:
+  `npx prisma studio` y cambiar su `rol`.
+- **Límites de uso** (`src/lib/limites.ts`): 3 cuentas por IP y hora, 10
+  intentos de login por IP cada cuarto de hora y 40 capturas por usuario y hora.
+  Es una ventana deslizante en memoria, que vale para un único proceso de Node;
+  con varios procesos habría que moverla a la base de datos o a Redis.
+- **Borrado de cuenta** desde `/cuenta`: se lleva la cuenta, las capturas y las
+  fotos del disco. Lo exige el derecho de supresión del RGPD.
+- **Normas de uso** en `/normas` y **aviso legal y privacidad** en
+  `/aviso-legal`.
+
+### Pendiente antes de abrirla al público
+
+1. **Rellenar los datos del responsable** en `src/app/aviso-legal/page.tsx`.
+   Están marcados con `[COMPLETAR]` y la página avisa mientras falten. Una web
+   pública que recoge emails, fotos y ubicaciones está sujeta al RGPD y a la
+   LSSI, y conviene que alguien que sepa revise el texto.
+2. **No hay verificación por email.** Cualquiera puede registrarse con un email
+   que no es suyo, y no hay forma de recuperar la contraseña si se olvida.
+   Ambas cosas necesitan un servidor de correo (SMTP o similar).
+3. **La moderación es manual y a posteriori.** No hay cola de revisión ni forma
+   de que un visitante denuncie una captura.
+
+## Fotos de las especies
 
 ```bash
 npm run fotos              # solo las que no tienen foto
