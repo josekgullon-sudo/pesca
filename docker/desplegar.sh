@@ -96,19 +96,40 @@ if [ "$respondio" = "si" ]; then
   if [ "${COMPROBAR_HTTPS:-si}" = "si" ]; then
     paso "Comprobando https://$DOMINIO desde fuera"
     for intento in $(seq 1 30); do
-      if curl -fsS --max-time 10 -o /dev/null "https://$DOMINIO/"; then
+      codigo=0
+      curl -fsS --max-time 10 -o /dev/null "https://$DOMINIO/" 2>/dev/null || codigo=$?
+
+      if [ "$codigo" = 0 ]; then
         paso "Desplegado y en línea en https://$DOMINIO"
         docker compose ps
         exit 0
       fi
-      [ "$intento" = 1 ] && echo "Todavía no; el certificado tarda un poco la primera vez."
+
+      # 6 es «no se pudo resolver el nombre». Reintentar no sirve de nada: el
+      # dominio no existe en el DNS y eso no se arregla desde aquí. Cortar en
+      # seco y decirlo claro es mejor que dos minutos de errores iguales.
+      if [ "$codigo" = 6 ]; then
+        paso "EL DOMINIO $DOMINIO NO EXISTE EN EL DNS"
+        echo "La app funciona; lo que falta es que el dominio apunte a este"
+        echo "servidor. Eso se hace en el panel donde compraste el dominio,"
+        echo "no aquí."
+        echo
+        echo "  1. Mira quién gestiona su DNS:   dig +short NS $DOMINIO"
+        echo "  2. En el panel de ese proveedor, crea dos registros A:"
+        echo "        @     ->  $(curl -s --max-time 5 ifconfig.me || echo 'la IP de este servidor')"
+        echo "        www   ->  la misma IP"
+        echo "     Borrando los que ya hubiera."
+        echo "  3. Cuando 'dig +short $DOMINIO' devuelva esa IP, repite esto."
+        exit 1
+      fi
+
+      [ "$intento" = 1 ] && echo "El dominio resuelve pero aún no contesta; el certificado tarda un poco la primera vez."
       sleep 5
     done
 
-    paso "LA APP FUNCIONA PERO https://$DOMINIO NO CONTESTA"
-    echo "Casi siempre es una de estas dos:"
-    echo "  1. El DNS no apunta aquí. Compruébalo con:  dig +short $DOMINIO"
-    echo "     Tiene que devolver la IP de este servidor."
+    paso "EL DOMINIO RESUELVE PERO https://$DOMINIO NO CONTESTA"
+    echo "El nombre existe, así que casi siempre es una de estas dos:"
+    echo "  1. Apunta a otro servidor. Compruébalo con:  dig +short $DOMINIO"
     echo "  2. Caddy no ha conseguido el certificado. Mira el registro de abajo."
     echo
     echo "--- Últimas 30 líneas del registro de Caddy ---"
