@@ -12,7 +12,9 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "setup": "node scripts/setup.mjs",
+    "dev:movil": "next dev -H 0.0.0.0"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.9.1",

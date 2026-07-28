@@ -13,13 +13,32 @@ cada especie, y un **diario** de capturas.
 
 ## Arrancar en local
 
+Hace falta Node 20 o superior.
+
 ```bash
+git clone <repo> && cd pesca
 npm install
-cp .env.example .env      # ajusta DATABASE_URL y SEED_PASSWORD si quieres
-npm run db:deploy         # crea prisma/dev.db y aplica migraciones
-npm run db:seed           # carga sitios, especies, aparejos y usuarios
-npm run dev
+npm run setup    # crea .env con un AUTH_SECRET nuevo, migra y carga los datos
+npm run dev      # http://localhost:3000
 ```
+
+`npm run setup` es idempotente y no pisa un `.env` que ya exista.
+
+### Probarlo en el móvil
+
+Como la app es mobile-first, lo suyo es abrirla en el teléfono. Con el móvil en
+la misma wifi que el ordenador:
+
+```bash
+npm run dev:movil
+```
+
+y entra desde el móvil a `http://LA-IP-DEL-ORDENADOR:3000` (la ves con
+`ipconfig getifaddr en0` en Mac o `hostname -I` en Linux).
+
+Ojo: sin HTTPS el navegador no dará acceso a la cámara ni al GPS, que hacen
+falta a partir del bloque 5. Para eso ya toca desplegar en el VPS con
+certificado, o usar un túnel tipo `ngrok`.
 
 Usuarios que crea el seed:
 
