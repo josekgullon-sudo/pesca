@@ -67,6 +67,22 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           else
             echo "listo=si" >> "$GITHUB_OUTPUT"
+
+            # GitHub enmascara los secretos en el registro, así que si uno tiene
+            # un espacio pegado o un dígito cambiado no hay forma de verlo: el
+            # despliegue se limita a agotar el tiempo de espera dos minutos
+            # después. Esto describe el valor sin revelarlo, que es justo lo que
+            # hace falta para distinguir «el servidor no contesta» de «el
+            # secreto está mal escrito».
+            echo "SSH_SERVIDOR: ${#SERVIDOR} caracteres"
+            case "$SERVIDOR" in
+              *[!0-9a-zA-Z.:-]*)
+                echo "  ATENCIÓN: contiene espacios, saltos de línea u otros"
+                echo "  caracteres que no valen en una dirección. Vuelve a"
+                echo "  crear el secreto escribiéndolo a mano." ;;
+              *) echo "  formato correcto" ;;
+            esac
+            echo "SSH_USUARIO: ${#USUARIO} caracteres"
           fi
 
       - name: Preparar el acceso SSH
@@ -93,8 +109,11 @@ jobs:
         run: |
           # El script viaja por la entrada estándar, así que el servidor
           # ejecuta la versión que hay en esta rama y no una copia vieja.
+          # Sin ConnectTimeout, una dirección equivocada tarda dos minutos en
+          # rendirse y el registro no dice nada útil mientras tanto.
           ssh -o IdentitiesOnly=yes \
               -o StrictHostKeyChecking=yes \
+              -o ConnectTimeout=15 \
               -i ~/.ssh/clave \
               "$USUARIO@$SERVIDOR" \
               "DIRECTORIO_PESCA='${DIRECTORIO:-}' RAMA_PESCA='${{ github.ref_name }}' bash -s" \
