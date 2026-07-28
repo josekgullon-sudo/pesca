@@ -1,0 +1,105 @@
+name: Comprobar y desplegar
+
+on:
+  push:
+    branches: [claude/fishing-app-sevilla-mdhbzr]
+  pull_request:
+  # Para lanzarlo a mano desde la pestaña Actions sin tener que subir nada.
+  workflow_dispatch:
+
+concurrency:
+  group: desplegar
+  # Nunca se cancela un despliegue a medias: dejaría el servidor reconstruyendo
+  # y sin nadie mirando. Si llegan dos seguidos, el segundo espera.
+  cancel-in-progress: false
+
+jobs:
+  comprobar:
+    name: Comprobar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` y no `npm install`: instala exactamente lo que dice el
+      # lockfile. El postinstall ya ejecuta `prisma generate`.
+      - run: npm ci --no-audit --no-fund
+
+      - run: npm run typecheck
+      - run: npm run lint
+
+      # El build no toca la base de datos —todas las páginas son dinámicas—
+      # pero el CLI de Prisma exige que la variable exista. Que esto pase sin
+      # fichero de base de datos delante es justo lo que se quiere comprobar:
+      # es el fallo que tumbó el build de Docker en el servidor.
+      - run: npm run build
+        env:
+          DATABASE_URL: file:./prisma/dev.db
+
+  desplegar:
+    name: Desplegar
+    needs: comprobar
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Comprobar que está configurado
+        id: config
+        env:
+          CLAVE: ${{ secrets.SSH_CLAVE_PRIVADA }}
+          SERVIDOR: ${{ secrets.SSH_SERVIDOR }}
+          USUARIO: ${{ secrets.SSH_USUARIO }}
+          HOST_KEY: ${{ secrets.SSH_HOST_KEY }}
+        run: |
+          if [ -z "$CLAVE" ] || [ -z "$SERVIDOR" ] || [ -z "$USUARIO" ] || [ -z "$HOST_KEY" ]; then
+            echo "listo=no" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Despliegue automático sin configurar"
+              echo
+              echo "Faltan secretos del repositorio. Mientras falten, esto no"
+              echo "hace nada y **no es un error**. Las instrucciones están en"
+              echo '`DESPLIEGUE.md`, apartado «Despliegue automático».'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "listo=si" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Preparar el acceso SSH
+        if: steps.config.outputs.listo == 'si'
+        env:
+          CLAVE: ${{ secrets.SSH_CLAVE_PRIVADA }}
+          HOST_KEY: ${{ secrets.SSH_HOST_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$CLAVE" > ~/.ssh/clave
+          chmod 600 ~/.ssh/clave
+          # La huella del servidor va fijada. Sin esto habría que aceptar
+          # cualquier host que conteste, que es exactamente por donde entra un
+          # ataque de intermediario.
+          printf '%s\n' "$HOST_KEY" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Desplegar
+        if: steps.config.outputs.listo == 'si'
+        env:
+          SERVIDOR: ${{ secrets.SSH_SERVIDOR }}
+          USUARIO: ${{ secrets.SSH_USUARIO }}
+          DIRECTORIO: ${{ vars.DIRECTORIO_PESCA }}
+        run: |
+          # El script viaja por la entrada estándar, así que el servidor
+          # ejecuta la versión que hay en esta rama y no una copia vieja.
+          ssh -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes \
+              -i ~/.ssh/clave \
+              "$USUARIO@$SERVIDOR" \
+              "DIRECTORIO_PESCA='${DIRECTORIO:-}' RAMA_PESCA='${{ github.ref_name }}' bash -s" \
+              < docker/desplegar.sh
+
+      - name: Borrar la clave
+        if: always()
+        run: rm -f ~/.ssh/clave

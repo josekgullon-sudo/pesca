@@ -136,11 +136,107 @@ certificado solo. No hay más configuración.
 Para actualizar:
 
 ```bash
-git pull && docker compose up -d --build
+bash docker/desplegar.sh
 ```
+
+Hace copia de seguridad, actualiza el código, reconstruye, levanta y **espera a
+comprobar que la web contesta**. Si no contesta, saca los registros y termina
+con error, en vez de dejarte creyendo que ha ido bien.
 
 Las migraciones se aplican solas al arrancar y el seed es idempotente, así que
 no pisa contraseñas ni fotos.
+
+## Despliegue automático
+
+Con esto configurado no hay que volver a entrar por SSH: cada cambio que se
+suba a la rama se despliega solo. Lo hace `.github/workflows/desplegar.yml`,
+que primero comprueba el proyecto (tipos, lint y build) y solo despliega si
+todo pasa.
+
+Mientras falten los secretos, el workflow no hace nada y **no da error**.
+
+### 1. En el servidor: un usuario sin privilegios de root
+
+Dar a GitHub una llave del servidor es cómodo, pero significa que quien entre
+en tu cuenta de GitHub entra en tu servidor. Así que la llave no es de root:
+
+```bash
+adduser --disabled-password --gecos "" despliegue
+usermod -aG docker despliegue
+```
+
+Estar en el grupo `docker` ya es mucho poder —permite arrancar contenedores
+privilegiados—, pero es lo mínimo que necesita para desplegar, y sigue siendo
+mejor que entregar root.
+
+Ahora se mueve el proyecto a su carpeta y se le da la propiedad:
+
+```bash
+mv /root/pesca /home/despliegue/pesca
+chown -R despliegue:despliegue /home/despliegue/pesca
+```
+
+### 2. En el servidor: la llave
+
+```bash
+sudo -u despliegue ssh-keygen -t ed25519 -N "" -C "despliegue-github" \
+  -f /home/despliegue/.ssh/github
+sudo -u despliegue sh -c 'cat /home/despliegue/.ssh/github.pub >> /home/despliegue/.ssh/authorized_keys'
+chmod 600 /home/despliegue/.ssh/authorized_keys
+```
+
+Y se sacan los tres valores que hay que copiar. **Esto es lo único que se pega
+en GitHub, y se pega en Secrets, en ningún otro sitio:**
+
+```bash
+echo "--- SSH_CLAVE_PRIVADA ---"; cat /home/despliegue/.ssh/github
+echo "--- SSH_HOST_KEY ---";      ssh-keyscan -t ed25519 localhost 2>/dev/null | sed "s/^localhost/$(curl -s ifconfig.me)/"
+```
+
+### 3. En GitHub: los secretos
+
+En el repositorio → **Settings → Secrets and variables → Actions → New
+repository secret**. Cuatro secretos:
+
+| Nombre              | Valor                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| `SSH_CLAVE_PRIVADA` | Todo el bloque `-----BEGIN...END OPENSSH PRIVATE KEY-----`   |
+| `SSH_HOST_KEY`      | La línea que sale de `ssh-keyscan`, entera                   |
+| `SSH_SERVIDOR`      | La IP del servidor                                           |
+| `SSH_USUARIO`       | `despliegue`                                                 |
+
+Y en la pestaña **Variables** de la misma página, una variable:
+
+| Nombre            | Valor                    |
+| ----------------- | ------------------------ |
+| `DIRECTORIO_PESCA`| `/home/despliegue/pesca` |
+
+`SSH_HOST_KEY` es la huella del servidor. Sirve para que el despliegue se
+niegue a conectarse si quien contesta no es tu máquina; sin ella habría que
+aceptar a ciegas a cualquiera que responda a esa IP.
+
+### 4. Probarlo
+
+En GitHub, pestaña **Actions** → «Comprobar y desplegar» → **Run workflow**.
+Si algo falla, el registro del paso «Desplegar» trae ya las últimas ochenta
+líneas del contenedor.
+
+A partir de ahí, cada cambio subido a la rama se despliega solo, y GitHub
+manda un correo si falla.
+
+### Si hace falta volver atrás
+
+El despliegue automático no revierte nada solo. Para volver a la versión
+anterior, en el servidor:
+
+```bash
+cd /home/despliegue/pesca
+git log --oneline -5          # elegir a cuál volver
+git reset --hard <el-commit>
+docker compose up -d --build
+```
+
+Las copias de la base de datos están en `/var/backups/pesca`.
 
 ### Copias de seguridad
 

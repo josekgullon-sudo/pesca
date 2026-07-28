@@ -125,6 +125,10 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | `npm run db:seed`    | Ejecuta el seed (es idempotente)               |
 | `npm run db:studio`  | Prisma Studio para curiosear la base de datos  |
 
+En el servidor, `bash docker/desplegar.sh` actualiza y levanta comprobando que
+la web responde. Con los secretos configurados, GitHub Actions lo ejecuta solo
+en cada subida a la rama: ver `DESPLIEGUE.md`.
+
 ## Qué hay construido
 
 | Sección                                       | Estado         |
