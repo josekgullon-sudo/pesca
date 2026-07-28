@@ -124,6 +124,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | `npm run db:deploy`  | Aplica migraciones existentes (producción)     |
 | `npm run db:seed`    | Ejecuta el seed (es idempotente)               |
 | `npm run db:studio`  | Prisma Studio para curiosear la base de datos  |
+| `npm run contrasena` | Cambia la contraseña de una cuenta              |
 
 En el servidor, `bash docker/desplegar.sh` actualiza y levanta comprobando que
 la web responde. Con los secretos configurados, GitHub Actions lo ejecuta solo
@@ -259,8 +260,10 @@ piezas que no son opcionales:
    pública que recoge emails, fotos y ubicaciones está sujeta al RGPD y a la
    LSSI, y conviene que alguien que sepa revise el texto.
 2. **No hay verificación por email.** Cualquiera puede registrarse con un email
-   que no es suyo, y no hay forma de recuperar la contraseña si se olvida.
-   Ambas cosas necesitan un servidor de correo (SMTP o similar).
+   que no es suyo, y no hay recuperación de contraseña por correo: eso necesita
+   un servidor de envío. Mientras tanto, una contraseña olvidada se cambia
+   desde el servidor con `npm run contrasena -- correo@ejemplo.com`, que genera
+   una nueva y la imprime una sola vez.
 3. **La moderación es manual y a posteriori.** No hay cola de revisión ni forma
    de que un visitante denuncie una captura.
 

@@ -17,7 +17,8 @@
     "dev:movil": "next dev -H 0.0.0.0",
     "fotos": "tsx scripts/fotos.mjs",
     "predev": "prisma migrate deploy",
-    "actualizar": "npm run db:deploy && npm run db:seed"
+    "actualizar": "npm run db:deploy && npm run db:seed",
+    "contrasena": "tsx scripts/contrasena.mjs"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.9.1",
