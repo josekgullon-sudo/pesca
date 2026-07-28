@@ -1,4 +1,17 @@
 # Caddy pide y renueva el certificado solo. No hay que tocar nada más.
+
+# El www va al dominio a secas, que es el que apuntan las canónicas y el
+# sitemap. Sin esto, quien escriba www.midominio.es se encuentra un error, y
+# si además llegara a servirse el mismo contenido en las dos direcciones Google
+# lo trataría como dos webs repartiéndose la fuerza.
+#
+# Necesita su propio registro A en el DNS: si no existe, la web principal
+# funciona igual pero Caddy se queda reintentando el certificado del www y lo
+# deja escrito en el registro.
+www.{$DOMINIO} {
+	redir https://{$DOMINIO}{uri} permanent
+}
+
 {$DOMINIO} {
 	encode zstd gzip
 
