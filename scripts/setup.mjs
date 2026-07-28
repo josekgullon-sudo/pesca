@@ -8,13 +8,14 @@
  */
 
 import { randomBytes } from "node:crypto";
-import { execFileSync } from "node:child_process";
+import { execSync } from "node:child_process";
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 
-const npm = process.platform === "win32" ? "npm.cmd" : "npm";
-
-function ejecutar(...args) {
-  execFileSync(npm, args, { stdio: "inherit" });
+// Va por `execSync` (que abre una shell) y no por `execFileSync`: en Windows
+// npm es un .cmd, y desde el parche de seguridad de Node no se puede lanzar un
+// .cmd sin shell — revienta con EINVAL.
+function ejecutar(comando) {
+  execSync(comando, { stdio: "inherit" });
 }
 
 if (existsSync(".env")) {
@@ -33,10 +34,10 @@ if (existsSync(".env")) {
 }
 
 console.log("\n· Aplicando migraciones…");
-ejecutar("run", "db:deploy");
+ejecutar("npm run db:deploy");
 
 console.log("\n· Cargando datos semilla…");
-ejecutar("run", "db:seed");
+ejecutar("npm run db:seed");
 
 console.log(
   [
