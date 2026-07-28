@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit",
     "setup": "node scripts/setup.mjs",
     "dev:movil": "next dev -H 0.0.0.0",
-    "fotos": "node scripts/fotos-especies.mjs"
+    "fotos": "tsx scripts/fotos-especies.mjs"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.9.1",

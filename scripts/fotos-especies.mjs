@@ -94,21 +94,32 @@ async function pedirJson(url) {
   return respuesta.json();
 }
 
-/** Imagen principal del artículo de Wikipedia de ese nombre científico. */
-async function buscarImagen(nombreCientifico) {
-  for (const idioma of ["es", "en"]) {
-    try {
-      const datos = await pedirJson(
-        `https://${idioma}.wikipedia.org/api/rest_v1/page/summary/` +
-          encodeURIComponent(nombreCientifico),
-      );
-      const url = datos?.originalimage?.source ?? datos?.thumbnail?.source;
-      if (url) return url;
-    } catch {
-      // Probamos con el siguiente idioma.
+/**
+ * Imagen principal del artículo de Wikipedia. Prueba primero por el nombre
+ * científico, que es lo que titula el artículo, y si no por el nombre común.
+ *
+ * Devuelve también qué ha pasado en cada intento: si falla, sin esto no hay
+ * forma de saber si es que no hay foto o es que no hay internet.
+ */
+async function buscarImagen(nombreCientifico, nombreComun) {
+  const motivos = [];
+
+  for (const termino of [nombreCientifico, nombreComun]) {
+    for (const idioma of ["es", "en"]) {
+      try {
+        const datos = await pedirJson(
+          `https://${idioma}.wikipedia.org/api/rest_v1/page/summary/` +
+            encodeURIComponent(termino),
+        );
+        const url = datos?.originalimage?.source ?? datos?.thumbnail?.source;
+        if (url) return { url, motivos };
+        motivos.push(`${idioma}:${termino} sin foto`);
+      } catch (error) {
+        motivos.push(`${idioma}:${termino} ${error.message}`);
+      }
     }
   }
-  return null;
+  return { url: null, motivos };
 }
 
 async function buscarMetadatos(nombreFichero) {
@@ -160,8 +171,11 @@ async function main() {
   for (const especie of especies) {
     const etiqueta = `${especie.nombreComun} (${especie.nombreCientifico})`;
     try {
-      const urlImagen = await buscarImagen(especie.nombreCientifico);
-      if (!urlImagen) throw new Error("sin imagen en Wikipedia");
+      const { url: urlImagen, motivos } = await buscarImagen(
+        especie.nombreCientifico,
+        especie.nombreComun,
+      );
+      if (!urlImagen) throw new Error(motivos.join("; ") || "sin imagen");
 
       const fichero = nombreDeFichero(urlImagen);
       const meta = fichero ? await buscarMetadatos(fichero) : null;
@@ -199,8 +213,22 @@ async function main() {
   if (fallos.length > 0) {
     console.log(
       "\nLas que han fallado se quedan con la silueta de color, que sigue\n" +
-        "funcionando. Puedes reintentar más tarde o subir una foto propia.",
+        "funcionando. Puedes reintentar más tarde con: npm run fotos",
     );
+
+    const sinRed = fallos.some(
+      (f) =>
+        f.motivo.includes("fetch failed") ||
+        f.motivo.includes("ENOTFOUND") ||
+        f.motivo.includes("ETIMEDOUT") ||
+        f.motivo.includes("ECONNREFUSED"),
+    );
+    if (sinRed) {
+      console.log(
+        "\nParece un problema de conexión, no de que falten fotos.\n" +
+          "Comprueba que tienes internet y que nada bloquea wikipedia.org.",
+      );
+    }
   }
 }
 
