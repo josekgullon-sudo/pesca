@@ -10,7 +10,20 @@ DESTINO="${DESTINO:-/var/backups/pesca}"
 FECHA=$(date +%Y-%m-%d)
 CONSERVAR_DIAS="${CONSERVAR_DIAS:-30}"
 
-mkdir -p "$DESTINO"
+# /var/backups es de root. Esto lo ejecutan dos usuarios distintos —root desde
+# el cron y el usuario de despliegue desde GitHub Actions— y el segundo no
+# puede escribir ahí, ni siquiera para sobrescribir una copia que dejó el
+# primero. En vez de fallar el despliegue entero por eso, se cae a una carpeta
+# del propio usuario.
+if ! mkdir -p "$DESTINO" 2>/dev/null || [ ! -w "$DESTINO" ]; then
+  DESTINO="$HOME/copias-pesca"
+  echo "Sin permiso de escritura en la ruta habitual; se copia en $DESTINO"
+  mkdir -p "$DESTINO"
+fi
+
+# Una copia del mismo día se reemplaza. Sin esto, `docker compose cp` falla al
+# intentar borrar el fichero anterior si lo dejó otro usuario.
+rm -f "$DESTINO/pesca-$FECHA.db" "$DESTINO/fotos-$FECHA.tar.gz" 2>/dev/null || true
 
 # La base de datos se copia con el comando de SQLite, no con `cp`: copiar el
 # fichero mientras hay escrituras puede dar una copia corrupta.
