@@ -26,6 +26,7 @@ import {
   URL_PORTAL_CAZA_Y_PESCA,
 } from "../src/lib/avisos";
 import { prisma } from "../src/lib/prisma";
+import { ARTICULOS } from "./articulos";
 
 const PRIMAVERA_Y_OTONO = [3, 4, 5, 6, 9, 10, 11];
 const TEMPORADA_LARGA = [3, 4, 5, 6, 7, 8, 9, 10];
@@ -1742,6 +1743,38 @@ async function main() {
 
   // --- Capturas de ejemplo -------------------------------------------------
   await sembrarDemo(sitios, especies, tecnicas);
+
+  // --- Artículos del blog --------------------------------------------------
+  // Se actualizan siempre: el texto vive en el repositorio, así que la versión
+  // buena es la del código y no la que quedó en la base de datos.
+  const provinciasPorSlug = new Map(
+    (await prisma.provincia.findMany({ select: { id: true, slug: true } })).map(
+      (x) => [x.slug, x.id],
+    ),
+  );
+  const hoy = new Date();
+  for (const a of ARTICULOS) {
+    const publicadaEl = new Date(hoy);
+    publicadaEl.setDate(publicadaEl.getDate() - a.diasAtras);
+    publicadaEl.setHours(9, 0, 0, 0);
+
+    const datos = {
+      titulo: a.titulo,
+      entradilla: a.entradilla,
+      contenido: a.contenido,
+      publicada: true,
+      publicadaEl,
+      provinciaId: a.provincia ? (provinciasPorSlug.get(a.provincia) ?? null) : null,
+    };
+    await prisma.articulo.upsert({
+      where: { slug: a.slug },
+      create: { slug: a.slug, ...datos },
+      // La fecha de publicación no se pisa si ya existía: si no, cada
+      // despliegue movería los artículos al día de hoy.
+      update: { ...datos, publicadaEl: undefined },
+    });
+  }
+  console.log(`  ${ARTICULOS.length} artículos del blog`);
 
   console.log("\nListo.");
   console.log(

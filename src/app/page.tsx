@@ -9,6 +9,7 @@ import { AVISO_COORDENADAS_APROXIMADAS } from "@/lib/avisos";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import { ETIQUETA_TIPO_SITIO, type TipoSitio } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
+import { articulosPublicados } from "@/lib/blog";
 import { provinciasPublicadas, rutaDeSitios } from "@/lib/provincias";
 
 // El título y la descripción los pone el layout —si se repitieran aquí, la
@@ -40,6 +41,7 @@ export default async function Home() {
     totalCapturas,
     especiesDistintas,
     mayor,
+    articulos,
   ] = await Promise.all([
       rutaDeSitios(),
       provinciasPublicadas(),
@@ -90,6 +92,7 @@ export default async function Home() {
           usuario: { select: { nombre: true } },
         },
       }),
+      articulosPublicados(3),
     ]);
 
   // "En temporada": los que tienen este mes marcado como buena época.
@@ -439,6 +442,44 @@ export default async function Home() {
             />
           </dl>
         </section>
+
+        {/* --- Blog: las preguntas que no responde una ficha de embalse. --- */}
+        {articulos.length > 0 && (
+          <section>
+            <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+              <div>
+                <h2 className="titulo-seccion font-bold">Antes de salir</h2>
+                <p className="mt-1 text-lg text-texto-suave">
+                  Licencias, normativa y lo que conviene saber.
+                </p>
+              </div>
+              <Link
+                href="/blog"
+                className="font-semibold text-acento underline underline-offset-4"
+              >
+                Ver el blog
+              </Link>
+            </div>
+
+            <ul className="grid gap-5 lg:grid-cols-3">
+              {articulos.map((a) => (
+                <li key={a.slug}>
+                  <Link
+                    href={`/blog/${a.slug}`}
+                    className="tarjeta tarjeta-enlace flex h-full flex-col p-6"
+                  >
+                    <h3 className="text-lg font-bold leading-tight">
+                      {a.titulo}
+                    </h3>
+                    <p className="mt-2 flex-auto leading-relaxed text-texto-suave">
+                      {a.entradilla}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* --- Empezar --- */}
         <section className="tarjeta overflow-hidden bg-ribera-800 p-8 text-center text-ribera-50 md:p-12">

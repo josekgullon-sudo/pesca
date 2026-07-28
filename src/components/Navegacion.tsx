@@ -19,7 +19,7 @@ import { usePathname } from "next/navigation";
  */
 
 /** Rutas que tienen su propia pestaña. Lo demás cuelga de una provincia. */
-const RUTAS_PROPIAS = ["/especies", "/capturas", "/ranking", "/entrar", "/registro", "/cuenta", "/normas", "/aviso-legal"];
+const RUTAS_PROPIAS = ["/especies", "/capturas", "/ranking", "/blog", "/entrar", "/registro", "/cuenta", "/normas", "/aviso-legal"];
 
 /** El destino del mapa lo decide el servidor, igual que el de los sitios. */
 const MARCA_MAPA = "__mapa__";
@@ -72,6 +72,17 @@ const ENLACES: Enlace[] = [
     etiqueta: "Ranking",
     icono: IconoRanking,
     activo: (r) => r.startsWith("/ranking"),
+  },
+  {
+    href: "/blog",
+    etiqueta: "Blog",
+    // No se pinta nunca: en la barra de móvil no entra. Se pone uno cualquiera
+    // porque el tipo lo exige.
+    icono: IconoLista,
+    activo: (r) => r.startsWith("/blog"),
+    // En la barra de móvil no cabe una séptima: se llega desde la portada y
+    // desde el pie.
+    soloEscritorio: true,
   },
 ];
 

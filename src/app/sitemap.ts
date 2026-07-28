@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
  * nombre de quien las subió. El listado sí, que es el que enseña la actividad.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [provincias, sitios, especies] = await Promise.all([
+  const [provincias, sitios, especies, articulos] = await Promise.all([
     prisma.provincia.findMany({
       where: { publicada: true },
       select: { slug: true, updatedAt: true },
@@ -29,6 +29,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     }),
     prisma.especie.findMany({ select: { slug: true, updatedAt: true } }),
+    prisma.articulo.findMany({
+      where: { publicada: true },
+      select: { slug: true, updatedAt: true },
+    }),
   ]);
 
   const fijas: MetadataRoute.Sitemap = [
@@ -36,6 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: urlAbsoluta("/especies"), changeFrequency: "monthly", priority: 0.8 },
     { url: urlAbsoluta("/ranking"), changeFrequency: "daily", priority: 0.7 },
     { url: urlAbsoluta("/capturas"), changeFrequency: "daily", priority: 0.4 },
+    { url: urlAbsoluta("/blog"), changeFrequency: "weekly", priority: 0.8 },
     { url: urlAbsoluta("/normas"), changeFrequency: "yearly", priority: 0.2 },
     { url: urlAbsoluta("/aviso-legal"), changeFrequency: "yearly", priority: 0.2 },
   ];
@@ -71,6 +76,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...especies.map((e) => ({
       url: urlAbsoluta(`/especies/${e.slug}`),
       lastModified: e.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    ...articulos.map((a) => ({
+      url: urlAbsoluta(`/blog/${a.slug}`),
+      lastModified: a.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),

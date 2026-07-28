@@ -78,7 +78,8 @@ model Provincia {
   /// Solo se publica lo que tiene sitios cargados y normativa verificada.
   publicada Boolean @default(false)
 
-  sitios Sitio[]
+  sitios    Sitio[]
+  articulos Articulo[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -387,4 +388,41 @@ model FotoCaptura {
   createdAt DateTime @default(now())
 
   @@index([capturaId])
+}
+
+/// Artículo del blog.
+///
+/// El blog existe por posicionamiento: la guía responde a «dónde pescar en
+/// Sevilla», pero la mayoría de las búsquedas de pesca son preguntas —«hace
+/// falta licencia», «qué hago si pesco un lucio», «cuándo se pesca la carpa»—
+/// y a esas no responde una ficha de embalse. Cada artículo entra por su
+/// pregunta y lleva a la guía.
+model Articulo {
+  id     String @id @default(cuid())
+  slug   String @unique
+  titulo String
+  /// Resumen de una o dos frases. Es lo que sale en el listado y en Google.
+  entradilla String
+  /// Cuerpo en Markdown reducido: ##, ###, listas, **negrita**, [enlaces] y
+  /// citas. Se convierte a elementos de React, nunca a HTML en crudo.
+  contenido String
+
+  /// Sin publicar no se ve ni entra en el sitemap, igual que las provincias.
+  publicada    Boolean   @default(false)
+  publicadaEl  DateTime?
+
+  /// Para poder decir «Guía de Sevilla» en un artículo de provincia y para
+  /// enlazarlos entre sí. Opcional: los hay que valen para toda España.
+  provinciaId String?
+  provincia   Provincia? @relation(fields: [provinciaId], references: [id], onDelete: SetNull)
+
+  imagenUrl      String?
+  imagenAutor    String?
+  imagenLicencia String?
+  imagenFuente   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([publicada, publicadaEl])
 }

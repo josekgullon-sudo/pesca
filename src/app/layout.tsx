@@ -107,6 +107,11 @@ export default async function RootLayout({
                           Capturas
                         </Link>
                       </li>
+                      <li>
+                        <Link href="/blog" className="hover:text-acento">
+                          Blog
+                        </Link>
+                      </li>
                     </ul>
                   </div>
 
