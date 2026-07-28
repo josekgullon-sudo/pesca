@@ -46,15 +46,6 @@ case "$DOMINIO" in
 esac
 echo "Dominio: $DOMINIO"
 
-paso "Copia de seguridad antes de tocar nada"
-# Si todavía no hay nada levantado (primer despliegue) esto no puede hacer
-# copia, y no es motivo para abortar.
-if docker compose ps --status running --quiet app | grep -q .; then
-  bash docker/copia-de-seguridad.sh
-else
-  echo "La app no está levantada todavía; no hay nada que copiar."
-fi
-
 paso "Actualizando el código"
 git fetch origin "$RAMA"
 # `reset --hard` y no `pull`: el servidor es un espejo de la rama, no un sitio
@@ -63,6 +54,24 @@ git fetch origin "$RAMA"
 # no lo está, y la base de datos y las fotos viven en un volumen de Docker.
 git reset --hard "origin/$RAMA"
 echo "Ahora en $(git rev-parse --short HEAD) — $(git log -1 --pretty=%s)"
+
+# La copia va DESPUÉS de actualizar el código, no antes. Este script llega por
+# la entrada estándar y está al día, pero el de la copia se lee del disco del
+# servidor: haciéndola antes se ejecutaba la versión vieja, y un arreglo en ella
+# no llegaba a aplicarse nunca —el despliegue moría con el fallo que el propio
+# arreglo venía a corregir—.
+#
+# No hay riesgo en el cambio de orden: actualizar ficheros de código no toca los
+# datos. Lo que la copia protege es lo de después, que es donde se migra la base
+# de datos y se levanta la imagen nueva.
+paso "Copia de seguridad antes de reconstruir"
+# Si todavía no hay nada levantado (primer despliegue) esto no puede hacer
+# copia, y no es motivo para abortar.
+if docker compose ps --status running --quiet app | grep -q .; then
+  bash docker/copia-de-seguridad.sh
+else
+  echo "La app no está levantada todavía; no hay nada que copiar."
+fi
 
 paso "Reconstruyendo y levantando"
 docker compose up -d --build
