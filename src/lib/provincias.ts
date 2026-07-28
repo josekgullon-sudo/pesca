@@ -31,12 +31,22 @@ export async function provinciasPublicadas() {
 /**
  * A dónde lleva "Sitios" en la navegación. Con una sola provincia publicada va
  * directo a ella; con varias, a la portada, que es donde está el listado.
+ *
+ * Si la base de datos no responde, devuelve la portada en vez de propagar el
+ * error. Esto lo llama la cabecera, que sale en TODAS las páginas: sin este
+ * respaldo, un problema con la base de datos tira la web entera, y al compilar
+ * la imagen de Docker —donde todavía no hay base de datos— el build fallaba al
+ * pregenerar /entrar.
  */
 export async function rutaDeSitios(): Promise<string> {
-  const publicadas = await prisma.provincia.findMany({
-    where: { publicada: true },
-    select: { slug: true },
-    take: 2,
-  });
-  return publicadas.length === 1 ? `/${publicadas[0].slug}` : "/";
+  try {
+    const publicadas = await prisma.provincia.findMany({
+      where: { publicada: true },
+      select: { slug: true },
+      take: 2,
+    });
+    return publicadas.length === 1 ? `/${publicadas[0].slug}` : "/";
+  } catch {
+    return "/";
+  }
 }
