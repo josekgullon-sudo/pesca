@@ -45,6 +45,10 @@ git checkout claude/fishing-app-sevilla-mdhbzr
 
 # 6. Configuración. El AUTH_SECRET se genera solo; no lo copies de ningún sitio.
 #    URL_BASE sale de DOMINIO, así que normalmente no hay que ponerla.
+#
+#    CAMBIA EL DOMINIO POR EL TUYO antes de ejecutar esto. Va a secas: sin
+#    https://, sin www y sin barra final. Si se cuela un dominio de ejemplo,
+#    Caddy se pasa media hora pidiendo un certificado que no le van a dar.
 cat > .env <<EOF
 DOMINIO=mapadepesca.es
 AUTH_SECRET=$(openssl rand -base64 32)
@@ -78,15 +82,40 @@ hay cámara ni GPS y la contraseña viaja en claro. En cuanto el dominio apunte,
 
 ### El dominio
 
-En el panel de tu proveedor de dominios, un registro `A`:
+Son dos cosas distintas y hacen falta las dos:
 
-| Tipo | Nombre | Valor                   |
-| ---- | ------ | ----------------------- |
-| A    | `@`    | la IP de tu servidor    |
-| A    | `www`  | la IP de tu servidor    |
+1. **Que el dominio apunte al servidor**, en el panel de tu proveedor de
+   dominios. Esto no se hace en el servidor.
+2. **Que `DOMINIO` en el `.env` sea ese mismo dominio.** Es lo que le dice a
+   Caddy qué certificado pedir.
 
-Tarda entre unos minutos y unas horas. Cuando resuelva, Caddy pide el
-certificado solo la primera vez que alguien entre.
+Si solo haces la segunda, Let's Encrypt llamará al dominio, contestará otro
+servidor y no habrá certificado.
+
+En el panel del dominio, dos registros `A`:
+
+| Tipo | Nombre | Valor                   | TTL |
+| ---- | ------ | ----------------------- | --- |
+| A    | `@`    | la IP de tu servidor    | 300 |
+| A    | `www`  | la IP de tu servidor    | 300 |
+
+**Borra los que ya hubiera** para `@` y `www`. Un dominio recién comprado suele
+traer un `A` a la página de «en construcción» del registrador y un `CNAME` en
+`www`; si se queda ahí, unas veces cargará tu web y otras la del registrador.
+
+El nombre es `@`, no el dominio entero: cada panel lo escribe a su manera, así
+que mira cómo están puestos los registros que ya hay y copia ese estilo.
+
+Tarda entre unos minutos y unas horas. Antes de levantar nada, comprueba que
+ha resuelto:
+
+```bash
+dig +short mapadepesca.es
+dig +short www.mapadepesca.es
+```
+
+Las dos tienen que devolver la IP de tu servidor. Cuando resuelvan, Caddy pide
+el certificado solo la primera vez que alguien entre.
 
 Comprueba que ha resuelto antes de levantar el compose normal:
 

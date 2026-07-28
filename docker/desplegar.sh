@@ -19,6 +19,33 @@ paso() { printf '\n\033[1m→ %s\033[0m\n' "$1"; }
 
 cd "$DIRECTORIO"
 
+DOMINIO="$(grep -E '^DOMINIO=' .env 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"'"'"' ' || true)"
+
+paso "Comprobando la configuración"
+if [ -z "$DOMINIO" ]; then
+  echo "ERROR: falta DOMINIO en $DIRECTORIO/.env" >&2
+  exit 1
+fi
+# Los marcadores de la documentación son dominios reales de otra gente. Si uno
+# se cuela en el .env, Caddy se pasa media hora pidiendo certificados que Let's
+# Encrypt no le va a dar nunca, y el error que escribe no dice de dónde sale.
+case "$DOMINIO" in
+  tu-dominio.es | www.tu-dominio.es | midominio.es | ejemplo.* | *.example.*)
+    echo "ERROR: DOMINIO=$DOMINIO es el marcador de la documentación." >&2
+    echo "       Ponlo con tu dominio de verdad en $DIRECTORIO/.env" >&2
+    exit 1
+    ;;
+esac
+case "$DOMINIO" in
+  http://* | https://* | */* | www.*)
+    echo "ERROR: DOMINIO=$DOMINIO no tiene el formato correcto." >&2
+    echo "       Va el dominio a secas: sin https://, sin www y sin barra." >&2
+    echo "       Del www se encarga el Caddyfile." >&2
+    exit 1
+    ;;
+esac
+echo "Dominio: $DOMINIO"
+
 paso "Copia de seguridad antes de tocar nada"
 # Si todavía no hay nada levantado (primer despliegue) esto no puede hacer
 # copia, y no es motivo para abortar.
@@ -51,14 +78,48 @@ comprobar() {
   ' >/dev/null 2>&1
 }
 
+respondio=no
 for _ in $(seq 1 "$ESPERA_MAXIMA"); do
   if comprobar; then
-    paso "Desplegado y respondiendo"
-    docker compose ps
-    exit 0
+    respondio=si
+    break
   fi
   sleep 1
 done
+
+if [ "$respondio" = "si" ]; then
+  echo "La app contesta dentro del contenedor."
+
+  # Que la app conteste por dentro no quiere decir que la web funcione: puede
+  # faltar el certificado, o el DNS puede estar apuntando a otro sitio. Sin
+  # esta segunda comprobación el despliegue se daba por bueno con la web caída.
+  if [ "${COMPROBAR_HTTPS:-si}" = "si" ]; then
+    paso "Comprobando https://$DOMINIO desde fuera"
+    for intento in $(seq 1 30); do
+      if curl -fsS --max-time 10 -o /dev/null "https://$DOMINIO/"; then
+        paso "Desplegado y en línea en https://$DOMINIO"
+        docker compose ps
+        exit 0
+      fi
+      [ "$intento" = 1 ] && echo "Todavía no; el certificado tarda un poco la primera vez."
+      sleep 5
+    done
+
+    paso "LA APP FUNCIONA PERO https://$DOMINIO NO CONTESTA"
+    echo "Casi siempre es una de estas dos:"
+    echo "  1. El DNS no apunta aquí. Compruébalo con:  dig +short $DOMINIO"
+    echo "     Tiene que devolver la IP de este servidor."
+    echo "  2. Caddy no ha conseguido el certificado. Mira el registro de abajo."
+    echo
+    echo "--- Últimas 30 líneas del registro de Caddy ---"
+    docker compose logs --tail 30 caddy || true
+    exit 1
+  fi
+
+  paso "Desplegado y respondiendo"
+  docker compose ps
+  exit 0
+fi
 
 # Si se llega aquí, algo ha ido mal. Los registros son lo primero que hace
 # falta para saber qué, así que se imprimen sin tener que entrar a buscarlos.
