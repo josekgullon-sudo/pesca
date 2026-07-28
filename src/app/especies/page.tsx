@@ -7,6 +7,7 @@ import {
   type Comestibilidad,
   type EstadoLegal,
 } from "@/lib/enums";
+import { usuarioOpcional } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = { title: "Especies" };
@@ -46,6 +47,7 @@ const GRUPOS: {
 ];
 
 export default async function PaginaEspecies() {
+  const usuario = await usuarioOpcional();
   const especies = await prisma.especie.findMany({
     orderBy: { nombreComun: "asc" },
     select: {
@@ -68,6 +70,23 @@ export default async function PaginaEspecies() {
           qué no se toca. El color de cada ficha es su semáforo legal.
         </p>
       </div>
+
+      {/* Recordatorio solo para administradores: las fotos de las especies no
+          vienen en el repositorio, hay que bajarlas una vez. Sin esto es fácil
+          pensar que la web está rota cuando solo falta ejecutar un comando. */}
+      {usuario?.esAdmin && especies.every((e) => !e.imagenUrl) && (
+        <div className="rounded-xl border-2 border-ambar-texto/30 bg-ambar-fondo p-4 text-ambar-texto">
+          <p className="font-bold">Faltan las fotos de las especies</p>
+          <p className="mt-1 leading-relaxed">
+            No vienen en el repositorio: se descargan de Wikimedia Commons con
+            su autor y su licencia. Ejecuta{" "}
+            <code className="rounded bg-ambar-texto/15 px-1.5 py-0.5 font-mono">
+              npm run fotos
+            </code>{" "}
+            una vez. Mientras tanto se ve la silueta con el color del semáforo.
+          </p>
+        </div>
+      )}
 
       {GRUPOS.map((grupo) => {
         const delGrupo = especies.filter((e) =>
