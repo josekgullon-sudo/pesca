@@ -316,4 +316,6 @@ Antes de tener tráfico no compensa el trabajo.
 - [ ] Cambiar la contraseña de las dos cuentas del seed
 - [ ] `AUTH_SECRET` propio, generado en el servidor
 - [ ] Comprobar que las copias de seguridad se están haciendo
-- [ ] Banner de consentimiento de cookies **antes** de poner AdSense
+- [ ] Poner `ADSENSE_ID` en el `.env` cuando tengas cuenta de AdSense. El
+      banner de cookies aparece solo al rellenarlo, y hasta que alguien acepte
+      no se carga nada de Google.

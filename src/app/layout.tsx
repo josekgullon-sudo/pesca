@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Anuncios } from "@/components/Anuncios";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { Cabecera } from "@/components/Cabecera";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
+import { BannerCookies, CambiarCookies } from "@/components/Consentimiento";
 import { NavegacionInferior } from "@/components/Navegacion";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
+import { consentimientoActual, hayQuePreguntar } from "@/lib/consentimiento";
 import { DESCRIPCION, LEMA, NOMBRE, URL_BASE } from "@/lib/marca";
 
 import { rutaDeSitios } from "@/lib/provincias";
@@ -50,12 +53,17 @@ export const viewport: Viewport = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const rutaSitios = await rutaDeSitios();
+  const [rutaSitios, consentimiento] = await Promise.all([
+    rutaDeSitios(),
+    consentimientoActual(),
+  ]);
+  const preguntarCookies = hayQuePreguntar();
 
   return (
     <html lang="es">
       <body className="antialiased">
         <DatosEstructurados schema={schemaWebSite()} />
+        <Anuncios />
 
         {/* El armazón ocupa la pantalla entera y es cada bloque el que centra
             su interior con `.contenedor`. Antes iba todo dentro de una caja de
@@ -135,14 +143,19 @@ export default async function RootLayout({
                 </nav>
               </div>
 
-              <p className="mt-8 border-t border-borde pt-6 text-sm text-texto-suave">
-                Datos legales contrastados a {FECHA_DATOS_LEGALES}. Proyecto
-                personal, sin ánimo de lucro.
+              <p className="mt-8 flex flex-wrap gap-x-4 gap-y-2 border-t border-borde pt-6 text-sm text-texto-suave">
+                <span>
+                  Datos legales contrastados a {FECHA_DATOS_LEGALES}. Proyecto
+                  personal, sin ánimo de lucro.
+                </span>
+                {preguntarCookies && <CambiarCookies />}
               </p>
             </div>
           </footer>
 
           <NavegacionInferior rutaSitios={rutaSitios} />
+
+          {preguntarCookies && <BannerCookies inicial={consentimiento} />}
         </div>
       </body>
     </html>

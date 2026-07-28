@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
+import { hayQuePreguntar } from "@/lib/consentimiento";
 import { metadatosDePagina } from "@/lib/marca";
 
 export const metadata: Metadata = metadatosDePagina({
@@ -25,6 +26,11 @@ const RESPONSABLE = {
 };
 
 export default function PaginaAvisoLegal() {
+  // El texto cambia según haya anuncios o no: decir que no hay cookies de
+  // seguimiento cuando sí las hay es exactamente la clase de afirmación que
+  // convierte un aviso legal en un problema.
+  const conAnuncios = hayQuePreguntar();
+
   return (
     <div className="contenedor max-w-prose space-y-6 py-10 md:py-14">
       <h1 className="text-3xl font-bold tracking-tight">
@@ -51,8 +57,21 @@ export default function PaginaAvisoLegal() {
         <h2 className="mb-2 text-xl font-bold">Qué datos se guardan</h2>
         <ul className="list-disc space-y-2 pl-5 leading-relaxed">
           <li>
-            <strong>Si solo consultas la web</strong>, ninguno. No hay analítica
-            ni cookies de seguimiento.
+            {conAnuncios ? (
+              <>
+                <strong>Si solo consultas la web</strong>, ningún dato personal
+                por nuestra parte. La web se financia con anuncios de Google
+                AdSense, que sí usan cookies para medir: <strong>no se cargan
+                hasta que las aceptas</strong> en el aviso que sale al entrar, y
+                si las rechazas la web funciona igual. Puedes cambiar de
+                opinión desde el enlace del pie de página.
+              </>
+            ) : (
+              <>
+                <strong>Si solo consultas la web</strong>, ninguno. No hay
+                analítica ni cookies de seguimiento.
+              </>
+            )}
           </li>
           <li>
             <strong>Si creas una cuenta</strong>: tu nombre visible, tu email y
@@ -85,8 +104,10 @@ export default function PaginaAvisoLegal() {
       <section>
         <h2 className="mb-2 text-xl font-bold">Dónde están</h2>
         <p className="leading-relaxed">
-          En un servidor propio. No se ceden a terceros, no se venden y no hay
-          servicios externos de analítica ni de publicidad.
+          En un servidor propio. No se ceden a terceros y no se venden.
+          {conAnuncios
+            ? " El único servicio externo es Google AdSense, y solo si aceptas sus cookies."
+            : " No hay servicios externos de analítica ni de publicidad."}
         </p>
       </section>
 

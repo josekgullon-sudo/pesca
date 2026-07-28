@@ -19,6 +19,9 @@ services:
       # Se lee al arrancar, no al compilar: cambiar de dominio no obliga a
       # reconstruir la imagen, basta con `docker compose up -d`.
       URL_BASE: "${URL_BASE:-https://${DOMINIO}}"
+      # Vacío = sin anuncios y sin banner de cookies. Al rellenarlo aparecen
+      # los dos, y el script de Google solo se envía si el visitante acepta.
+      ADSENSE_ID: "${ADSENSE_ID:-}"
       SEED_PASSWORD: "${SEED_PASSWORD:-cambiala-ya}"
       # Pon "no" cuando no quieras que el seed se ejecute en cada arranque.
       SEMBRAR_AL_ARRANCAR: "${SEMBRAR_AL_ARRANCAR:-si}"
