@@ -87,7 +87,7 @@ export default async function PaginaSitios({
           </p>
 
           {sitios.length === 0 ? (
-            <p className="rounded-xl border border-borde bg-fondo-elevado p-4 leading-relaxed">
+            <p className="tarjeta p-4 leading-relaxed">
               No hay ningún sitio que cumpla eso.{" "}
               {hayFiltros(filtros) && (
                 <Link

@@ -74,6 +74,16 @@
   --chip-fondo: var(--color-junco-100);
   --chip-texto: var(--color-junco-800);
 
+  /* La cabecera va en verde oscuro en los dos modos: es lo que le da identidad
+     y, al amanecer, una barra clara arriba deslumbra. */
+  --cabecera-fondo: var(--color-ribera-800);
+  --cabecera-texto: #f1f7f2;
+  --cabecera-texto-suave: #bad6bf;
+
+  /* Sombras muy suaves. Sin ellas todo eran rectángulos planos sobre beige. */
+  --sombra-tarjeta: 0 1px 2px rgb(41 35 28 / 0.06), 0 2px 8px rgb(41 35 28 / 0.05);
+  --sombra-elevada: 0 2px 4px rgb(41 35 28 / 0.08), 0 8px 24px rgb(41 35 28 / 0.09);
+
   --semaforo-verde-fondo: #e4f2e7;
   --semaforo-verde-texto: #1d5730;
   --semaforo-ambar-fondo: #fbf0da;
@@ -96,6 +106,13 @@ html.oscuro {
 
   --chip-fondo: #22302a;
   --chip-texto: #c3d3c8;
+
+  --cabecera-fondo: #16211a;
+  --cabecera-texto: #e8eee9;
+  --cabecera-texto-suave: #8fba97;
+
+  --sombra-tarjeta: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.25);
+  --sombra-elevada: 0 2px 4px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
 
   --semaforo-verde-fondo: #14301d;
   --semaforo-verde-texto: #9fd9b0;
@@ -120,6 +137,13 @@ html.oscuro {
     --chip-fondo: #22302a;
     --chip-texto: #c3d3c8;
 
+    --cabecera-fondo: #16211a;
+    --cabecera-texto: #e8eee9;
+    --cabecera-texto-suave: #8fba97;
+
+    --sombra-tarjeta: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.25);
+    --sombra-elevada: 0 2px 4px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
+
     --semaforo-verde-fondo: #14301d;
     --semaforo-verde-texto: #9fd9b0;
     --semaforo-ambar-fondo: #362405;
@@ -142,6 +166,13 @@ html.oscuro {
 
   --color-chip-fondo: var(--chip-fondo);
   --color-chip-texto: var(--chip-texto);
+
+  --color-cabecera-fondo: var(--cabecera-fondo);
+  --color-cabecera-texto: var(--cabecera-texto);
+  --color-cabecera-texto-suave: var(--cabecera-texto-suave);
+
+  --shadow-tarjeta: var(--sombra-tarjeta);
+  --shadow-elevada: var(--sombra-elevada);
 
   --color-verde-fondo: var(--semaforo-verde-fondo);
   --color-verde-texto: var(--semaforo-verde-texto);
@@ -208,4 +239,22 @@ summary::-webkit-details-marker {
     content-visibility: visible;
     block-size: auto;
   }
+}
+
+/*
+ * Las tarjetas llevan una sombra muy suave en vez de solo un borde de un
+ * píxel: con tanto beige, sin algo de profundidad todo se lee como un plano.
+ */
+.tarjeta {
+  background-color: var(--fondo-elevado);
+  border: 1px solid var(--borde);
+  border-radius: 0.75rem;
+  box-shadow: var(--sombra-tarjeta);
+}
+
+/* Los títulos, más apretados. A tamaño grande el interletrado por defecto
+   deja las palabras sueltas. */
+h1,
+h2 {
+  letter-spacing: -0.02em;
 }

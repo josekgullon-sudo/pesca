@@ -40,7 +40,7 @@ export default async function PaginaRanking() {
       </div>
 
       {!hayAlgo ? (
-        <div className="rounded-xl border border-borde bg-fondo-elevado p-8 text-center">
+        <div className="tarjeta p-8 text-center">
           <p className="text-lg font-bold">Todavía no hay capturas</p>
           <p className="mx-auto mt-2 max-w-md leading-relaxed text-texto-suave">
             En cuanto se registre la primera, aquí saldrán las piezas más
@@ -63,7 +63,7 @@ export default async function PaginaRanking() {
             </p>
 
             {porPeso.length === 0 ? (
-              <p className="rounded-xl border border-borde bg-fondo-elevado p-4 leading-relaxed text-texto-suave">
+              <p className="tarjeta p-4 leading-relaxed text-texto-suave">
                 Todavía nadie ha apuntado el peso de una captura. Es el dato que
                 mueve este ranking.
               </p>
@@ -135,7 +135,7 @@ export default async function PaginaRanking() {
                 <li key={e.slug}>
                   <Link
                     href={`/capturas?especie=${e.slug}`}
-                    className="flex h-full gap-3 overflow-hidden rounded-xl border border-borde bg-fondo-elevado"
+                    className="flex h-full gap-3 tarjeta overflow-hidden"
                   >
                     <div className="w-20 shrink-0">
                       {e.record?.fotoUrl ? (
@@ -192,7 +192,7 @@ export default async function PaginaRanking() {
           {porPescador.length > 0 && (
             <section>
               <h2 className="mb-3 text-xl font-bold">Quién va ganando</h2>
-              <div className="overflow-x-auto rounded-xl border border-borde bg-fondo-elevado">
+              <div className="overflow-x-auto tarjeta">
                 <table className="w-full min-w-[34rem] border-collapse text-left">
                   <thead>
                     <tr className="border-b border-borde text-sm uppercase tracking-wide text-texto-suave">

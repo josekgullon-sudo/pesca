@@ -121,7 +121,7 @@ export default async function PaginaCapturas({
       )}
 
       {capturas.length === 0 ? (
-        <div className="rounded-xl border border-borde bg-fondo-elevado p-8 text-center">
+        <div className="tarjeta p-8 text-center">
           <p className="text-lg font-bold">
             {filtrando ? "Nada con ese filtro" : "Todavía no hay capturas"}
           </p>
@@ -145,7 +145,7 @@ export default async function PaginaCapturas({
               <li key={c.id}>
                 <Link
                   href={`/capturas/${c.id}`}
-                  className="flex h-full flex-col overflow-hidden rounded-xl border border-borde bg-fondo-elevado"
+                  className="flex h-full flex-col tarjeta overflow-hidden"
                 >
                   <div className="relative aspect-square bg-chip-fondo">
                     {c.fotos[0] ? (

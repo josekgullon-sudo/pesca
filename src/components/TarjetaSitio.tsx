@@ -49,9 +49,14 @@ export function TarjetaSitio({ sitio }: { sitio: SitioTarjeta }) {
     <li>
       <Link
         href={`/sitios/${sitio.slug}`}
-        className="flex h-full flex-col overflow-hidden rounded-xl border border-borde bg-fondo-elevado"
+        className="flex h-full flex-col tarjeta overflow-hidden"
       >
-        <BandaSitio tipo={sitio.tipo} imagenUrl={sitio.imagenUrl} className="h-20" />
+        <BandaSitio
+          tipo={sitio.tipo}
+          imagenUrl={sitio.imagenUrl}
+          slug={sitio.slug}
+          className="h-24"
+        />
 
         <div className="flex flex-auto flex-col p-4">
         <div className="flex items-start justify-between gap-3">

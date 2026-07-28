@@ -76,7 +76,7 @@ function FilaEspecie({
   atenuada?: boolean;
 }) {
   return (
-    <li className="rounded-xl border border-borde bg-fondo-elevado p-4">
+    <li className="tarjeta p-4">
       <div className="flex items-start justify-between gap-3">
         <Link
           href={`/especies/${se.especie.slug}`}
@@ -280,7 +280,7 @@ export default async function FichaSitio({
                   {g.items.map((as) => (
                     <li
                       key={as.aparejoId}
-                      className="rounded-xl border border-borde bg-fondo-elevado p-3"
+                      className="tarjeta p-3"
                     >
                       <p className="font-semibold">{as.aparejo.nombre}</p>
                       {as.notas && (
@@ -331,7 +331,7 @@ export default async function FichaSitio({
           </div>
 
           {!avisoGrave && sitio.avisosSanitarios && (
-            <div className="rounded-xl border border-borde bg-fondo-elevado p-4">
+            <div className="tarjeta p-4">
               <h3 className="font-bold">Salud y seguridad</h3>
               <p className="mt-1 leading-relaxed">{sitio.avisosSanitarios}</p>
             </div>
@@ -373,7 +373,7 @@ function Dato({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-borde bg-fondo-elevado p-3">
+    <div className="tarjeta p-3">
       <dt className="text-xs font-bold uppercase tracking-wide text-texto-suave">
         {titulo}
       </dt>

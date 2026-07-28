@@ -86,7 +86,7 @@ export default async function FichaCaptura({
       {(captura.pesoGramos !== null || captura.longitudCm !== null) && (
         <dl className="grid grid-cols-2 gap-3">
           {captura.pesoGramos !== null && (
-            <div className="rounded-xl border border-borde bg-fondo-elevado p-4">
+            <div className="tarjeta p-4">
               <dt className="text-xs font-bold uppercase tracking-wide text-texto-suave">
                 Peso
               </dt>
@@ -96,7 +96,7 @@ export default async function FichaCaptura({
             </div>
           )}
           {captura.longitudCm !== null && (
-            <div className="rounded-xl border border-borde bg-fondo-elevado p-4">
+            <div className="tarjeta p-4">
               <dt className="text-xs font-bold uppercase tracking-wide text-texto-suave">
                 Longitud
               </dt>
@@ -110,7 +110,7 @@ export default async function FichaCaptura({
 
       <SemaforoLegal estado={captura.especie.estadoLegal} />
 
-      <dl className="divide-y divide-borde rounded-xl border border-borde bg-fondo-elevado">
+      <dl className="divide-y divide-borde tarjeta">
         <Fila titulo="Sitio">
           <Link
             href={`/sitios/${captura.sitio.slug}`}

@@ -45,7 +45,7 @@ export async function CapturasDelSitio({
     return (
       <section>
         <h2 className="mb-2 text-xl font-bold">Lo que se ha pescado aquí</h2>
-        <p className="max-w-prose rounded-xl border border-borde bg-fondo-elevado p-4 leading-relaxed text-texto-suave">
+        <p className="max-w-prose tarjeta p-4 leading-relaxed text-texto-suave">
           Todavía nadie ha registrado ninguna captura en este sitio. La primera
           que se apunte sale aquí.
         </p>
@@ -94,7 +94,7 @@ export async function CapturasDelSitio({
           <li key={c.id}>
             <Link
               href={`/capturas/${c.id}`}
-              className="block overflow-hidden rounded-xl border border-borde bg-fondo-elevado"
+              className="block tarjeta overflow-hidden"
             >
               <div className="aspect-square">
                 {c.fotos[0] ? (

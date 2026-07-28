@@ -40,7 +40,7 @@ export function FiltrosSitios({
       // En escritorio hay sitio de sobra: la clase `filtros-panel` hace que se
       // muestren siempre desplegados y sin el botón de abrir/cerrar (ver
       // globals.css). En móvil sigue siendo un desplegable normal.
-      className="filtros-panel rounded-xl border border-borde bg-fondo-elevado"
+      className="filtros-panel tarjeta"
     >
       <summary className="flex min-h-touch cursor-pointer list-none items-center justify-between px-4 font-bold">
         <span>Filtrar</span>

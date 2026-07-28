@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BandaSitio } from "@/components/BandaSitio";
 import { FotoEspecie } from "@/components/FotoEspecie";
+import { Portada } from "@/components/Portada";
 import { usuarioOpcional } from "@/lib/auth";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import { ETIQUETA_TIPO_SITIO, type TipoSitio } from "@/lib/enums";
@@ -73,40 +74,50 @@ export default async function Home() {
   const destacados = (enTemporada.length >= 3 ? enTemporada : sitios).slice(0, 3);
 
   return (
-    <div className="space-y-10">
-      {/* --- Portada --- */}
-      <section>
-        {usuario ? (
-          <p className="font-semibold text-texto-suave">Hola, {usuario.nombre}</p>
-        ) : (
-          <p className="font-semibold text-texto-suave">
-            Guía de pesca de la provincia de Sevilla
-          </p>
-        )}
-        <h1 className="mt-1 text-4xl font-bold leading-tight tracking-tight">
-          {usuario ? "¿Nos vamos a pescar?" : "Dónde pescar en Sevilla"}
-        </h1>
-        {!usuario && (
-          <p className="mt-2 max-w-prose text-lg leading-relaxed text-texto-suave">
-            Catorce embalses y ríos con sus especies, qué llevar para pescarlas
-            y qué dice la ley de cada una. Todo se puede consultar sin cuenta;
-            entrar solo hace falta para apuntar capturas.
-          </p>
-        )}
+    <div className="space-y-10 [&>section:not(:first-child)]:px-0">
+      {/* --- Portada: ilustración a sangre con el titular encima --- */}
+      <section className="-mx-4 -mt-6 md:-mx-6 md:-mt-10">
+        <div className="relative">
+          <Portada className="h-56 w-full sm:h-72 md:h-80" />
 
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="/sitios"
-            className="flex min-h-touch flex-1 items-center justify-center rounded-xl bg-acento px-6 text-lg font-bold text-acento-texto"
-          >
-            Ver dónde ir
-          </Link>
-          <Link
-            href={usuario ? "/capturas/nueva" : "/ranking"}
-            className="flex min-h-touch flex-1 items-center justify-center rounded-xl border-2 border-borde bg-fondo-elevado px-6 text-lg font-bold"
-          >
-            {usuario ? "Registrar captura" : "Ver el ranking"}
-          </Link>
+          {/* Degradado para que el texto se lea sobre cualquier parte del dibujo */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/70 via-black/25 to-transparent"
+          />
+
+          <div className="absolute inset-x-0 bottom-0 p-4 md:p-6">
+            <p className="text-sm font-bold uppercase tracking-widest text-white/85 [text-shadow:0_1px_3px_rgb(0_0_0/0.6)]">
+              {usuario ? `Hola, ${usuario.nombre}` : "Provincia de Sevilla"}
+            </p>
+            <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight text-white [text-shadow:0_2px_8px_rgb(0_0_0/0.55)] sm:text-4xl md:text-5xl">
+              {usuario ? "¿Nos vamos a pescar?" : "Dónde pescar en Sevilla"}
+            </h1>
+          </div>
+        </div>
+
+        <div className="px-4 pt-5 md:px-6">
+          {!usuario && (
+            <p className="max-w-prose text-lg leading-relaxed text-texto-suave">
+              {sitios.length} embalses y ríos con sus especies, qué llevar para
+              pescarlas y qué dice la ley de cada una. Se consulta sin cuenta.
+            </p>
+          )}
+
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/sitios"
+              className="flex min-h-touch flex-1 items-center justify-center rounded-xl bg-acento px-6 text-lg font-bold text-acento-texto shadow-tarjeta"
+            >
+              Ver dónde ir
+            </Link>
+            <Link
+              href={usuario ? "/capturas/nueva" : "/ranking"}
+              className="flex min-h-touch flex-1 items-center justify-center rounded-xl border-2 border-borde bg-fondo-elevado px-6 text-lg font-bold"
+            >
+              {usuario ? "Registrar captura" : "Ver el ranking"}
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -157,7 +168,7 @@ export default async function Home() {
               <li key={c.id}>
                 <Link
                   href={`/capturas/${c.id}`}
-                  className="block overflow-hidden rounded-xl border border-borde bg-fondo-elevado"
+                  className="block tarjeta overflow-hidden"
                 >
                   <div className="aspect-square">
                     {c.fotos[0] ? (
@@ -213,9 +224,9 @@ export default async function Home() {
             <li key={s.slug}>
               <Link
                 href={`/sitios/${s.slug}`}
-                className="flex h-full flex-col overflow-hidden rounded-xl border border-borde bg-fondo-elevado"
+                className="flex h-full flex-col tarjeta overflow-hidden"
               >
-                <BandaSitio tipo={s.tipo} imagenUrl={s.imagenUrl} />
+                <BandaSitio tipo={s.tipo} imagenUrl={s.imagenUrl} slug={s.slug} />
                 <div className="p-4">
                   <h3 className="font-bold leading-tight">{s.nombre}</h3>
                   <p className="mt-0.5 text-sm text-texto-suave">
@@ -244,7 +255,7 @@ function Marcador({
   pie?: string;
 }) {
   return (
-    <div className="rounded-xl border border-borde bg-fondo-elevado p-4">
+    <div className="tarjeta p-4">
       <dt className="text-xs font-bold uppercase tracking-wide text-texto-suave">
         {titulo}
       </dt>

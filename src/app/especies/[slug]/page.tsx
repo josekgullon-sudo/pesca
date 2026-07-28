@@ -164,7 +164,7 @@ export default async function FichaEspecie({
                     <li key={se.sitioId}>
                       <Link
                         href={`/sitios/${se.sitio.slug}`}
-                        className="flex h-full flex-col rounded-xl border border-borde bg-fondo-elevado p-4"
+                        className="flex h-full flex-col tarjeta p-4"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div>
@@ -206,7 +206,7 @@ export default async function FichaEspecie({
                 {especie.aparejos.map((ae) => (
                   <li
                     key={ae.aparejoId}
-                    className="rounded-xl border border-borde bg-fondo-elevado p-4"
+                    className="tarjeta p-4"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -265,7 +265,7 @@ export default async function FichaEspecie({
           {especie.tallaMinimaCm !== null && (
             <section>
               <h2 className="mb-2 text-xl font-bold">Talla mínima</h2>
-              <p className="rounded-xl border border-borde bg-fondo-elevado p-4 text-2xl font-bold">
+              <p className="tarjeta p-4 text-2xl font-bold">
                 {especie.tallaMinimaCm} cm
               </p>
             </section>

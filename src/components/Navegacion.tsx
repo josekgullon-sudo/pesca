@@ -9,6 +9,10 @@ import { usePathname } from "next/navigation";
  * En móvil va abajo, porque se usa con una mano, de pie y con la caña en la
  * otra: el pulgar no llega arriba del todo. En escritorio va en la cabecera,
  * que es donde la busca todo el mundo, y la de abajo desaparece.
+ *
+ * Son cinco pestañas y no seis a propósito: con seis, a 390 px de ancho, las
+ * etiquetas se tocaban unas con otras. El mapa se abre desde el listado de
+ * sitios, que es de donde se entra a él de todas formas.
  */
 
 type Enlace = {
@@ -24,14 +28,7 @@ const ENLACES: Enlace[] = [
     href: "/sitios",
     etiqueta: "Sitios",
     icono: IconoLista,
-    // Las fichas de sitio cuelgan de aquí, pero el mapa tiene pestaña propia.
-    activo: (r) => r.startsWith("/sitios") && r !== "/sitios/mapa",
-  },
-  {
-    href: "/sitios/mapa",
-    etiqueta: "Mapa",
-    icono: IconoMapa,
-    activo: (r) => r === "/sitios/mapa",
+    activo: (r) => r.startsWith("/sitios"),
   },
   {
     href: "/especies",
@@ -69,8 +66,8 @@ export function NavegacionCabecera() {
                 aria-current={activo ? "page" : undefined}
                 className={`inline-flex min-h-11 items-center rounded-lg px-3 font-semibold ${
                   activo
-                    ? "bg-chip-fondo text-acento"
-                    : "text-texto-suave hover:text-texto"
+                    ? "bg-cabecera-texto/15 text-cabecera-texto"
+                    : "text-cabecera-texto-suave hover:text-cabecera-texto"
                 }`}
               >
                 {etiqueta}
@@ -147,24 +144,6 @@ function IconoLista({ activo }: PropsIcono) {
       strokeLinecap="round"
     >
       <path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" />
-    </svg>
-  );
-}
-
-function IconoMapa({ activo }: PropsIcono) {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 24 24"
-      className="h-6 w-6"
-      fill={activo ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
-      <circle cx="12" cy="10" r="2.5" fill={activo ? "var(--fondo)" : "none"} />
     </svg>
   );
 }

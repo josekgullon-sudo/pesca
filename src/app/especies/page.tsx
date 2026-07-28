@@ -87,7 +87,7 @@ export default async function PaginaEspecies() {
                 <li key={e.slug}>
                   <Link
                     href={`/especies/${e.slug}`}
-                    className="flex h-full gap-3 overflow-hidden rounded-xl border border-borde bg-fondo-elevado"
+                    className="flex h-full gap-3 tarjeta overflow-hidden"
                   >
                     <FotoEspecie
                       nombre={e.nombreComun}

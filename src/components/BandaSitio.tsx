@@ -1,17 +1,22 @@
+import { Portada } from "./Portada";
+
 /**
- * Banda de color en la cabecera de una tarjeta de sitio.
+ * Banda de cabecera de una tarjeta de sitio.
  *
- * Cuando el sitio tenga foto propia se usa esa; mientras tanto, un degradado
- * según el tipo de agua, que ya distingue de un vistazo un embalse de un río
- * y evita que el listado sea un muro de texto.
+ * Cuando el sitio tenga foto propia se usa esa; mientras tanto, la misma
+ * ilustración de la portada con el tono del tipo de agua. Antes era un
+ * degradado plano y las tarjetas parecían fichas sin terminar.
  */
 export function BandaSitio({
   tipo,
   imagenUrl,
+  slug,
   className = "h-24",
 }: {
   tipo: string;
   imagenUrl: string | null;
+  /** Hace únicos los degradados del SVG cuando hay varias tarjetas a la vez. */
+  slug: string;
   className?: string;
 }) {
   if (imagenUrl) {
@@ -21,17 +26,6 @@ export function BandaSitio({
     );
   }
 
-  const degradado =
-    tipo === "rio"
-      ? "from-agua-400 to-agua-700"
-      : tipo === "canal"
-        ? "from-junco-400 to-junco-700"
-        : "from-ribera-400 to-ribera-700";
-
-  return (
-    <div
-      aria-hidden
-      className={`w-full bg-gradient-to-br ${degradado} ${className}`}
-    />
-  );
+  const variante = tipo === "rio" || tipo === "canal" ? tipo : "embalse";
+  return <Portada className={`w-full ${className}`} variante={variante} id={slug} />;
 }

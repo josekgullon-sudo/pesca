@@ -8,11 +8,11 @@ export async function Cabecera() {
   const nombre = sesion?.user?.name;
 
   return (
-    <header className="border-b border-borde px-4 py-3 md:px-6">
+    <header className="bg-cabecera-fondo px-4 py-3 text-cabecera-texto md:px-6">
       <div className="flex items-center justify-between gap-4">
         <Link
           href="/"
-          className="shrink-0 text-2xl font-bold tracking-tight text-acento"
+          className="shrink-0 text-2xl font-bold tracking-tight text-cabecera-texto"
         >
           Pesca Sevilla
         </Link>
@@ -24,14 +24,14 @@ export async function Cabecera() {
           <div className="flex shrink-0 items-center gap-2">
             <Link
               href="/cuenta"
-              className="min-h-11 rounded-lg px-2 py-1 text-sm font-semibold text-texto underline underline-offset-2"
+              className="min-h-11 rounded-lg px-2 py-1 text-sm font-semibold text-cabecera-texto underline underline-offset-2"
             >
               {nombre}
             </Link>
             <form action={salir}>
               <button
                 type="submit"
-                className="min-h-11 rounded-lg px-2 text-sm font-semibold text-texto-suave underline underline-offset-2"
+                className="min-h-11 rounded-lg px-2 text-sm font-semibold text-cabecera-texto-suave underline underline-offset-2"
               >
                 Salir
               </button>
@@ -40,7 +40,7 @@ export async function Cabecera() {
         ) : (
           <Link
             href="/entrar"
-            className="inline-flex min-h-11 shrink-0 items-center rounded-lg border-2 border-borde px-3 font-semibold"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-lg border-2 border-cabecera-texto-suave/50 px-3 font-semibold text-cabecera-texto"
           >
             Entrar
           </Link>
