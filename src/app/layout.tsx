@@ -6,6 +6,7 @@ import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { NavegacionInferior } from "@/components/Navegacion";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
 import { DESCRIPCION, LEMA, NOMBRE, URL_BASE } from "@/lib/marca";
+
 import { rutaDeSitios } from "@/lib/provincias";
 import { schemaWebSite } from "@/lib/schema";
 import "./globals.css";
@@ -56,27 +57,84 @@ export default async function RootLayout({
       <body className="antialiased">
         <DatosEstructurados schema={schemaWebSite()} />
 
-        <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col">
+        {/* El armazón ocupa la pantalla entera y es cada bloque el que centra
+            su interior con `.contenedor`. Antes iba todo dentro de una caja de
+            1152 px y en un monitor grande la web flotaba en el medio. */}
+        <div className="flex min-h-dvh w-full flex-col">
           <Cabecera />
 
-          <main className="flex-1 px-4 py-6 md:px-6 md:py-10">{children}</main>
+          {/* Sin márgenes propios: cada página centra lo suyo con `.contenedor`
+              y así la portada puede ir a sangre, de borde a borde. */}
+          <main className="flex-1">{children}</main>
 
-          <footer className="mt-8 border-t border-borde px-4 py-6 md:px-6">
-            <div className="max-w-prose">
-              <AvisoLegal />
-            </div>
-            <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-texto-suave">
-              <span>
+          <footer className="mt-16 border-t border-borde bg-fondo-elevado py-10">
+            <div className="contenedor">
+              <div className="grid gap-8 lg:grid-cols-[minmax(0,42rem)_1fr]">
+                <div>
+                  <p className="text-lg font-bold tracking-tight">{NOMBRE}</p>
+                  <p className="mt-1 text-texto-suave">{LEMA}</p>
+                  <div className="mt-4">
+                    <AvisoLegal />
+                  </div>
+                </div>
+
+                <nav
+                  aria-label="Pie de página"
+                  className="grid gap-6 sm:grid-cols-2 lg:justify-items-end"
+                >
+                  <div>
+                    <p className="text-sm font-bold uppercase tracking-wide text-texto-suave">
+                      La guía
+                    </p>
+                    <ul className="mt-2 space-y-1.5">
+                      <li>
+                        <Link href={rutaSitios} className="hover:text-acento">
+                          Dónde pescar
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/especies" className="hover:text-acento">
+                          Especies
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/ranking" className="hover:text-acento">
+                          Ranking
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/capturas" className="hover:text-acento">
+                          Capturas
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-bold uppercase tracking-wide text-texto-suave">
+                      Legal
+                    </p>
+                    <ul className="mt-2 space-y-1.5">
+                      <li>
+                        <Link href="/normas" className="hover:text-acento">
+                          Normas de uso
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/aviso-legal" className="hover:text-acento">
+                          Aviso legal y privacidad
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </nav>
+              </div>
+
+              <p className="mt-8 border-t border-borde pt-6 text-sm text-texto-suave">
                 Datos legales contrastados a {FECHA_DATOS_LEGALES}. Proyecto
                 personal, sin ánimo de lucro.
-              </span>
-              <Link href="/normas" className="underline underline-offset-2">
-                Normas de uso
-              </Link>
-              <Link href="/aviso-legal" className="underline underline-offset-2">
-                Aviso legal y privacidad
-              </Link>
-            </p>
+              </p>
+            </div>
           </footer>
 
           <NavegacionInferior rutaSitios={rutaSitios} />

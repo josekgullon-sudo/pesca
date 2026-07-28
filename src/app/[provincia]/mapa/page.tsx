@@ -82,7 +82,7 @@ export default async function PaginaMapa({
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="contenedor space-y-6 py-10 md:py-14">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">

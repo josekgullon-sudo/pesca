@@ -26,7 +26,7 @@ const RESPONSABLE = {
 
 export default function PaginaAvisoLegal() {
   return (
-    <div className="mx-auto max-w-prose space-y-6">
+    <div className="contenedor max-w-prose space-y-6 py-10 md:py-14">
       <h1 className="text-3xl font-bold tracking-tight">
         Aviso legal y privacidad
       </h1>

@@ -69,12 +69,14 @@ export default async function PaginaEspecies() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="contenedor space-y-12 py-10 md:py-14">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Especies</h1>
-        <p className="mt-1 max-w-prose text-texto-suave">
-          Qué se puede pescar en la provincia, qué hay que devolver al agua y
-          qué no se toca. El color de cada ficha es su semáforo legal.
+        <h1 className="titulo-pagina font-bold">
+          Peces de agua dulce de España
+        </h1>
+        <p className="mt-3 max-w-prose text-lg leading-relaxed text-texto-suave">
+          Qué se puede pescar, qué hay que devolver al agua y qué no se toca. El
+          color de cada ficha es su semáforo legal.
         </p>
       </div>
 
@@ -103,26 +105,34 @@ export default async function PaginaEspecies() {
 
         return (
           <section key={grupo.titulo}>
-            <h2 className="text-xl font-bold">{grupo.titulo}</h2>
-            <p className="mt-1 mb-3 max-w-prose text-[0.95rem] leading-relaxed text-texto-suave">
+            <h2 className="titulo-seccion font-bold">{grupo.titulo}</h2>
+            <p className="mt-2 mb-5 max-w-prose leading-relaxed text-texto-suave">
               {grupo.explicacion}
             </p>
 
-            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {/* La foto arriba y grande, no en una tira de 96 px al lado: un pez
+                se identifica por su forma y su color, y en un sello no se ve
+                ninguna de las dos cosas. */}
+            {/* Dos columnas ya en móvil: a una sola, cada ficha ocupaba la
+                pantalla entera y había que hacer diez gestos para ver el
+                listado. */}
+            <ul className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
               {delGrupo.map((e) => (
                 <li key={e.slug}>
                   <Link
                     href={`/especies/${e.slug}`}
-                    className="flex h-full gap-3 tarjeta overflow-hidden"
+                    className="tarjeta tarjeta-enlace flex h-full flex-col overflow-hidden"
                   >
-                    <FotoEspecie
-                      nombre={e.nombreComun}
-                      imagenUrl={e.imagenUrl}
-                      estadoLegal={e.estadoLegal}
-                      className="w-24 shrink-0 self-stretch"
-                    />
+                    <div className="aspect-[4/3] overflow-hidden">
+                      <FotoEspecie
+                        nombre={e.nombreComun}
+                        imagenUrl={e.imagenUrl}
+                        estadoLegal={e.estadoLegal}
+                        className="foto-zoom h-full w-full"
+                      />
+                    </div>
 
-                    <div className="min-w-0 flex-1 py-3 pr-3">
+                    <div className="flex flex-auto flex-col p-4">
                       <h3 className="text-lg font-bold leading-tight">
                         {e.nombreComun}
                       </h3>
@@ -130,7 +140,7 @@ export default async function PaginaEspecies() {
                         {e.nombreCientifico}
                       </p>
 
-                      <div className="mt-2 flex flex-wrap gap-1.5">
+                      <div className="mt-3 flex flex-auto flex-wrap items-end gap-1.5">
                         <EtiquetaLegal estado={e.estadoLegal} />
                         <span className="rounded-lg bg-chip-fondo px-2 py-1 text-xs font-bold text-chip-texto">
                           {ETIQUETA_COMESTIBILIDAD[

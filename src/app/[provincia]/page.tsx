@@ -88,7 +88,7 @@ export default async function PaginaProvincia({
   ]);
 
   return (
-    <div className="space-y-6">
+    <div className="contenedor space-y-6 py-10 md:py-14">
       <DatosEstructurados
         schema={schemaMigas([
           { nombre: "Inicio", ruta: "/" },
@@ -102,28 +102,30 @@ export default async function PaginaProvincia({
         </Link>
       </nav>
 
-      {provincia.descripcion && (
-        <p className="max-w-prose text-lg leading-relaxed text-texto-suave">
-          {provincia.descripcion}
-        </p>
-      )}
-
-      <div className="flex items-start justify-between gap-3">
+      {/* El título primero y la descripción debajo. Al revés, quien entraba se
+          encontraba un párrafo sin saber todavía de qué provincia hablaba. */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="titulo-pagina font-bold">
             Dónde pescar en {provincia.nombre}
           </h1>
-          <p className="mt-1 text-texto-suave">
+          <p className="mt-1 text-lg text-texto-suave">
             Embalses y ríos de la provincia, del más cercano al más lejano.
           </p>
         </div>
         <Link
           href={urlConFiltros(`/${provincia.slug}/mapa`, filtros)}
-          className="inline-flex min-h-touch shrink-0 items-center rounded-xl border-2 border-borde bg-fondo-elevado px-4 font-semibold"
+          className="inline-flex min-h-touch shrink-0 items-center rounded-xl border-2 border-borde bg-fondo-elevado px-5 font-semibold hover:border-acento"
         >
           Ver mapa
         </Link>
       </div>
+
+      {provincia.descripcion && (
+        <p className="max-w-prose text-lg leading-relaxed text-texto-suave">
+          {provincia.descripcion}
+        </p>
+      )}
 
       {/* En escritorio los filtros se quedan fijos a la izquierda mientras se
           recorre la lista; en móvil van arriba, plegados. */}
@@ -135,7 +137,7 @@ export default async function PaginaProvincia({
         </div>
 
         <div className="mt-6 md:mt-0">
-          <p className="mb-3 font-semibold text-texto-suave">
+          <p className="mb-4 font-semibold text-texto-suave">
             {sitios.length === 1 ? "1 sitio" : `${sitios.length} sitios`}
           </p>
 
@@ -152,7 +154,7 @@ export default async function PaginaProvincia({
               )}
             </p>
           ) : (
-            <ul className="grid gap-3 lg:grid-cols-2">
+            <ul className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
               {sitios.map((s) => (
                 <TarjetaSitio key={s.slug} sitio={s} provincia={provincia.slug} />
               ))}

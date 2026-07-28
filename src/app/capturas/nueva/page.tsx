@@ -47,7 +47,7 @@ export default async function NuevaCaptura({
     : null;
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="contenedor max-w-2xl py-10 md:py-14">
       <h1 className="mb-6 text-3xl font-bold tracking-tight">
         Registrar captura
       </h1>

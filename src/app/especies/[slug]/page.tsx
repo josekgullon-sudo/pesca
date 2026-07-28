@@ -92,7 +92,7 @@ export default async function FichaEspecie({
   const comestible = especie.comestible as Comestibilidad;
 
   return (
-    <article>
+    <article className="contenedor py-10 md:py-14">
       <DatosEstructurados
         schema={[
           schemaEspecie({

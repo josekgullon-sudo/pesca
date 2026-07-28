@@ -14,7 +14,7 @@ export default async function PaginaRegistro() {
   if (await usuarioOpcional()) redirect("/");
 
   return (
-    <div className="mx-auto max-w-md space-y-6 py-2">
+    <div className="contenedor max-w-md space-y-6 py-12 md:py-20">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Crear cuenta</h1>
         <p className="mt-2 leading-relaxed text-texto-suave">

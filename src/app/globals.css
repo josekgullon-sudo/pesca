@@ -241,15 +241,99 @@ summary::-webkit-details-marker {
   }
 }
 
-/*
- * Las tarjetas llevan una sombra muy suave en vez de solo un borde de un
- * píxel: con tanto beige, sin algo de profundidad todo se lee como un plano.
- */
-.tarjeta {
-  background-color: var(--fondo-elevado);
-  border: 1px solid var(--borde);
-  border-radius: 0.75rem;
-  box-shadow: var(--sombra-tarjeta);
+@layer components {
+  /*
+   * El ancho de la web.
+   *
+   * Va en el contenido, no en el armazón: la cabecera, el pie y las portadas
+   * ocupan la pantalla entera y solo su interior se centra. Metiéndolo todo en
+   * una caja, en un monitor grande la web quedaba flotando en medio con dos
+   * franjas de fondo a los lados.
+   *
+   * 90rem son 1440 px. Más que eso y las rejillas de tarjetas empiezan a
+   * separarse tanto que dejan de leerse como una lista.
+   */
+  .contenedor {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .contenedor {
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .contenedor {
+      padding-inline: 3rem;
+    }
+  }
+
+  /*
+   * Las tarjetas llevan una sombra muy suave en vez de solo un borde de un
+   * píxel: con tanto beige, sin algo de profundidad todo se lee como un plano.
+   */
+  .tarjeta {
+    background-color: var(--fondo-elevado);
+    border: 1px solid var(--borde);
+    border-radius: 0.875rem;
+    box-shadow: var(--sombra-tarjeta);
+  }
+
+  /*
+   * Las tarjetas que son un enlace se levantan un poco al pasar por encima. En
+   * escritorio es la única forma de saber qué es pulsable: en el móvil te lo
+   * dice el dedo, con ratón no te lo dice nada.
+   */
+  .tarjeta-enlace {
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  @media (hover: hover) {
+    .tarjeta-enlace:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--sombra-elevada);
+      border-color: var(--acento);
+    }
+
+    /* La foto de dentro acompaña con un acercamiento muy leve. */
+    .tarjeta-enlace:hover .foto-zoom {
+      transform: scale(1.04);
+    }
+  }
+
+  .foto-zoom {
+    transition: transform 0.35s ease;
+  }
+
+  /*
+   * Titulares que crecen con la pantalla. Con saltos fijos por puntos de ruptura,
+   * en un monitor grande el titular de la portada se quedaba pequeño y la
+   * cabecera parecía media vacía.
+   */
+  .titulo-hero {
+    font-size: clamp(2rem, 1.1rem + 3.6vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .titulo-pagina {
+    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .titulo-seccion {
+    font-size: clamp(1.25rem, 1.05rem + 0.7vw, 1.6rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
 }
 
 /* Los títulos, más apretados. A tamaño grande el interletrado por defecto

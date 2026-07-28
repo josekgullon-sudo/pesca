@@ -11,7 +11,7 @@ export function BandaSitio({
   tipo,
   imagenUrl,
   slug,
-  className = "h-24",
+  className = "h-24 w-full",
 }: {
   tipo: string;
   imagenUrl: string | null;
@@ -22,10 +22,10 @@ export function BandaSitio({
   if (imagenUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={imagenUrl} alt="" className={`w-full object-cover ${className}`} />
+      <img src={imagenUrl} alt="" className={`object-cover ${className}`} />
     );
   }
 
   const variante = tipo === "rio" || tipo === "canal" ? tipo : "embalse";
-  return <Portada className={`w-full ${className}`} variante={variante} id={slug} />;
+  return <Portada className={className} variante={variante} id={slug} />;
 }

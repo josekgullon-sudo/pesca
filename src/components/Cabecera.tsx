@@ -3,6 +3,7 @@ import { salir } from "@/app/entrar/actions";
 import { auth } from "@/lib/auth";
 import { NOMBRE } from "@/lib/marca";
 import { rutaDeSitios } from "@/lib/provincias";
+import { Marca } from "./Marca";
 import { NavegacionCabecera } from "./Navegacion";
 
 export async function Cabecera() {
@@ -10,30 +11,36 @@ export async function Cabecera() {
   const nombre = sesion?.user?.name;
 
   return (
-    <header className="bg-cabecera-fondo px-4 py-3 text-cabecera-texto md:px-6">
-      <div className="flex items-center justify-between gap-4">
+    // Pegajosa en escritorio: los listados son largos y tener siempre a mano la
+    // navegación evita subir del todo para cambiar de sección. En móvil no hace
+    // falta, que para eso está la barra de abajo, y ahí la pantalla es oro.
+    <header className="bg-cabecera-fondo text-cabecera-texto md:sticky md:top-0 md:z-40">
+      <div className="contenedor flex items-center justify-between gap-6 py-3">
         <Link
           href="/"
-          className="shrink-0 text-2xl font-bold tracking-tight text-cabecera-texto"
+          className="flex shrink-0 items-center gap-2.5 text-cabecera-texto"
         >
-          {NOMBRE}
+          <Marca className="h-8 w-8 text-ribera-300" />
+          <span className="text-xl font-bold tracking-tight md:text-2xl">
+            {NOMBRE}
+          </span>
         </Link>
 
         {/* En escritorio la navegación va aquí; en móvil, en la barra de abajo. */}
         <NavegacionCabecera rutaSitios={rutaSitios} />
 
         {nombre ? (
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1">
             <Link
               href="/cuenta"
-              className="min-h-11 rounded-lg px-2 py-1 text-sm font-semibold text-cabecera-texto underline underline-offset-2"
+              className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-cabecera-texto hover:bg-white/10"
             >
               {nombre}
             </Link>
             <form action={salir}>
               <button
                 type="submit"
-                className="min-h-11 rounded-lg px-2 text-sm font-semibold text-cabecera-texto-suave underline underline-offset-2"
+                className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-cabecera-texto-suave hover:bg-white/10 hover:text-cabecera-texto"
               >
                 Salir
               </button>
@@ -42,7 +49,7 @@ export async function Cabecera() {
         ) : (
           <Link
             href="/entrar"
-            className="inline-flex min-h-11 shrink-0 items-center rounded-lg border-2 border-cabecera-texto-suave/50 px-3 font-semibold text-cabecera-texto"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-xl border-2 border-cabecera-texto-suave/40 px-4 font-semibold text-cabecera-texto hover:border-cabecera-texto-suave hover:bg-white/10"
           >
             Entrar
           </Link>

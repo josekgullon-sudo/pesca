@@ -7,7 +7,7 @@ import { usuarioOpcional } from "@/lib/auth";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import { ETIQUETA_TIPO_SITIO, type TipoSitio } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
-import { provinciasPublicadas } from "@/lib/provincias";
+import { provinciasPublicadas, rutaDeSitios } from "@/lib/provincias";
 
 // El título y la descripción los pone el layout —si se repitieran aquí, la
 // plantilla «%s · Mapa de Pesca» dejaría el nombre dos veces—, así que solo
@@ -29,8 +29,17 @@ export default async function Home() {
   const usuario = await usuarioOpcional();
   const mes = mesActual();
 
-  const [provincias, sitios, ultimas, misCapturas, totalCapturas, especiesDistintas, mayor] =
-    await Promise.all([
+  const [
+    rutaSitios,
+    provincias,
+    sitios,
+    ultimas,
+    misCapturas,
+    totalCapturas,
+    especiesDistintas,
+    mayor,
+  ] = await Promise.all([
+      rutaDeSitios(),
       provinciasPublicadas(),
       prisma.sitio.findMany({
         where: { provincia: { publicada: true } },
@@ -94,65 +103,66 @@ export default async function Home() {
     destacados.find((s) => s.imagenUrl) ?? sitios.find((s) => s.imagenUrl) ?? null;
 
   return (
-    <div className="space-y-10 [&>section:not(:first-child)]:px-0">
-      {/* --- Portada: ilustración a sangre con el titular encima --- */}
-      <section className="-mx-4 -mt-6 md:-mx-6 md:-mt-10">
-        <div className="relative">
+    <div>
+      {/* --- Portada a sangre: la foto ocupa la pantalla de borde a borde y el
+          titular va encima, no debajo. Es lo primero que ve quien llega de
+          Google y tiene que decir de qué va esto en dos segundos. --- */}
+      {/* La foto va de fondo y el contenido manda en la altura: con altura fija
+          y el texto colocado encima en absoluto, en un móvil estrecho el
+          titular crecía hacia arriba y se salía por encima de la cabecera. */}
+      <section className="relative isolate">
+        <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
           {/* Si algún sitio tiene ya su foto, la portada la usa; si no, la
               ilustración. Así la web mejora sola según se van bajando fotos. */}
           {fotoPortada ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={fotoPortada.imagenUrl ?? ""}
-              alt={fotoPortada.nombre}
-              className="h-56 w-full object-cover sm:h-72 md:h-80"
+              alt=""
+              className="h-full w-full object-cover"
             />
           ) : (
-            <Portada className="h-56 w-full sm:h-72 md:h-80" />
+            <Portada className="h-full w-full" />
           )}
 
-          {/* Degradado para que el texto se lea sobre cualquier parte del dibujo */}
-          <div
-            aria-hidden
-            className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/70 via-black/25 to-transparent"
-          />
-
-          {fotoPortada?.imagenAutor && (
-            <p className="absolute top-2 right-3 text-[0.65rem] text-white/60">
-              {fotoPortada.nombre} · {fotoPortada.imagenAutor}
-              {fotoPortada.imagenLicencia && ` · ${fotoPortada.imagenLicencia}`}
-            </p>
-          )}
-
-          <div className="absolute inset-x-0 bottom-0 p-4 md:p-6">
-            <p className="text-sm font-bold uppercase tracking-widest text-white/85 [text-shadow:0_1px_3px_rgb(0_0_0/0.6)]">
-              {usuario ? `Hola, ${usuario.nombre}` : "Guía de pesca continental"}
-            </p>
-            <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight text-white [text-shadow:0_2px_8px_rgb(0_0_0/0.55)] sm:text-4xl md:text-5xl">
-              {usuario ? "¿Nos vamos a pescar?" : "Dónde pescar en España"}
-            </h1>
-          </div>
+          {/* Oscurecido de arriba abajo: abajo para que se lea el texto, arriba
+              para que la cabecera pegajosa no se pierda sobre una foto clara. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/30" />
         </div>
 
-        <div className="px-4 pt-5 md:px-6">
+        {fotoPortada?.imagenAutor && (
+          <p className="absolute top-3 right-4 text-[0.7rem] text-white/55">
+            {fotoPortada.nombre} · {fotoPortada.imagenAutor}
+            {fotoPortada.imagenLicencia && ` · ${fotoPortada.imagenLicencia}`}
+          </p>
+        )}
+
+        <div className="contenedor flex min-h-[22rem] flex-col justify-end py-12 sm:min-h-[26rem] md:py-16 lg:min-h-[32rem]">
+          <p className="text-sm font-bold uppercase tracking-widest text-white/85 [text-shadow:0_1px_3px_rgb(0_0_0/0.6)]">
+            {usuario ? `Hola, ${usuario.nombre}` : "Guía de pesca continental"}
+          </p>
+          <h1 className="titulo-hero mt-2 max-w-3xl font-bold text-white [text-shadow:0_2px_12px_rgb(0_0_0/0.5)]">
+            {usuario ? "¿Nos vamos a pescar?" : "Dónde pescar en España"}
+          </h1>
+
           {!usuario && (
-            <p className="max-w-prose text-lg leading-relaxed text-texto-suave">
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/85 [text-shadow:0_1px_6px_rgb(0_0_0/0.5)] md:text-xl">
               Embalses y ríos con sus especies, qué llevar para pescarlas y qué
               dice la ley de cada una, provincia por provincia. Se consulta sin
               cuenta.
             </p>
           )}
 
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/sitios"
-              className="flex min-h-touch flex-1 items-center justify-center rounded-xl bg-acento px-6 text-lg font-bold text-acento-texto shadow-tarjeta"
+              href={rutaSitios}
+              className="inline-flex min-h-touch items-center justify-center rounded-xl bg-acento px-8 text-lg font-bold text-acento-texto shadow-elevada hover:brightness-110"
             >
               Ver dónde ir
             </Link>
             <Link
               href={usuario ? "/capturas/nueva" : "/ranking"}
-              className="flex min-h-touch flex-1 items-center justify-center rounded-xl border-2 border-borde bg-fondo-elevado px-6 text-lg font-bold"
+              className="inline-flex min-h-touch items-center justify-center rounded-xl border-2 border-white/40 bg-white/10 px-8 text-lg font-bold text-white backdrop-blur-sm hover:bg-white/20"
             >
               {usuario ? "Registrar captura" : "Ver el ranking"}
             </Link>
@@ -160,164 +170,260 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* --- Marcador entre los dos --- */}
-      <section>
-        <div className="mb-3 flex items-baseline justify-between gap-3">
-          <h2 className="text-xl font-bold">Cómo vamos</h2>
-          <Link
-            href="/ranking"
-            className="font-semibold text-acento underline underline-offset-2"
+      <div className="contenedor space-y-16 py-12 md:py-16">
+        {/* --- Qué es esto: tres frases, para quien cae aquí desde Google y no
+            sabe qué está mirando. --- */}
+        <section className="grid gap-6 sm:grid-cols-3">
+          <Argumento titulo="Dónde ir">
+            Embalses y tramos de río con lo que se pesca en cada uno, cómo es el
+            acceso y cuánto se tarda en coche.
+          </Argumento>
+          <Argumento titulo="Qué dice la ley">
+            Cada especie con su semáforo: cuál te puedes llevar, cuál hay que
+            devolver y cuál no se puede devolver al agua.
+          </Argumento>
+          <Argumento titulo="Qué se está pescando">
+            Las capturas de la gente, con foto y peso, y el ranking por especie
+            y por sitio.
+          </Argumento>
+        </section>
+
+        {/* --- Provincias --- */}
+        <section id="provincias" className="scroll-mt-20">
+          <h2 className="titulo-seccion font-bold">Elige provincia</h2>
+          <p className="mt-2 mb-5 max-w-prose text-lg text-texto-suave">
+            Cada provincia tiene su normativa y sus áreas delimitadas para
+            especies invasoras, así que van por separado.
+          </p>
+
+          {/* La rejilla se ajusta a cuántas hay. Con una sola provincia, tres
+              columnas dejaban la única tarjeta encogida en una esquina y la
+              sección parecía rota en vez de recién empezada. */}
+          <ul
+            className={`grid gap-5 ${
+              provincias.length >= 3
+                ? "sm:grid-cols-2 lg:grid-cols-3"
+                : provincias.length === 2
+                  ? "sm:grid-cols-2"
+                  : "max-w-3xl"
+            }`}
           >
-            Ver el ranking
-          </Link>
-        </div>
-        <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {usuario && <Marcador titulo="Tuyas" valor={misCapturas} />}
-          <Marcador titulo="Capturas" valor={totalCapturas} />
-          <Marcador titulo="Especies distintas" valor={especiesDistintas} />
-          <Marcador
-            titulo="La más gorda"
-            valor={mayor ? (formatearPeso(mayor.pesoGramos) ?? "—") : "—"}
-            pie={mayor ? `${mayor.especie.nombreComun}, ${mayor.usuario.nombre}` : undefined}
-          />
-        </dl>
-        {totalCapturas === 0 && (
-          <p className="mt-3 max-w-prose leading-relaxed text-texto-suave">
-            Todo a cero de momento. En cuanto se registren capturas, aquí saldrá
-            quién va ganando, y el ranking irá corrigiendo las abundancias que
-            trae la guía de fábrica.
-          </p>
-        )}
-      </section>
-
-      {/* --- Últimas capturas --- */}
-      {ultimas.length > 0 && (
-        <section>
-          <div className="mb-3 flex items-baseline justify-between gap-3">
-            <h2 className="text-xl font-bold">Lo último</h2>
-            <Link
-              href="/capturas"
-              className="font-semibold text-acento underline underline-offset-2"
-            >
-              Ver el diario
-            </Link>
-          </div>
-          <ul className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-            {ultimas.map((c) => (
-              <li key={c.id}>
+            {provincias.map((p) => (
+              <li key={p.slug}>
                 <Link
-                  href={`/capturas/${c.id}`}
-                  className="block tarjeta overflow-hidden"
+                  href={`/${p.slug}`}
+                  className="tarjeta tarjeta-enlace flex h-full flex-col p-6"
                 >
-                  <div className="aspect-square">
-                    {c.fotos[0] ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={c.fotos[0].url}
-                        alt={c.especie.nombreComun}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <FotoEspecie
-                        nombre={c.especie.nombreComun}
-                        imagenUrl={c.especie.imagenUrl}
-                        estadoLegal={c.especie.estadoLegal}
-                        className="h-full w-full"
-                      />
-                    )}
-                  </div>
-                  <p className="truncate px-2 py-1.5 text-xs font-semibold">
-                    {c.especie.nombreComun}
+                  <h3 className="text-xl font-bold leading-tight">
+                    Pescar en {p.nombre}
+                  </h3>
+                  <p className="mt-1 text-sm font-semibold text-acento">
+                    {p.comunidad} ·{" "}
+                    {p._count.sitios === 1
+                      ? "1 sitio"
+                      : `${p._count.sitios} sitios`}
                   </p>
-                  <p className="truncate px-2 pb-2 text-xs text-texto-suave">
-                    {c.usuario.nombre} · {formatearFechaCorta(c.fecha)}
-                  </p>
+                  {p.descripcion && (
+                    <p
+                      className={`mt-3 leading-relaxed text-texto-suave ${
+                        provincias.length > 1 ? "line-clamp-4" : ""
+                      }`}
+                    >
+                      {p.descripcion}
+                    </p>
+                  )}
+                  <span className="mt-4 font-semibold text-acento underline underline-offset-4">
+                    Ver los sitios de {p.nombre}
+                  </span>
                 </Link>
               </li>
             ))}
           </ul>
+
+          <p className="mt-5 max-w-prose leading-relaxed text-texto-suave">
+            Vamos añadiendo provincias según conseguimos comprobar su normativa
+            en el boletín oficial correspondiente. Publicar una a medias sería
+            peor que no publicarla.
+          </p>
         </section>
-      )}
 
-      {/* --- Provincias --- */}
-      <section id="provincias" className="scroll-mt-4">
-        <h2 className="text-xl font-bold">Elige provincia</h2>
-        <p className="mt-1 mb-3 max-w-prose text-texto-suave">
-          Cada provincia tiene su normativa y sus áreas delimitadas para
-          especies invasoras, así que van por separado.
-        </p>
-
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {provincias.map((p) => (
-            <li key={p.slug}>
-              <Link
-                href={`/${p.slug}`}
-                className="flex h-full flex-col tarjeta p-4"
-              >
-                <h3 className="text-lg font-bold leading-tight">
-                  Pescar en {p.nombre}
-                </h3>
-                <p className="mt-0.5 text-sm text-texto-suave">
-                  {p.comunidad} ·{" "}
-                  {p._count.sitios === 1
-                    ? "1 sitio"
-                    : `${p._count.sitios} sitios`}
+        {/* --- Sitios destacados de la provincia con datos --- */}
+        {destacados.length > 0 && (
+          <section>
+            <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+              <div>
+                <h2 className="titulo-seccion font-bold">
+                  {enTemporada.length >= 3 ? "Ahora mismo" : "Para empezar"}
+                </h2>
+                <p className="mt-1 text-lg text-texto-suave">
+                  {enTemporada.length >= 3
+                    ? "Sitios que están en su mejor época este mes."
+                    : "Algunos de los sitios de la guía."}
                 </p>
-                {p.descripcion && (
-                  <p className="mt-2 line-clamp-3 text-[0.95rem] leading-relaxed text-texto-suave">
-                    {p.descripcion}
-                  </p>
-                )}
+              </div>
+              <Link
+                href={rutaSitios}
+                className="font-semibold text-acento underline underline-offset-4"
+              >
+                Verlos todos
               </Link>
-            </li>
-          ))}
-        </ul>
+            </div>
 
-        <p className="mt-4 max-w-prose text-sm leading-relaxed text-texto-suave">
-          Vamos añadiendo provincias según conseguimos comprobar su normativa en
-          el boletín oficial correspondiente. Publicar una a medias sería peor
-          que no publicarla.
-        </p>
-      </section>
+            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {destacados.map((s) => (
+                <li key={s.slug}>
+                  <Link
+                    href={`/${s.provincia.slug}/${s.slug}`}
+                    className="tarjeta tarjeta-enlace flex h-full flex-col overflow-hidden"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <BandaSitio
+                        tipo={s.tipo}
+                        imagenUrl={s.imagenUrl}
+                        slug={s.slug}
+                        className="foto-zoom absolute inset-0 h-full w-full"
+                      />
+                      <div
+                        aria-hidden
+                        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 to-transparent"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 p-4">
+                        <h3 className="text-lg font-bold leading-tight text-white [text-shadow:0_1px_4px_rgb(0_0_0/0.5)]">
+                          {s.nombre}
+                        </h3>
+                        <p className="text-sm text-white/80">
+                          {ETIQUETA_TIPO_SITIO[s.tipo as TipoSitio]} ·{" "}
+                          {s.municipio}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="p-4 font-bold tabular-nums text-acento">
+                      A {s.tiempoCocheMin} min en coche
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
-      {/* --- Sitios destacados de la provincia con datos --- */}
-      {destacados.length > 0 && (
+        {/* --- Últimas capturas --- */}
+        {ultimas.length > 0 && (
+          <section>
+            <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="titulo-seccion font-bold">Lo último que ha caído</h2>
+              <Link
+                href="/capturas"
+                className="font-semibold text-acento underline underline-offset-4"
+              >
+                Ver todas
+              </Link>
+            </div>
+            <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+              {ultimas.map((c) => (
+                <li key={c.id}>
+                  <Link
+                    href={`/capturas/${c.id}`}
+                    className="tarjeta tarjeta-enlace block overflow-hidden"
+                  >
+                    <div className="aspect-square overflow-hidden">
+                      {c.fotos[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={c.fotos[0].url}
+                          alt={c.especie.nombreComun}
+                          className="foto-zoom h-full w-full object-cover"
+                        />
+                      ) : (
+                        <FotoEspecie
+                          nombre={c.especie.nombreComun}
+                          imagenUrl={c.especie.imagenUrl}
+                          estadoLegal={c.especie.estadoLegal}
+                          className="h-full w-full"
+                        />
+                      )}
+                    </div>
+                    <p className="truncate px-3 pt-2 font-semibold">
+                      {c.especie.nombreComun}
+                    </p>
+                    <p className="truncate px-3 pb-3 text-sm text-texto-suave">
+                      {c.usuario.nombre} · {formatearFechaCorta(c.fecha)}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* --- Marcador. Con todo a cero no se enseñan cuatro ceros, que es la
+            peor tarjeta de presentación posible: se invita a empezar. --- */}
         <section>
-          <div className="mb-1 flex items-baseline justify-between gap-3">
-            <h2 className="text-xl font-bold">
-              {enTemporada.length >= 3 ? "Ahora mismo" : "Para empezar"}
-            </h2>
-          </div>
-          <p className="mb-3 text-texto-suave">
-            {enTemporada.length >= 3
-              ? "Sitios que están en su mejor época este mes."
-              : "Algunos de los sitios de la guía."}
-          </p>
-
-          <ul className="grid gap-3 sm:grid-cols-3">
-            {destacados.map((s) => (
-              <li key={s.slug}>
+          {totalCapturas === 0 ? (
+            <div className="tarjeta overflow-hidden bg-ribera-800 p-8 text-center text-ribera-50 md:p-12">
+              <h2 className="titulo-seccion font-bold">
+                Todavía no hay ninguna captura registrada
+              </h2>
+              <p className="mx-auto mt-3 max-w-2xl text-lg leading-relaxed text-ribera-100">
+                El ranking arranca con la primera. Apunta lo que pesques —foto,
+                peso y sitio— y a partir de ahí la guía se va corrigiendo sola:
+                las abundancias que trae de fábrica son estimaciones, y lo que
+                de verdad cae lo dicen las capturas.
+              </p>
+              <Link
+                href={usuario ? "/capturas/nueva" : "/registro"}
+                className="mt-6 inline-flex min-h-touch items-center justify-center rounded-xl bg-ribera-50 px-8 text-lg font-bold text-ribera-900 hover:bg-white"
+              >
+                {usuario ? "Registrar la primera" : "Crear cuenta y empezar"}
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+                <h2 className="titulo-seccion font-bold">Cómo vamos</h2>
                 <Link
-                  href={`/${s.provincia.slug}/${s.slug}`}
-                  className="flex h-full flex-col tarjeta overflow-hidden"
+                  href="/ranking"
+                  className="font-semibold text-acento underline underline-offset-4"
                 >
-                  <BandaSitio tipo={s.tipo} imagenUrl={s.imagenUrl} slug={s.slug} />
-                  <div className="p-4">
-                    <h3 className="font-bold leading-tight">{s.nombre}</h3>
-                    <p className="mt-0.5 text-sm text-texto-suave">
-                      {ETIQUETA_TIPO_SITIO[s.tipo as TipoSitio]} · {s.municipio}
-                    </p>
-                    <p className="mt-2 font-bold tabular-nums text-acento">
-                      {s.tiempoCocheMin} min
-                    </p>
-                  </div>
+                  Ver el ranking
                 </Link>
-              </li>
-            ))}
-          </ul>
+              </div>
+              <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                {usuario && <Marcador titulo="Tuyas" valor={misCapturas} />}
+                <Marcador titulo="Capturas" valor={totalCapturas} />
+                <Marcador
+                  titulo="Especies distintas"
+                  valor={especiesDistintas}
+                />
+                <Marcador
+                  titulo="La más gorda"
+                  valor={mayor ? (formatearPeso(mayor.pesoGramos) ?? "—") : "—"}
+                  pie={
+                    mayor
+                      ? `${mayor.especie.nombreComun}, ${mayor.usuario.nombre}`
+                      : undefined
+                  }
+                />
+              </dl>
+            </>
+          )}
         </section>
-      )}
+      </div>
+    </div>
+  );
+}
 
+function Argumento({
+  titulo,
+  children,
+}: {
+  titulo: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-t-3 border-acento pt-4">
+      <h2 className="text-lg font-bold">{titulo}</h2>
+      <p className="mt-1 leading-relaxed text-texto-suave">{children}</p>
     </div>
   );
 }

@@ -61,7 +61,7 @@ export default async function FichaCaptura({
   const puedeBorrar = esMia || (usuario?.esAdmin ?? false);
 
   return (
-    <article className="mx-auto max-w-3xl space-y-6">
+    <article className="contenedor max-w-3xl space-y-6 py-10 md:py-14">
       {captura.fotos.length > 0 && (
         <ul className="grid gap-2 sm:grid-cols-2">
           {captura.fotos.map((f, i) => (

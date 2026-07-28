@@ -12,7 +12,7 @@ export const metadata: Metadata = metadatosDePagina({
 
 export default function PaginaNormas() {
   return (
-    <div className="mx-auto max-w-prose space-y-6">
+    <div className="contenedor max-w-prose space-y-6 py-10 md:py-14">
       <h1 className="text-3xl font-bold tracking-tight">Normas de uso</h1>
 
       <p className="leading-relaxed">

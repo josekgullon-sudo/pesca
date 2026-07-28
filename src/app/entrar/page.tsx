@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function PaginaEntrar() {
   return (
-    <div className="mx-auto max-w-sm space-y-6 py-6">
+    <div className="contenedor max-w-sm space-y-6 py-12 md:py-20">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Entrar</h1>
         <p className="mt-1 text-texto-suave">

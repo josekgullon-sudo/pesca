@@ -5,6 +5,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { BarraAbundancia } from "@/components/BarraAbundancia";
 import { CapturasDelSitio } from "@/components/CapturasDelSitio";
+import { BandaSitio } from "@/components/BandaSitio";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { MejorEpoca } from "@/components/MejorEpoca";
 import { EtiquetaLegal } from "@/components/SemaforoLegal";
@@ -176,7 +177,7 @@ export default async function FichaSitio({
   })).filter((g) => g.items.length > 0);
 
   return (
-    <article>
+    <article className="contenedor py-10 md:py-14">
       <DatosEstructurados
         schema={[
           schemaSitio({
@@ -200,18 +201,53 @@ export default async function FichaSitio({
         ]}
       />
 
-      {/* Foto de cabecera cuando la hay, con su crédito: las de Commons son
-          Creative Commons con obligación de atribuir. */}
-      {sitio.imagenUrl && (
-        <figure className="mb-6 -mx-4 md:-mx-6">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={sitio.imagenUrl}
-            alt={sitio.nombre}
-            className="h-52 w-full object-cover sm:h-72 md:rounded-xl"
+      {/* Cabecera con imagen siempre, no solo cuando hay foto: sin ella la
+          ficha empezaba con un título suelto sobre fondo beige y no se
+          distinguía un embalse de otro. Si no hay foto entra la ilustración
+          con el tono del tipo de agua. */}
+      <header className="relative isolate mb-8 overflow-hidden rounded-2xl">
+        <div aria-hidden className="absolute inset-0 -z-10">
+          <BandaSitio
+            tipo={sitio.tipo}
+            imagenUrl={sitio.imagenUrl}
+            slug={sitio.slug}
+            className="h-full w-full"
           />
-          {sitio.imagenAutor && (
-            <figcaption className="px-4 pt-2 text-xs text-texto-suave md:px-0">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/20" />
+        </div>
+
+        <div className="flex min-h-[16rem] flex-col justify-end p-5 sm:min-h-[20rem] md:p-8">
+          {/* Las mismas migas que se declaran en JSON-LD: Google penaliza
+              marcar una ruta de navegación que el visitante no ve. */}
+          <nav
+            aria-label="Migas de pan"
+            className="mb-3 flex flex-wrap items-center gap-x-2 text-sm"
+          >
+            <Link href="/" className="text-white/75 underline underline-offset-2">
+              Inicio
+            </Link>
+            <span aria-hidden className="text-white/60">
+              ›
+            </span>
+            <Link
+              href={`/${provincia.slug}`}
+              className="font-semibold text-white underline underline-offset-2"
+            >
+              Pescar en {provincia.nombre}
+            </Link>
+          </nav>
+
+          <p className="text-sm font-bold uppercase tracking-wide text-white/85 [text-shadow:0_1px_3px_rgb(0_0_0/0.6)]">
+            {ETIQUETA_TIPO_SITIO[sitio.tipo as TipoSitio]} · {sitio.municipio}
+          </p>
+          <h1 className="titulo-pagina mt-1 font-bold text-white [text-shadow:0_2px_10px_rgb(0_0_0/0.5)]">
+            {sitio.nombre}
+          </h1>
+
+          {/* El crédito de la foto: las de Commons son Creative Commons y
+              obligan a atribuir. */}
+          {sitio.imagenUrl && sitio.imagenAutor && (
+            <p className="mt-3 text-xs text-white/60">
               Foto: {sitio.imagenAutor}
               {sitio.imagenLicencia && ` · ${sitio.imagenLicencia}`}
               {sitio.imagenFuente && (
@@ -227,37 +263,9 @@ export default async function FichaSitio({
                   </a>
                 </>
               )}
-            </figcaption>
+            </p>
           )}
-        </figure>
-      )}
-
-      <header className="mb-8">
-        {/* Las mismas migas que se declaran en JSON-LD: Google penaliza marcar
-            una ruta de navegación que el visitante no ve. */}
-        <nav
-          aria-label="Migas de pan"
-          className="mb-2 flex flex-wrap items-center gap-x-2 text-sm"
-        >
-          <Link href="/" className="text-texto-suave underline underline-offset-2">
-            Inicio
-          </Link>
-          <span aria-hidden className="text-texto-suave">
-            ›
-          </span>
-          <Link
-            href={`/${provincia.slug}`}
-            className="font-semibold text-acento underline underline-offset-2"
-          >
-            Pescar en {provincia.nombre}
-          </Link>
-        </nav>
-        <p className="text-sm font-bold uppercase tracking-wide text-texto-suave">
-          {ETIQUETA_TIPO_SITIO[sitio.tipo as TipoSitio]} · {sitio.municipio}
-        </p>
-        <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight">
-          {sitio.nombre}
-        </h1>
+        </div>
       </header>
 
       {/* Lo urgente primero: si hay un aviso sanitario grave, se ve antes que

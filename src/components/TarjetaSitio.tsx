@@ -55,60 +55,73 @@ export function TarjetaSitio({
     <li>
       <Link
         href={`/${provincia}/${sitio.slug}`}
-        className="flex h-full flex-col tarjeta overflow-hidden"
+        className="tarjeta tarjeta-enlace flex h-full flex-col overflow-hidden"
       >
-        <BandaSitio
-          tipo={sitio.tipo}
-          imagenUrl={sitio.imagenUrl}
-          slug={sitio.slug}
-          className="h-24"
-        />
+        {/* La foto manda: es lo que hace que un embalse se distinga de otro de
+            un vistazo. Antes era una banda de 96 px y todas las fichas se
+            parecían. El nombre va encima, que es como se lee un sitio. */}
+        <div className="relative aspect-[16/10] overflow-hidden">
+          <BandaSitio
+            tipo={sitio.tipo}
+            imagenUrl={sitio.imagenUrl}
+            slug={sitio.slug}
+            className="foto-zoom absolute inset-0 h-full w-full"
+          />
 
-        <div className="flex flex-auto flex-col p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="text-lg font-bold leading-tight">{sitio.nombre}</h3>
-            <p className="mt-0.5 text-sm text-texto-suave">
-              {ETIQUETA_TIPO_SITIO[sitio.tipo as TipoSitio]} · {sitio.municipio}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/35 to-transparent"
+          />
+
+          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
+            <div className="min-w-0">
+              <h3 className="text-lg font-bold leading-tight text-white [text-shadow:0_1px_4px_rgb(0_0_0/0.5)]">
+                {sitio.nombre}
+              </h3>
+              <p className="mt-0.5 truncate text-sm text-white/80">
+                {ETIQUETA_TIPO_SITIO[sitio.tipo as TipoSitio]} ·{" "}
+                {sitio.municipio}
+              </p>
+            </div>
+            <p className="shrink-0 rounded-lg bg-black/45 px-2.5 py-1 text-right backdrop-blur-sm">
+              <span className="block font-bold tabular-nums text-white">
+                {sitio.tiempoCocheMin} min
+              </span>
+              <span className="block text-xs tabular-nums text-white/75">
+                {sitio.distanciaDesdeDosHermanasKm} km
+              </span>
             </p>
           </div>
-          <p className="shrink-0 text-right">
-            <span className="block text-xl font-bold tabular-nums text-acento">
-              {sitio.tiempoCocheMin} min
-            </span>
-            <span className="block text-xs text-texto-suave tabular-nums">
-              {sitio.distanciaDesdeDosHermanasKm} km
-            </span>
-          </p>
         </div>
 
-        {principales.length > 0 && (
-          <p className="mt-3 text-[0.95rem] leading-snug">
-            <span className="text-texto-suave">Lo que más cae: </span>
-            <span className="font-semibold">{principales.join(", ")}</span>
-          </p>
-        )}
+        <div className="flex flex-auto flex-col p-4">
+          {principales.length > 0 && (
+            <p className="text-[0.95rem] leading-snug">
+              <span className="text-texto-suave">Lo que más cae: </span>
+              <span className="font-semibold">{principales.join(", ")}</span>
+            </p>
+          )}
 
-        <ul className="mt-3 flex flex-auto flex-wrap items-end gap-2 text-xs font-semibold">
-          <li className="rounded-lg bg-chip-fondo px-2 py-1 text-chip-texto">
-            {ETIQUETA_DIFICULTAD[sitio.dificultadAcceso as DificultadAcceso]}
-          </li>
-          {sitio.tieneSombra && (
+          <ul className="mt-3 flex flex-auto flex-wrap items-end gap-2 text-xs font-semibold">
             <li className="rounded-lg bg-chip-fondo px-2 py-1 text-chip-texto">
-              Con sombra
+              {ETIQUETA_DIFICULTAD[sitio.dificultadAcceso as DificultadAcceso]}
             </li>
-          )}
-          {!sitio.esAreaDelimitadaEEI && (
-            <li className="rounded-lg bg-ambar-fondo px-2 py-1 text-ambar-texto">
-              Fuera de área EEI
-            </li>
-          )}
-          {esAvisoGrave(sitio.avisosSanitarios) && (
-            <li className="rounded-lg bg-rojo-fondo px-2 py-1 text-rojo-texto">
-              ⚠ Aviso sanitario grave
-            </li>
-          )}
-        </ul>
+            {sitio.tieneSombra && (
+              <li className="rounded-lg bg-chip-fondo px-2 py-1 text-chip-texto">
+                Con sombra
+              </li>
+            )}
+            {!sitio.esAreaDelimitadaEEI && (
+              <li className="rounded-lg bg-ambar-fondo px-2 py-1 text-ambar-texto">
+                Fuera de área EEI
+              </li>
+            )}
+            {esAvisoGrave(sitio.avisosSanitarios) && (
+              <li className="rounded-lg bg-rojo-fondo px-2 py-1 text-rojo-texto">
+                ⚠ Aviso sanitario grave
+              </li>
+            )}
+          </ul>
         </div>
       </Link>
     </li>
