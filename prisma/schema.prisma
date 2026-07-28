@@ -358,6 +358,13 @@ model Captura {
   /// Identificador que genera el cliente offline para evitar duplicados al sincronizar.
   clienteUuid String? @unique
 
+  /// Captura de muestra, para que el diario y el ranking no se vean vacíos
+  /// mientras no haya capturas de verdad. Se marca en toda la interfaz y se
+  /// excluye de los cálculos que corrigen las abundancias de la guía: si una
+  /// captura inventada moviera esos números, la guía dejaría de ser fiable.
+  /// Se borran con SEMBRAR_DEMO=no.
+  esEjemplo Boolean @default(false)
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   /// Momento en que la captura llegó al servidor desde el diario offline.

@@ -192,18 +192,18 @@ export default async function Home() {
       </section>
 
       <div className="contenedor space-y-16 py-12 md:py-16">
-        {/* --- Qué es esto: tres frases, para quien cae aquí desde Google y no
-            sabe qué está mirando. --- */}
-        <section className="grid gap-6 sm:grid-cols-3">
-          <Argumento titulo="Dónde ir">
+        {/* --- Qué es esto, para quien cae aquí desde Google y no sabe qué
+            está mirando. --- */}
+        <section className="grid gap-8 sm:grid-cols-3 sm:gap-10">
+          <Argumento numero="1" titulo="Dónde ir">
             Embalses y tramos de río con lo que se pesca en cada uno, cómo es el
             acceso y cuánto se tarda en coche.
           </Argumento>
-          <Argumento titulo="Qué dice la ley">
+          <Argumento numero="2" titulo="Qué dice la ley">
             Cada especie con su semáforo: cuál te puedes llevar, cuál hay que
             devolver y cuál no se puede devolver al agua.
           </Argumento>
-          <Argumento titulo="Qué se está pescando">
+          <Argumento numero="3" titulo="Qué se está pescando">
             Las capturas de la gente, con foto y peso, y el ranking por especie
             y por sitio.
           </Argumento>
@@ -413,57 +413,49 @@ export default async function Home() {
           </section>
         )}
 
-        {/* --- Marcador. Con todo a cero no se enseñan cuatro ceros, que es la
-            peor tarjeta de presentación posible: se invita a empezar. --- */}
+        {/* --- Marcador --- */}
         <section>
-          {totalCapturas === 0 ? (
-            <div className="tarjeta overflow-hidden bg-ribera-800 p-8 text-center text-ribera-50 md:p-12">
-              <h2 className="titulo-seccion font-bold">
-                Todavía no hay ninguna captura registrada
-              </h2>
-              <p className="mx-auto mt-3 max-w-2xl text-lg leading-relaxed text-ribera-100">
-                El ranking arranca con la primera. Apunta lo que pesques —foto,
-                peso y sitio— y a partir de ahí la guía se va corrigiendo sola:
-                las abundancias que trae de fábrica son estimaciones, y lo que
-                de verdad cae lo dicen las capturas.
-              </p>
-              <Link
-                href={usuario ? "/capturas/nueva" : "/registro"}
-                className="mt-6 inline-flex min-h-touch items-center justify-center rounded-xl bg-ribera-50 px-8 text-lg font-bold text-ribera-900 hover:bg-white"
-              >
-                {usuario ? "Registrar la primera" : "Crear cuenta y empezar"}
-              </Link>
-            </div>
-          ) : (
-            <>
-              <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
-                <h2 className="titulo-seccion font-bold">Cómo vamos</h2>
-                <Link
-                  href="/ranking"
-                  className="font-semibold text-acento underline underline-offset-4"
-                >
-                  Ver el ranking
-                </Link>
-              </div>
-              <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                {usuario && <Marcador titulo="Tuyas" valor={misCapturas} />}
-                <Marcador titulo="Capturas" valor={totalCapturas} />
-                <Marcador
-                  titulo="Especies distintas"
-                  valor={especiesDistintas}
-                />
-                <Marcador
-                  titulo="La más gorda"
-                  valor={mayor ? (formatearPeso(mayor.pesoGramos) ?? "—") : "—"}
-                  pie={
-                    mayor
-                      ? `${mayor.especie.nombreComun}, ${mayor.usuario.nombre}`
-                      : undefined
-                  }
-                />
-              </dl>
-            </>
-          )}
+          <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="titulo-seccion font-bold">Cómo vamos</h2>
+            <Link
+              href="/ranking"
+              className="font-semibold text-acento underline underline-offset-4"
+            >
+              Ver el ranking
+            </Link>
+          </div>
+          <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {usuario && <Marcador titulo="Tuyas" valor={misCapturas} />}
+            <Marcador titulo="Capturas" valor={totalCapturas} />
+            <Marcador titulo="Especies distintas" valor={especiesDistintas} />
+            <Marcador
+              titulo="La más gorda"
+              valor={mayor ? (formatearPeso(mayor.pesoGramos) ?? "—") : "—"}
+              pie={
+                mayor
+                  ? `${mayor.especie.nombreComun}, ${mayor.usuario.nombre}`
+                  : undefined
+              }
+            />
+          </dl>
+        </section>
+
+        {/* --- Empezar --- */}
+        <section className="tarjeta overflow-hidden bg-ribera-800 p-8 text-center text-ribera-50 md:p-12">
+          <h2 className="titulo-seccion font-bold">
+            {usuario ? "¿Has pescado algo?" : "Apunta lo que pesques"}
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-lg leading-relaxed text-ribera-100">
+            Foto, peso y sitio. Con eso entras en el ranking y la guía se va
+            afinando: las abundancias que trae de fábrica son estimaciones
+            nuestras, y lo que de verdad cae lo dicen las capturas.
+          </p>
+          <Link
+            href={usuario ? "/capturas/nueva" : "/registro"}
+            className="mt-6 inline-flex min-h-touch items-center justify-center rounded-xl bg-ribera-50 px-8 text-lg font-bold text-ribera-900 hover:bg-white"
+          >
+            {usuario ? "Registrar captura" : "Crear cuenta y empezar"}
+          </Link>
         </section>
       </div>
     </div>
@@ -471,16 +463,19 @@ export default async function Home() {
 }
 
 function Argumento({
+  numero,
   titulo,
   children,
 }: {
+  numero: string;
   titulo: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-t-3 border-acento pt-4">
-      <h2 className="text-lg font-bold">{titulo}</h2>
-      <p className="mt-1 leading-relaxed text-texto-suave">{children}</p>
+    <div className="border-t-2 border-acento pt-5">
+      <p className="text-sm font-bold tabular-nums text-acento">{numero}</p>
+      <h2 className="mt-1 text-xl font-bold">{titulo}</h2>
+      <p className="mt-2 leading-relaxed text-texto-suave">{children}</p>
     </div>
   );
 }

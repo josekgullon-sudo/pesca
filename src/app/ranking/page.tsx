@@ -3,10 +3,10 @@ import { Ranking } from "@/components/Ranking";
 import { metadatosDePagina } from "@/lib/marca";
 
 export const metadata: Metadata = metadatosDePagina({
-  titulo: "Ranking de pesca de España: dónde ir a por cada especie",
+  titulo: "Ranking de pesca de España: las capturas más grandes",
   descripcion:
-    "Los sitios con más black bass, carpa, barbo o lucio de cada provincia, " +
-    "los que están en su mejor época y las capturas más grandes registradas.",
+    "Las piezas más grandes registradas, el récord de cada especie, quién va " +
+    "ganando y en qué embalses cae más. Cualquiera puede apuntar las suyas.",
   ruta: "/ranking",
 });
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export default function PaginaRanking() {
   return (
     <Ranking
       titulo="Ranking de pesca de España"
-      entradilla="Dónde ir a por cada especie, qué sitios están en su mejor época y qué ha pescado la gente. Lo primero sale de la guía; lo último, del diario."
+      entradilla="Las piezas más grandes, el récord de cada especie, quién va ganando y dónde cae más. Sale de lo que la gente apunta en el diario."
     />
   );
 }

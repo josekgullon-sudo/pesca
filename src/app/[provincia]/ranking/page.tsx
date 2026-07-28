@@ -19,8 +19,8 @@ export async function generateMetadata({
   const nombre = p?.nombre ?? "la provincia";
 
   return metadatosDePagina({
-    titulo: `Ranking de pesca de ${nombre}: dónde ir a por cada especie`,
-    descripcion: `Los sitios de ${nombre} con más black bass, carpa o barbo, los que están en su mejor época y las capturas más grandes registradas.`,
+    titulo: `Ranking de pesca de ${nombre}: las capturas más grandes`,
+    descripcion: `Las piezas más grandes pescadas en ${nombre}, el récord de cada especie y quién va ganando.`,
     ruta: `/${provincia}/ranking`,
   });
 }
@@ -37,7 +37,7 @@ export default async function RankingProvincia({
     <Ranking
       ambito={{ provinciaId: provincia.id }}
       titulo={`Ranking de pesca de ${provincia.nombre}`}
-      entradilla={`Dónde ir a por cada especie en ${provincia.nombre}, qué sitios están en su mejor época y qué ha pescado la gente. Lo primero sale de la guía; lo último, del diario.`}
+      entradilla={`Las piezas más grandes pescadas en ${provincia.nombre}, el récord de cada especie y quién va ganando. Sale de lo que la gente apunta en el diario.`}
     />
   );
 }

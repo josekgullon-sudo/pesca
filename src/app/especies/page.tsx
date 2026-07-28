@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DondeEstaCadaEspecie } from "@/components/DondeEstaCadaEspecie";
 import { FotoEspecie } from "@/components/FotoEspecie";
 import { EtiquetaLegal } from "@/components/SemaforoLegal";
 import {
@@ -161,6 +162,8 @@ export default async function PaginaEspecies() {
           </section>
         );
       })}
+
+      <DondeEstaCadaEspecie />
     </div>
   );
 }

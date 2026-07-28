@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { AvisoEjemplos, EtiquetaEjemplo } from "@/components/AvisoEjemplos";
 import { FotoEspecie } from "@/components/FotoEspecie";
-import { RankingGuia } from "@/components/RankingGuia";
 import { EtiquetaLegal } from "@/components/SemaforoLegal";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import {
@@ -49,21 +49,7 @@ export async function Ranking({
         </p>
       </div>
 
-      {/* Lo que dice la guía va siempre, haya capturas o no. Antes, sin
-          capturas, esta página era un cartel de «todavía no hay nada»: el
-          visitante se iba y Google no tenía qué indexar. La información para
-          responder «dónde voy a por un black bass» ya la teníamos cargada. */}
-      <RankingGuia ambito={ambito} />
-
-      <div className="border-t border-borde pt-12">
-        <h2 className="titulo-seccion font-bold">
-          Lo que ha pescado la gente
-        </h2>
-        <p className="mt-2 max-w-prose leading-relaxed text-texto-suave">
-          Esta parte la escriben los pescadores: sale de las capturas que se
-          registran en el diario, con su foto y su peso.
-        </p>
-      </div>
+      <AvisoEjemplos ambito={ambito} />
 
       {!hayAlgo ? (
         <div className="tarjeta p-8 text-center">
@@ -142,6 +128,7 @@ export async function Ranking({
                           {c.usuario.nombre} · {c.sitio.nombre} ·{" "}
                           {formatearFechaCorta(c.fecha)}
                         </p>
+                        {c.esEjemplo && <EtiquetaEjemplo className="mt-1" />}
                       </div>
                     </Link>
                   </li>
@@ -199,6 +186,9 @@ export async function Ranking({
                           <span className="text-texto-suave">
                             · {e.record.usuario}
                           </span>
+                          {e.record.esEjemplo && (
+                            <EtiquetaEjemplo className="ml-1.5" />
+                          )}
                         </p>
                       ) : (
                         <p className="mt-1 text-sm text-texto-suave">

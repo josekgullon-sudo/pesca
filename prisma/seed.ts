@@ -18,6 +18,7 @@
  * Solo crea los usuarios si no existen (no pisa contraseñas ya cambiadas).
  */
 
+import { randomBytes } from "node:crypto";
 import { hash } from "bcryptjs";
 import {
   AVISO_FUERA_DE_AREA_DELIMITADA,
@@ -1475,6 +1476,108 @@ const USUARIOS = [
 const PASSWORD_INICIAL = process.env.SEED_PASSWORD ?? "pesca2026";
 
 // ---------------------------------------------------------------------------
+// Capturas de ejemplo
+// ---------------------------------------------------------------------------
+
+/**
+ * Capturas de muestra para que el diario y el ranking no se vean vacíos el día
+ * que alguien entra por primera vez.
+ *
+ * Van marcadas como ejemplo en la base de datos y en toda la interfaz: no se
+ * hacen pasar por reales. Eso importa por dos razones. La primera es legal —
+ * inventar actividad de usuarios para captar registros es publicidad engañosa,
+ * y más con anuncios en la web—. La segunda es que la guía dice que las
+ * abundancias se irán corrigiendo con lo que se pesque de verdad; si estas
+ * capturas contaran para eso, la corrección se haría con datos falsos.
+ *
+ * Los pesos son verosímiles para cada especie en la provincia, no récords.
+ * Desaparecen todas con SEMBRAR_DEMO=no.
+ */
+const CUENTA_DEMO = {
+  nombre: "Mapa de Pesca",
+  email: "ejemplo@mapadepesca.es",
+  rol: "usuario",
+};
+
+/** [especie, sitio, díasAtrás, hora, gramos, cm, técnica, liberado, notas] */
+const CAPTURAS_DEMO: [
+  string, string, number, string, number, number | null, string | null, boolean, string,
+][] = [
+  ["black-bass", "jose-toran", 3, "08:20", 2450, 51, "spinning", true, "A vinilo sobre la piedra, primera hora."],
+  ["black-bass", "torre-del-aguila", 9, "19:40", 1180, 41, "superficie", true, "Popper al atardecer, en la cola."],
+  ["black-bass", "el-pintado", 16, "07:50", 1750, 46, "spinning", true, "Entre los troncos de la orilla norte."],
+  ["carpa-comun", "torre-del-aguila", 1, "10:15", 5300, 68, "fondo", true, "Maíz a fondo, media hora de pelea."],
+  ["carpa-comun", "guadaira-oromana", 6, "09:00", 2900, 55, "fondo", true, "Masilla de pan, a veinte metros."],
+  ["carpa-comun", "puebla-de-cazalla", 12, "11:30", 4100, 62, "fondo", true, ""],
+  ["barbo", "huesna", 4, "08:45", 1650, 48, "feeder", true, "Devuelto al agua, como manda la norma."],
+  ["barbo", "guadalquivir-cantillana-alcala-del-rio", 11, "17:20", 2200, 54, "feeder", true, "En la corriente, con lombriz."],
+  ["barbo", "viar-melonares-cantillana", 20, "18:00", 980, 39, "feeder", true, ""],
+  ["carpin", "guadaira-oromana", 2, "16:40", 420, 24, "fondo", true, "Pequeño pero da guerra."],
+  ["boga-de-rio", "viar-melonares-cantillana", 8, "09:30", 310, 26, "feeder", true, "Devolución obligatoria."],
+  ["lucio", "torre-del-aguila", 14, "07:30", 3200, 74, "spinning", true, "En el área delimitada, comprobado antes."],
+  ["carpa-comun", "gergal", 18, "12:10", 3600, 59, "fondo", true, ""],
+  ["black-bass", "la-minilla", 22, "08:10", 890, 36, "spinning", true, "Día flojo, solo picó este."],
+];
+
+async function sembrarDemo(
+  sitios: Map<string, string>,
+  especies: Map<string, string>,
+  tecnicas: Map<string, string>,
+) {
+  const activo = (process.env.SEMBRAR_DEMO ?? "si") === "si";
+
+  // Se borran siempre antes de volver a crearlas: así el seed es idempotente y
+  // apagar SEMBRAR_DEMO las quita de verdad, sin dejar restos.
+  const borradas = await prisma.captura.deleteMany({ where: { esEjemplo: true } });
+  if (borradas.count > 0) console.log(`  ${borradas.count} capturas de ejemplo retiradas`);
+
+  if (!activo) {
+    await prisma.usuario.deleteMany({ where: { email: CUENTA_DEMO.email } });
+    console.log("  SEMBRAR_DEMO=no: sin capturas de ejemplo");
+    return;
+  }
+
+  // La cuenta de ejemplo no tiene contraseña utilizable: no es de nadie y no se
+  // puede entrar con ella. Solo existe para firmar estas capturas.
+  const passwordHash = await hash(randomBytes(32).toString("hex"), 12);
+  const usuario = await prisma.usuario.upsert({
+    where: { email: CUENTA_DEMO.email },
+    create: { ...CUENTA_DEMO, passwordHash },
+    update: { nombre: CUENTA_DEMO.nombre },
+  });
+
+  const hoy = new Date();
+  let creadas = 0;
+  for (const [esp, sit, dias, hora, gramos, cm, tec, liberado, notas] of CAPTURAS_DEMO) {
+    const especieId = especies.get(esp);
+    const sitioId = sitios.get(sit);
+    if (!especieId || !sitioId) continue;
+
+    const fecha = new Date(hoy);
+    fecha.setDate(fecha.getDate() - dias);
+    fecha.setHours(12, 0, 0, 0);
+
+    await prisma.captura.create({
+      data: {
+        usuarioId: usuario.id,
+        sitioId,
+        especieId,
+        fecha,
+        hora,
+        pesoGramos: gramos,
+        longitudCm: cm,
+        tecnicaId: tec ? (tecnicas.get(tec) ?? null) : null,
+        liberado,
+        notas,
+        esEjemplo: true,
+      },
+    });
+    creadas++;
+  }
+  console.log(`  ${creadas} capturas de ejemplo`);
+}
+
+// ---------------------------------------------------------------------------
 // Ejecución
 // ---------------------------------------------------------------------------
 
@@ -1581,6 +1684,9 @@ async function main() {
   const aparejos = new Map(
     (await prisma.aparejo.findMany({ select: { id: true, slug: true } })).map((a) => [a.slug, a.id]),
   );
+  const tecnicas = new Map(
+    (await prisma.tecnica.findMany({ select: { id: true, slug: true } })).map((x) => [x.slug, x.id]),
+  );
 
   const exigir = (mapa: Map<string, string>, slug: string, que: string) => {
     const id = mapa.get(slug);
@@ -1633,6 +1739,9 @@ async function main() {
     });
   }
   console.log(`  ${vistos.size} relaciones aparejo-sitio`);
+
+  // --- Capturas de ejemplo -------------------------------------------------
+  await sembrarDemo(sitios, especies, tecnicas);
 
   console.log("\nListo.");
   console.log(

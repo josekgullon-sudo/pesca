@@ -29,6 +29,7 @@ export async function rankingPorPeso(ambito: Ambito = {}, limite = 10) {
       pesoGramos: true,
       longitudCm: true,
       fecha: true,
+      esEjemplo: true,
       usuario: { select: { nombre: true } },
       sitio: { select: { nombre: true, slug: true } },
       especie: {
@@ -55,6 +56,7 @@ export type FilaEspecie = {
     pesoGramos: number;
     usuario: string;
     fotoUrl: string | null;
+    esEjemplo: boolean;
   } | null;
 };
 
@@ -95,6 +97,7 @@ export async function rankingPorEspecie(
             id: true,
             especieId: true,
             pesoGramos: true,
+            esEjemplo: true,
             usuario: { select: { nombre: true } },
             fotos: { orderBy: { esPrincipal: "desc" }, take: 1 },
           },
@@ -124,6 +127,7 @@ export async function rankingPorEspecie(
                 pesoGramos: r.pesoGramos,
                 usuario: r.usuario.nombre,
                 fotoUrl: r.fotos[0]?.url ?? null,
+                esEjemplo: r.esEjemplo,
               }
             : null,
       };
@@ -149,7 +153,10 @@ export async function rankingPorPescador(
   // sola y no tiene sentido consultarla entera para pintar ceros.
   const conCapturas = await prisma.captura.groupBy({
     by: ["usuarioId"],
-    where: filtroSitio(ambito),
+    // Las de muestra no entran aquí: que una cuenta que no es de nadie
+    // encabece el marcador de pescadores no enseña nada y confunde. En los
+    // pesos y en los récords sí salen, marcadas.
+    where: { esEjemplo: false, ...filtroSitio(ambito) },
     _count: { _all: true },
     orderBy: { _count: { usuarioId: "desc" } },
     take: limite,
@@ -165,23 +172,24 @@ export async function rankingPorPescador(
     usuarios.map(async (u) => {
       const [capturas, distintas, suma, mejor] = await Promise.all([
         prisma.captura.count({
-          where: { usuarioId: u.id, ...filtroSitio(ambito) },
+          where: { usuarioId: u.id, esEjemplo: false, ...filtroSitio(ambito) },
         }),
         prisma.captura
           .findMany({
-            where: { usuarioId: u.id, ...filtroSitio(ambito) },
+            where: { usuarioId: u.id, esEjemplo: false, ...filtroSitio(ambito) },
             distinct: ["especieId"],
             select: { especieId: true },
           })
           .then((r) => r.length),
         prisma.captura.aggregate({
-          where: { usuarioId: u.id, ...filtroSitio(ambito) },
+          where: { usuarioId: u.id, esEjemplo: false, ...filtroSitio(ambito) },
           _sum: { pesoGramos: true },
         }),
         prisma.captura.findFirst({
           where: {
             usuarioId: u.id,
             pesoGramos: { not: null },
+            esEjemplo: false,
             ...filtroSitio(ambito),
           },
           orderBy: { pesoGramos: "desc" },
