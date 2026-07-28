@@ -9,7 +9,7 @@ cada especie, y un **diario** de capturas.
 - Next.js 15 (App Router) + TypeScript
 - Tailwind CSS v4
 - Prisma 7 + SQLite (preparado para migrar a PostgreSQL)
-- Imágenes en el sistema de ficheros local, en `public/uploads`
+- Imágenes en el sistema de ficheros local, en `datos/` (ver más abajo)
 
 ## Arrancar en local
 
@@ -116,7 +116,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | Acceso de los dos usuarios                     | Hecho          |
 | Guía de sitios: listado, filtros, mapa y ficha | Hecho          |
 | Guía de especies con semáforo legal            | Hecho          |
-| Registro de capturas con foto y GPS            | Pendiente      |
+| Registro de capturas con foto y GPS            | Hecho          |
 | Galería, estadísticas, ranking y comparativa   | Pendiente      |
 | Recomendador "¿qué me llevo?"                  | Pendiente      |
 | PWA y funcionamiento offline                   | Pendiente      |
@@ -139,6 +139,45 @@ que además tienen dueño, se dibuja una silueta con el color del semáforo lega
 así el listado se lee de un vistazo. Cuando haya fotos propias, basta con
 rellenar `Especie.imagenUrl`.
 
+## Fotos
+
+### Fotos de las especies
+
+```bash
+npm run fotos              # solo las que no tienen foto
+npm run fotos -- --todas   # rehacerlas todas
+```
+
+Descarga una foto por especie desde Wikimedia Commons y guarda **autor,
+licencia y enlace al original**, que la ficha muestra al pie de la imagen. Casi
+todas las fotos de Commons son Creative Commons con obligación de atribuir, así
+que la atribución viaja con la foto en lugar de perderse. Las que fallen se
+quedan con la silueta de color, que sigue funcionando.
+
+Necesita conexión a internet, así que hay que ejecutarlo en tu máquina o en el
+VPS, no vale con hacerlo en el repositorio.
+
+### Dónde viven las imágenes
+
+Las fotos **no** están en `public/`, y es a propósito. Next.js recorre `public/`
+al compilar y solo sirve los ficheros que existían entonces: una foto subida en
+producción daba 404 hasta el siguiente `npm run build`. Se guardan en `datos/` y
+las sirve `src/app/media/[...ruta]/route.ts`, que las lee del disco en cada
+petición y valida la ruta para que no se pueda salir de ahí.
+
+De paso queda mejor para el VPS:
+
+- `datos/` es **lo único que hay que copiar o montar como volumen**, junto con
+  `prisma/dev.db`. Es lo que no se puede regenerar.
+- Está detrás del middleware, así que una foto vuestra no se ve por el simple
+  hecho de conocer la URL.
+- Se cachean para siempre (`immutable`): el nombre del fichero es aleatorio y
+  nunca se reescribe.
+
+Las fotos que llegan del móvil se redimensionan a 1600 px de ancho y se pasan a
+WebP con `sharp`, aplicando antes la orientación EXIF para que las verticales no
+salgan tumbadas. Un JPEG de 4 MB se queda en unos 200 KB.
+
 ## Base de datos
 
 `prisma/schema.prisma` está escrito para poder saltar a PostgreSQL sin dolor:
@@ -160,7 +199,7 @@ Para migrar:
   invasoras**: contrastado a julio de 2026. Aun así, la app avisa por todas
   partes de que hay que verificarlo en el Portal de Caza y Pesca de la Junta de
   Andalucía antes de cada salida.
-- **Coordenadas**: aproximadas. Sitúan la lámina de agua o el centro del tramo,
+- **Coordenadas de los sitios**: aproximadas. Sitúan la lámina de agua o el centro del tramo,
   no el punto de aparcamiento.
 - **Distancias y tiempos desde Dos Hermanas**: estimados en coche.
 - **Abundancias, probabilidades de captura y efectividad de aparejos**:

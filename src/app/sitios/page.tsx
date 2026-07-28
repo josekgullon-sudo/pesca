@@ -39,6 +39,7 @@ export default async function PaginaSitios({
         tieneSombra: true,
         avisosSanitarios: true,
         esAreaDelimitadaEEI: true,
+        imagenUrl: true,
         especies: {
           select: {
             abundancia: true,

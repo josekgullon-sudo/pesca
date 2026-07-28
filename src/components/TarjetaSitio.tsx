@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BandaSitio } from "./BandaSitio";
 import {
   ETIQUETA_DIFICULTAD,
   ETIQUETA_TIPO_SITIO,
@@ -17,6 +18,7 @@ export type SitioTarjeta = {
   tieneSombra: boolean;
   avisosSanitarios: string;
   esAreaDelimitadaEEI: boolean;
+  imagenUrl: string | null;
   especies: {
     abundancia: number;
     especie: { nombreComun: string; estadoLegal: string };
@@ -47,8 +49,11 @@ export function TarjetaSitio({ sitio }: { sitio: SitioTarjeta }) {
     <li>
       <Link
         href={`/sitios/${sitio.slug}`}
-        className="flex h-full flex-col rounded-xl border border-borde bg-fondo-elevado p-4"
+        className="flex h-full flex-col overflow-hidden rounded-xl border border-borde bg-fondo-elevado"
       >
+        <BandaSitio tipo={sitio.tipo} imagenUrl={sitio.imagenUrl} className="h-20" />
+
+        <div className="flex flex-auto flex-col p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-lg font-bold leading-tight">{sitio.nombre}</h3>
@@ -93,6 +98,7 @@ export function TarjetaSitio({ sitio }: { sitio: SitioTarjeta }) {
             </li>
           )}
         </ul>
+        </div>
       </Link>
     </li>
   );

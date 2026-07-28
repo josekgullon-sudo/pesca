@@ -72,13 +72,47 @@ export default async function FichaEspecie({
 
   return (
     <article>
+      {/* Con foto, cabecera grande; sin ella, la silueta pequeña al lado del
+          título, que ocupando media pantalla quedaría ridícula. */}
+      {especie.imagenUrl && (
+        <figure className="mb-6">
+          <FotoEspecie
+            nombre={especie.nombreComun}
+            imagenUrl={especie.imagenUrl}
+            estadoLegal={especie.estadoLegal}
+            className="h-56 w-full rounded-xl sm:h-72"
+          />
+          {(especie.imagenAutor || especie.imagenLicencia) && (
+            <figcaption className="mt-2 text-xs text-texto-suave">
+              Foto: {especie.imagenAutor ?? "autor no indicado"}
+              {especie.imagenLicencia && ` · ${especie.imagenLicencia}`}
+              {especie.imagenFuente && (
+                <>
+                  {" · "}
+                  <a
+                    href={especie.imagenFuente}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    Wikimedia Commons ↗
+                  </a>
+                </>
+              )}
+            </figcaption>
+          )}
+        </figure>
+      )}
+
       <header className="mb-6 flex items-center gap-4">
-        <FotoEspecie
-          nombre={especie.nombreComun}
-          imagenUrl={especie.imagenUrl}
-          estadoLegal={especie.estadoLegal}
-          className="h-24 w-24 shrink-0 rounded-xl"
-        />
+        {!especie.imagenUrl && (
+          <FotoEspecie
+            nombre={especie.nombreComun}
+            imagenUrl={null}
+            estadoLegal={especie.estadoLegal}
+            className="h-24 w-24 shrink-0 rounded-xl"
+          />
+        )}
         <div className="min-w-0">
           <h1 className="text-3xl font-bold leading-tight tracking-tight">
             {especie.nombreComun}

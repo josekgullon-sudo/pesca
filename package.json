@@ -14,7 +14,8 @@
     "db:studio": "prisma studio",
     "typecheck": "tsc --noEmit",
     "setup": "node scripts/setup.mjs",
-    "dev:movil": "next dev -H 0.0.0.0"
+    "dev:movil": "next dev -H 0.0.0.0",
+    "fotos": "node scripts/fotos-especies.mjs"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.9.1",
@@ -25,7 +26,8 @@
     "next-auth": "^5.0.0-beta.32",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-leaflet": "^5.0.0"
+    "react-leaflet": "^5.0.0",
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

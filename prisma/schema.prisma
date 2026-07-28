@@ -81,6 +81,9 @@ model Sitio {
   /// Ficha en embalses.net u otra fuente para consultar el nivel del agua.
   urlNivelAgua String?
 
+  /// Foto de cabecera. La ponemos nosotros desde la propia app.
+  imagenUrl String?
+
   especies SitioEspecie[]
   aparejos AparejoSitio[]
   capturas Captura[]
@@ -118,6 +121,12 @@ model Especie {
   notasLegales        String @default("")
 
   imagenUrl   String?
+  /// Autoría y licencia de la imagen. Si la foto viene de Wikimedia Commons hay
+  /// obligación de atribuirla, así que se guarda con ella y se pinta en la ficha.
+  imagenAutor    String?
+  imagenLicencia String?
+  imagenFuente   String?
+
   descripcion String
 
   /// Cómo y dónde buscarla (bloque libre para la ficha de especie).

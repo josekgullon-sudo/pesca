@@ -47,6 +47,5 @@ next-env.d.ts
 *.db
 *.db-journal
 
-# imágenes subidas desde el móvil
-/public/uploads/*
-!/public/uploads/.gitkeep
+# fotos e imágenes: es la carpeta que hay que copiar del VPS
+/datos
