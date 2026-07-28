@@ -123,7 +123,17 @@ export async function RankingGuia({ ambito = {} }: { ambito?: Ambito }) {
               : `Estos ${enTemporada.length} sitios tienen marcado este mes como buena época.`}
           </p>
 
-          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* La rejilla se ajusta a cuántos hay: con uno solo, tres columnas
+              dejaban la única tarjeta encogida en una esquina. */}
+          <ul
+            className={`grid gap-5 ${
+              enTemporada.length >= 3
+                ? "sm:grid-cols-2 lg:grid-cols-3"
+                : enTemporada.length === 2
+                  ? "sm:grid-cols-2"
+                  : "max-w-md"
+            }`}
+          >
             {enTemporada.slice(0, 6).map((s) => (
               <li key={s.slug}>
                 <Link
