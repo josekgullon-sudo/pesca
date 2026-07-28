@@ -73,39 +73,43 @@ export default async function PaginaSitios({
         </Link>
       </div>
 
-      <FiltrosSitios base="/sitios" filtros={filtros} especies={especies} />
+      {/* En escritorio los filtros se quedan fijos a la izquierda mientras se
+          recorre la lista; en móvil van arriba, plegados. */}
+      <div className="md:grid md:grid-cols-[17rem_1fr] md:items-start md:gap-8">
+        <div className="md:sticky md:top-6">
+          <FiltrosSitios base="/sitios" filtros={filtros} especies={especies} />
+        </div>
 
-      <div>
-        <p className="mb-3 font-semibold text-texto-suave">
-          {sitios.length === 1
-            ? "1 sitio"
-            : `${sitios.length} sitios`}
-        </p>
-
-        {sitios.length === 0 ? (
-          <p className="rounded-xl border border-borde bg-fondo-elevado p-4 leading-relaxed">
-            No hay ningún sitio que cumpla eso.{" "}
-            {hayFiltros(filtros) && (
-              <Link
-                href="/sitios"
-                className="font-semibold text-acento underline underline-offset-2"
-              >
-                Quita los filtros
-              </Link>
-            )}
+        <div className="mt-6 md:mt-0">
+          <p className="mb-3 font-semibold text-texto-suave">
+            {sitios.length === 1 ? "1 sitio" : `${sitios.length} sitios`}
           </p>
-        ) : (
-          <ul className="space-y-3">
-            {sitios.map((s) => (
-              <TarjetaSitio key={s.slug} sitio={s} />
-            ))}
-          </ul>
-        )}
-      </div>
 
-      <p className="text-sm leading-relaxed text-texto-suave">
-        {AVISO_ABUNDANCIAS_ESTIMADAS}
-      </p>
+          {sitios.length === 0 ? (
+            <p className="rounded-xl border border-borde bg-fondo-elevado p-4 leading-relaxed">
+              No hay ningún sitio que cumpla eso.{" "}
+              {hayFiltros(filtros) && (
+                <Link
+                  href="/sitios"
+                  className="font-semibold text-acento underline underline-offset-2"
+                >
+                  Quita los filtros
+                </Link>
+              )}
+            </p>
+          ) : (
+            <ul className="grid gap-3 lg:grid-cols-2">
+              {sitios.map((s) => (
+                <TarjetaSitio key={s.slug} sitio={s} />
+              ))}
+            </ul>
+          )}
+
+          <p className="mt-6 max-w-prose text-sm leading-relaxed text-texto-suave">
+            {AVISO_ABUNDANCIAS_ESTIMADAS}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

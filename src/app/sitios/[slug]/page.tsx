@@ -151,8 +151,8 @@ export default async function FichaSitio({
   })).filter((g) => g.items.length > 0);
 
   return (
-    <article className="space-y-8">
-      <header>
+    <article>
+      <header className="mb-8">
         <p className="text-sm font-bold uppercase tracking-wide text-texto-suave">
           {ETIQUETA_TIPO_SITIO[sitio.tipo as TipoSitio]} · {sitio.municipio}
         </p>
@@ -161,11 +161,12 @@ export default async function FichaSitio({
         </h1>
       </header>
 
-      {/* Lo urgente primero: si hay un aviso sanitario grave, se ve antes que nada. */}
+      {/* Lo urgente primero: si hay un aviso sanitario grave, se ve antes que
+          nada, y a ancho completo en las dos versiones. */}
       {avisoGrave && (
         <section
           role="alert"
-          className="rounded-xl border-2 border-rojo-texto/40 bg-rojo-fondo p-4 text-rojo-texto"
+          className="mb-8 rounded-xl border-2 border-rojo-texto/40 bg-rojo-fondo p-4 text-rojo-texto"
         >
           <h2 className="flex items-center gap-2 text-lg font-bold">
             <span aria-hidden>⚠️</span> Aviso sanitario
@@ -174,7 +175,11 @@ export default async function FichaSitio({
         </section>
       )}
 
-      <section>
+      <div className="lg:grid lg:grid-cols-[1fr_20rem] lg:items-start lg:gap-10">
+      {/* Columna principal */}
+      <div className="space-y-8">
+
+      <section className="lg:hidden">
         <h2 className="sr-only">Datos generales</h2>
         <dl className="grid grid-cols-2 gap-3">
         <Dato titulo="Desde Dos Hermanas">
@@ -196,12 +201,12 @@ export default async function FichaSitio({
 
       <section>
         <h2 className="mb-2 text-xl font-bold">Qué es</h2>
-        <p className="leading-relaxed">{sitio.descripcion}</p>
+        <p className="max-w-prose leading-relaxed">{sitio.descripcion}</p>
       </section>
 
       <section>
         <h2 className="mb-2 text-xl font-bold">Cómo se llega</h2>
-        <p className="leading-relaxed">{sitio.accesoDescripcion}</p>
+        <p className="max-w-prose leading-relaxed">{sitio.accesoDescripcion}</p>
         <p className="mt-3 text-sm leading-relaxed text-texto-suave">
           {AVISO_COORDENADAS_APROXIMADAS}
         </p>
@@ -231,7 +236,7 @@ export default async function FichaSitio({
             <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-texto-suave">
               Lo que puedes pescar
             </h3>
-            <ul className="space-y-3">
+            <ul className="grid gap-3 xl:grid-cols-2">
               {pescables.map((se) => (
                 <FilaEspecie key={se.especieId} se={se} />
               ))}
@@ -248,7 +253,7 @@ export default async function FichaSitio({
               No se pueden buscar. Van aquí para que sepas identificarlas y qué
               hacer si caen por accidente.
             </p>
-            <ul className="space-y-3">
+            <ul className="grid gap-3 xl:grid-cols-2">
               {noPescables.map((se) => (
                 <FilaEspecie key={se.especieId} se={se} atenuada />
               ))}
@@ -289,6 +294,31 @@ export default async function FichaSitio({
         )}
       </section>
 
+      </div>
+
+      {/* Columna lateral: los datos duros y todo lo legal, siempre a la vista
+          en escritorio mientras se lee el resto. */}
+      <aside className="mt-8 space-y-6 lg:mt-0 lg:sticky lg:top-6">
+
+      <section className="hidden lg:block">
+        <h2 className="sr-only">Datos generales</h2>
+        <dl className="grid grid-cols-2 gap-3">
+          <Dato titulo="Desde Dos Hermanas">
+            {sitio.tiempoCocheMin} min · {sitio.distanciaDesdeDosHermanasKm} km
+          </Dato>
+          <Dato titulo="Acceso">
+            {ETIQUETA_DIFICULTAD[
+              sitio.dificultadAcceso as DificultadAcceso
+            ].replace("Acceso ", "")}
+          </Dato>
+          <Dato titulo="Sombra">{sitio.tieneSombra ? "Sí" : "No"}</Dato>
+          <Dato titulo="Navegable">{sitio.navegable ? "Sí" : "No"}</Dato>
+          {sitio.capacidadHm3 !== null && (
+            <Dato titulo="Capacidad">{sitio.capacidadHm3} hm³</Dato>
+          )}
+        </dl>
+      </section>
+
       <section>
         <h2 className="mb-3 text-xl font-bold">Antes de ir</h2>
         <div className="space-y-3">
@@ -325,6 +355,9 @@ export default async function FichaSitio({
       >
         Registrar captura aquí
       </Link>
+
+      </aside>
+      </div>
     </article>
   );
 }

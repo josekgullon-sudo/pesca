@@ -75,28 +75,39 @@ export default async function PaginaMapa({
         </Link>
       </div>
 
-      <div className="h-[60vh] min-h-80 overflow-hidden rounded-xl border border-borde">
-        <MapaSitios sitios={puntos} />
+      <div className="md:grid md:grid-cols-[17rem_1fr] md:items-start md:gap-8">
+        <div className="order-2 mt-6 md:order-1 md:mt-0 md:sticky md:top-6">
+          <FiltrosSitios
+            base="/sitios/mapa"
+            filtros={filtros}
+            especies={especies}
+          />
+        </div>
+
+        <div className="order-1 md:order-2">
+          <div className="h-[60vh] min-h-80 overflow-hidden rounded-xl border border-borde md:h-[70vh]">
+            <MapaSitios sitios={puntos} />
+          </div>
+
+          <ul className="mt-4 flex flex-wrap gap-3 text-sm font-semibold">
+            <li className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full bg-[#33633d]" /> Embalse
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full bg-[#416f87]" /> Río
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full bg-[#857659]" /> Canal
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full bg-[#b3261e]" /> Aviso
+              sanitario
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <ul className="flex flex-wrap gap-3 text-sm font-semibold">
-        <li className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-[#33633d]" /> Embalse
-        </li>
-        <li className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-[#416f87]" /> Río
-        </li>
-        <li className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-[#857659]" /> Canal
-        </li>
-        <li className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-[#b3261e]" /> Aviso sanitario
-        </li>
-      </ul>
-
-      <FiltrosSitios base="/sitios/mapa" filtros={filtros} especies={especies} />
-
-      <p className="text-sm leading-relaxed text-texto-suave">
+      <p className="max-w-prose text-sm leading-relaxed text-texto-suave">
         {AVISO_COORDENADAS_APROXIMADAS} El mapa necesita conexión: las teselas
         vienen de OpenStreetMap.
       </p>

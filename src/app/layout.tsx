@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { Cabecera } from "@/components/Cabecera";
-import { NavegacionInferior } from "@/components/NavegacionInferior";
+import { NavegacionInferior } from "@/components/Navegacion";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
 import "./globals.css";
 
@@ -36,13 +36,15 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="antialiased">
-        <div className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col">
+        <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col">
           <Cabecera />
 
-          <main className="flex-1 px-4 py-6">{children}</main>
+          <main className="flex-1 px-4 py-6 md:px-6 md:py-10">{children}</main>
 
-          <footer className="mt-8 border-t border-borde px-4 py-6">
-            <AvisoLegal />
+          <footer className="mt-8 border-t border-borde px-4 py-6 md:px-6">
+            <div className="max-w-prose">
+              <AvisoLegal />
+            </div>
             <p className="mt-4 text-xs text-texto-suave">
               Datos legales contrastados a {FECHA_DATOS_LEGALES}. App privada,
               de uso personal.

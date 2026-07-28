@@ -37,7 +37,10 @@ export function FiltrosSitios({
   return (
     <details
       open={activos > 0}
-      className="rounded-xl border border-borde bg-fondo-elevado"
+      // En escritorio hay sitio de sobra: la clase `filtros-panel` hace que se
+      // muestren siempre desplegados y sin el botón de abrir/cerrar (ver
+      // globals.css). En móvil sigue siendo un desplegable normal.
+      className="filtros-panel rounded-xl border border-borde bg-fondo-elevado"
     >
       <summary className="flex min-h-touch cursor-pointer list-none items-center justify-between px-4 font-bold">
         <span>Filtrar</span>
@@ -50,7 +53,7 @@ export function FiltrosSitios({
         </span>
       </summary>
 
-      <div className="space-y-4 border-t border-borde p-4">
+      <div className="space-y-4 border-t border-borde p-4 md:border-t-0">
       {GRUPOS_FILTRO.map((grupo) => (
         <fieldset key={grupo.titulo}>
           <legend className="mb-2 text-sm font-bold text-texto-suave uppercase tracking-wide">

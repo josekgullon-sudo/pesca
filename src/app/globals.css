@@ -186,3 +186,26 @@ body {
 summary::-webkit-details-marker {
   display: none;
 }
+
+/*
+ * Filtros: desplegable en móvil, panel fijo en escritorio.
+ *
+ * A partir de `md` se esconde el botón de abrir y se fuerza el contenido a
+ * mostrarse, esté el <details> abierto o no. Hay que atacar tanto el hijo
+ * directo como ::details-content, porque los navegadores han implementado el
+ * ocultado de las dos formas según la versión.
+ */
+@media (min-width: 768px) {
+  details.filtros-panel > summary {
+    display: none;
+  }
+
+  details.filtros-panel > *:not(summary) {
+    display: block;
+  }
+
+  details.filtros-panel::details-content {
+    content-visibility: visible;
+    block-size: auto;
+  }
+}

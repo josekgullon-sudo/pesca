@@ -115,7 +115,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | Base de datos, schema y datos semilla          | Hecho          |
 | Acceso de los dos usuarios                     | Hecho          |
 | Guía de sitios: listado, filtros, mapa y ficha | Hecho          |
-| Guía de especies con semáforo legal            | Pendiente      |
+| Guía de especies con semáforo legal            | Hecho          |
 | Registro de capturas con foto y GPS            | Pendiente      |
 | Galería, estadísticas, ranking y comparativa   | Pendiente      |
 | Recomendador "¿qué me llevo?"                  | Pendiente      |
@@ -124,6 +124,20 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 El mapa usa Leaflet con teselas de OpenStreetMap, sin API key. Necesita
 conexión: cachear las teselas para uso offline es parte del bloque de PWA.
+
+### Móvil y escritorio
+
+El diseño es mobile-first, pero no se queda en una tira estrecha en el
+ordenador. A partir de 768 px la navegación pasa de la barra inferior a la
+cabecera, los filtros dejan de ser un desplegable y se quedan fijos en una
+columna lateral, y los listados y las fichas se reparten en varias columnas.
+Los párrafos largos se limitan a `max-w-prose` para que no crucen la pantalla
+entera y sigan siendo legibles.
+
+Las especies no tienen foto todavía. En vez de tirar de imágenes de internet,
+que además tienen dueño, se dibuja una silueta con el color del semáforo legal,
+así el listado se lee de un vistazo. Cuando haya fotos propias, basta con
+rellenar `Especie.imagenUrl`.
 
 ## Base de datos
 

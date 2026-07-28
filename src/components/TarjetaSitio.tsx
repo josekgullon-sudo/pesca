@@ -47,7 +47,7 @@ export function TarjetaSitio({ sitio }: { sitio: SitioTarjeta }) {
     <li>
       <Link
         href={`/sitios/${sitio.slug}`}
-        className="block rounded-xl border border-borde bg-fondo-elevado p-4"
+        className="flex h-full flex-col rounded-xl border border-borde bg-fondo-elevado p-4"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -73,7 +73,7 @@ export function TarjetaSitio({ sitio }: { sitio: SitioTarjeta }) {
           </p>
         )}
 
-        <ul className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
+        <ul className="mt-3 flex flex-auto flex-wrap items-end gap-2 text-xs font-semibold">
           <li className="rounded-lg bg-chip-fondo px-2 py-1 text-chip-texto">
             {ETIQUETA_DIFICULTAD[sitio.dificultadAcceso as DificultadAcceso]}
           </li>
