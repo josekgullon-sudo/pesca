@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Prisma } from "@/generated/prisma/client";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { BarraAbundancia } from "@/components/BarraAbundancia";
+import { CapturasDelSitio } from "@/components/CapturasDelSitio";
 import { MejorEpoca } from "@/components/MejorEpoca";
 import { EtiquetaLegal } from "@/components/SemaforoLegal";
 import {
@@ -261,6 +262,8 @@ export default async function FichaSitio({
           </>
         )}
       </section>
+
+      <CapturasDelSitio sitioId={sitio.id} sitioSlug={sitio.slug} />
 
       <section>
         <h2 className="mb-3 text-xl font-bold">Qué llevar aquí</h2>

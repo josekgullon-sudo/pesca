@@ -20,7 +20,7 @@ export async function Cabecera() {
         {/* En escritorio la navegación va aquí; en móvil, en la barra de abajo. */}
         <NavegacionCabecera />
 
-        {nombre && (
+        {nombre ? (
           <form action={salir} className="shrink-0">
             <button
               type="submit"
@@ -30,6 +30,13 @@ export async function Cabecera() {
               <span className="block underline underline-offset-2">Salir</span>
             </button>
           </form>
+        ) : (
+          <Link
+            href="/entrar"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-lg border-2 border-borde px-3 font-semibold"
+          >
+            Entrar
+          </Link>
         )}
       </div>
     </header>

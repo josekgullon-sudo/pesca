@@ -46,8 +46,8 @@ export default function RootLayout({
               <AvisoLegal />
             </div>
             <p className="mt-4 text-xs text-texto-suave">
-              Datos legales contrastados a {FECHA_DATOS_LEGALES}. App privada,
-              de uso personal.
+              Datos legales contrastados a {FECHA_DATOS_LEGALES}. Proyecto
+              personal, sin ánimo de lucro.
             </p>
           </footer>
 

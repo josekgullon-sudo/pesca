@@ -1,7 +1,8 @@
 import { compare } from "bcryptjs";
+import { redirect } from "next/navigation";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { authConfig } from "./auth.config";
+import { authConfig, RUTA_LOGIN } from "./auth.config";
 import { prisma } from "./prisma";
 
 /**
@@ -48,18 +49,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
 });
 
+export type UsuarioSesion = {
+  id: string;
+  nombre: string;
+  email: string;
+  avatarUrl: string | null;
+};
+
 /**
- * Devuelve el usuario de la sesión o lanza. En páginas y acciones protegidas
- * por el middleware la sesión siempre existe; esto es la red de seguridad para
- * que TypeScript no nos obligue a comprobar `undefined` en cada sitio.
+ * El usuario de la sesión, o null si se está mirando la web sin entrar.
+ * Casi toda la web es pública, así que esta es la versión que usan las páginas.
  */
-export async function usuarioActual() {
+export async function usuarioOpcional(): Promise<UsuarioSesion | null> {
   const sesion = await auth();
-  if (!sesion?.user?.id) throw new Error("No hay sesión iniciada");
+  if (!sesion?.user?.id) return null;
   return {
     id: sesion.user.id,
     nombre: sesion.user.name ?? "",
     email: sesion.user.email ?? "",
     avatarUrl: sesion.user.image ?? null,
   };
+}
+
+/**
+ * El usuario de la sesión, exigiéndola. Si no la hay manda al login en vez de
+ * reventar: las acciones de servidor viajan como POST a páginas públicas, así
+ * que el middleware no las cubre y este es el único sitio donde se comprueba.
+ */
+export async function usuarioActual(): Promise<UsuarioSesion> {
+  const usuario = await usuarioOpcional();
+  if (!usuario) redirect(RUTA_LOGIN);
+  return usuario;
 }

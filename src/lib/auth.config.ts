@@ -11,6 +11,14 @@ import type { NextAuthConfig } from "next-auth";
 
 export const RUTA_LOGIN = "/entrar";
 
+/**
+ * La web se ve entera sin entrar: guía, mapa, especies, diario y ranking.
+ * Solo hace falta sesión para escribir, y eso son estas rutas. Las acciones de
+ * servidor (guardar y borrar capturas) comprueban la sesión por su cuenta,
+ * porque viajan como POST a la página en la que estás, que sí es pública.
+ */
+const RUTAS_QUE_PIDEN_SESION = ["/capturas/nueva"];
+
 export const authConfig = {
   pages: {
     signIn: RUTA_LOGIN,
@@ -36,8 +44,12 @@ export const authConfig = {
         return true;
       }
 
-      // Todo lo demás requiere sesión, incluidas las fotos de /uploads.
-      return haySesion;
+      if (RUTAS_QUE_PIDEN_SESION.some((r) => pathname.startsWith(r))) {
+        return haySesion;
+      }
+
+      // El resto es público, fotos incluidas.
+      return true;
     },
     jwt({ token, user }) {
       if (user) {

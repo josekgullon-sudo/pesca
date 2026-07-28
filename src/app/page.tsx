@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BandaSitio } from "@/components/BandaSitio";
 import { FotoEspecie } from "@/components/FotoEspecie";
-import { usuarioActual } from "@/lib/auth";
+import { usuarioOpcional } from "@/lib/auth";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import { ETIQUETA_TIPO_SITIO, type TipoSitio } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
@@ -14,7 +14,7 @@ function mesActual() {
 }
 
 export default async function Home() {
-  const usuario = await usuarioActual();
+  const usuario = await usuarioOpcional();
   const mes = mesActual();
 
   const [sitios, ultimas, misCapturas, totalCapturas, especiesDistintas, mayor] =
@@ -42,7 +42,9 @@ export default async function Home() {
           fotos: { orderBy: { esPrincipal: "desc" }, take: 1 },
         },
       }),
-      prisma.captura.count({ where: { usuarioId: usuario.id } }),
+      usuario
+        ? prisma.captura.count({ where: { usuarioId: usuario.id } })
+        : Promise.resolve(0),
       prisma.captura.count(),
       prisma.captura
         .findMany({ distinct: ["especieId"], select: { especieId: true } })
@@ -74,33 +76,54 @@ export default async function Home() {
     <div className="space-y-10">
       {/* --- Portada --- */}
       <section>
-        <p className="font-semibold text-texto-suave">Hola, {usuario.nombre}</p>
+        {usuario ? (
+          <p className="font-semibold text-texto-suave">Hola, {usuario.nombre}</p>
+        ) : (
+          <p className="font-semibold text-texto-suave">
+            Guía de pesca de la provincia de Sevilla
+          </p>
+        )}
         <h1 className="mt-1 text-4xl font-bold leading-tight tracking-tight">
-          ¿Nos vamos a pescar?
+          {usuario ? "¿Nos vamos a pescar?" : "Dónde pescar en Sevilla"}
         </h1>
+        {!usuario && (
+          <p className="mt-2 max-w-prose text-lg leading-relaxed text-texto-suave">
+            Catorce embalses y ríos con sus especies, qué llevar para pescarlas
+            y qué dice la ley de cada una. Todo se puede consultar sin cuenta;
+            entrar solo hace falta para apuntar capturas.
+          </p>
+        )}
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Link
-            href="/capturas/nueva"
-            className="flex min-h-touch flex-1 items-center justify-center gap-2 rounded-xl bg-acento px-6 text-lg font-bold text-acento-texto"
-          >
-            Registrar captura
-          </Link>
-          <Link
             href="/sitios"
-            className="flex min-h-touch flex-1 items-center justify-center rounded-xl border-2 border-borde bg-fondo-elevado px-6 text-lg font-bold"
+            className="flex min-h-touch flex-1 items-center justify-center rounded-xl bg-acento px-6 text-lg font-bold text-acento-texto"
           >
             Ver dónde ir
+          </Link>
+          <Link
+            href={usuario ? "/capturas/nueva" : "/ranking"}
+            className="flex min-h-touch flex-1 items-center justify-center rounded-xl border-2 border-borde bg-fondo-elevado px-6 text-lg font-bold"
+          >
+            {usuario ? "Registrar captura" : "Ver el ranking"}
           </Link>
         </div>
       </section>
 
       {/* --- Marcador entre los dos --- */}
       <section>
-        <h2 className="mb-3 text-xl font-bold">Cómo vamos</h2>
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <h2 className="text-xl font-bold">Cómo vamos</h2>
+          <Link
+            href="/ranking"
+            className="font-semibold text-acento underline underline-offset-2"
+          >
+            Ver el ranking
+          </Link>
+        </div>
         <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Marcador titulo="Tuyas" valor={misCapturas} />
-          <Marcador titulo="Entre los dos" valor={totalCapturas} />
+          {usuario && <Marcador titulo="Tuyas" valor={misCapturas} />}
+          <Marcador titulo="Capturas" valor={totalCapturas} />
           <Marcador titulo="Especies distintas" valor={especiesDistintas} />
           <Marcador
             titulo="La más gorda"
@@ -110,7 +133,7 @@ export default async function Home() {
         </dl>
         {totalCapturas === 0 && (
           <p className="mt-3 max-w-prose leading-relaxed text-texto-suave">
-            Todo a cero de momento. En cuanto registréis capturas, aquí saldrá
+            Todo a cero de momento. En cuanto se registren capturas, aquí saldrá
             quién va ganando, y el ranking irá corrigiendo las abundancias que
             trae la guía de fábrica.
           </p>

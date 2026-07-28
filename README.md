@@ -1,8 +1,12 @@
 # Pesca Sevilla
 
-App privada (dos usuarios) para pescar en la provincia de Sevilla. Tiene dos
-partes: una **guía** de sitios, especies y aparejos con la información legal de
-cada especie, y un **diario** de capturas.
+Web de pesca de la provincia de Sevilla. Tiene tres partes: una **guía** de
+sitios, especies y aparejos con la información legal de cada especie, un
+**diario** de capturas y un **ranking**.
+
+**Se lee entera sin cuenta.** Guía, mapa, capturas y ranking son públicos.
+Entrar solo hace falta para registrar capturas, y las cuentas las crea el seed:
+no hay registro público.
 
 ## Stack
 
@@ -76,12 +80,20 @@ contraseña sin miedo a que la próxima ejecución la revierta.
 
 NextAuth con proveedor de credenciales y sesión en JWT. **No hay registro
 público**: los dos usuarios los crea el seed y no hay forma de dar de alta a
-nadie más desde la app.
+nadie más desde la web.
 
-- El middleware (`src/middleware.ts`) deja fuera de la sesión únicamente
-  `/entrar` y los assets de la PWA. Todo lo demás pide login, **incluidas las
-  fotos de `/uploads`**: así una foto de una captura no es accesible por el
-  simple hecho de conocer su URL.
+- **Leer es público.** Guía, mapa, especies, capturas y ranking se ven sin
+  entrar, fotos incluidas. La lista de rutas que sí piden sesión está en
+  `RUTAS_QUE_PIDEN_SESION`, en `src/lib/auth.config.ts`.
+- **Escribir pide sesión.** Las acciones de servidor (guardar y borrar
+  capturas) la comprueban por su cuenta con `usuarioActual()`, porque viajan
+  como POST a páginas que sí son públicas y el middleware no las cubre. Cada
+  uno solo puede borrar sus propias capturas.
+- **Las coordenadas exactas de cada captura solo se ven con sesión.** El sitio
+  (el embalse o el tramo de río) sale para todo el mundo, pero el punto al
+  metro no: publicarlo es regalar los puestos y dejar un rastro de por dónde
+  anda uno. Se cambia en `src/app/capturas/[id]/page.tsx` si se prefiere
+  público.
 - La sesión dura 90 días. La app se usa a la orilla del agua y sin cobertura;
   que pidiera la contraseña justo cuando pica algo sería absurdo.
 - `src/lib/auth.config.ts` va separado de `src/lib/auth.ts` a propósito: el
@@ -117,7 +129,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | Guía de sitios: listado, filtros, mapa y ficha | Hecho          |
 | Guía de especies con semáforo legal            | Hecho          |
 | Registro de capturas con foto y GPS            | Hecho          |
-| Galería, estadísticas, ranking y comparativa   | Pendiente      |
+| Ranking, galería y comparativa                 | Hecho          |
 | Recomendador "¿qué me llevo?"                  | Pendiente      |
 | PWA y funcionamiento offline                   | Pendiente      |
 | Registro de salidas                            | Pendiente      |
@@ -169,8 +181,6 @@ De paso queda mejor para el VPS:
 
 - `datos/` es **lo único que hay que copiar o montar como volumen**, junto con
   `prisma/dev.db`. Es lo que no se puede regenerar.
-- Está detrás del middleware, así que una foto vuestra no se ve por el simple
-  hecho de conocer la URL.
 - Se cachean para siempre (`immutable`): el nombre del fichero es aleatorio y
   nunca se reescribe.
 

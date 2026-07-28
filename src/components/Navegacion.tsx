@@ -41,9 +41,15 @@ const ENLACES: Enlace[] = [
   },
   {
     href: "/capturas",
-    etiqueta: "Diario",
+    etiqueta: "Capturas",
     icono: IconoDiario,
     activo: (r) => r.startsWith("/capturas"),
+  },
+  {
+    href: "/ranking",
+    etiqueta: "Ranking",
+    icono: IconoRanking,
+    activo: (r) => r.startsWith("/ranking"),
   },
 ];
 
@@ -159,6 +165,25 @@ function IconoMapa({ activo }: PropsIcono) {
     >
       <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
       <circle cx="12" cy="10" r="2.5" fill={activo ? "var(--fondo)" : "none"} />
+    </svg>
+  );
+}
+
+function IconoRanking({ activo }: PropsIcono) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="h-6 w-6"
+      fill={activo ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="12" width="5" height="8" rx="1" />
+      <rect x="9.5" y="7" width="5" height="13" rx="1" />
+      <rect x="16" y="14" width="5" height="6" rx="1" />
     </svg>
   );
 }

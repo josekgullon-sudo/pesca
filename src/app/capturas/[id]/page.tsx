@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SemaforoLegal } from "@/components/SemaforoLegal";
-import { usuarioActual } from "@/lib/auth";
+import { usuarioOpcional } from "@/lib/auth";
 import { formatearFecha, formatearPeso } from "@/lib/formato";
 import { prisma } from "@/lib/prisma";
 import { borrarCaptura } from "../acciones";
@@ -42,10 +42,10 @@ export default async function FichaCaptura({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [captura, usuario] = await Promise.all([cargar(id), usuarioActual()]);
+  const [captura, usuario] = await Promise.all([cargar(id), usuarioOpcional()]);
   if (!captura) notFound();
 
-  const esMia = captura.usuarioId === usuario.id;
+  const esMia = usuario !== null && captura.usuarioId === usuario.id;
 
   return (
     <article className="mx-auto max-w-3xl space-y-6">
@@ -133,18 +133,33 @@ export default async function FichaCaptura({
         {captura.condicionesMeteo && (
           <Fila titulo="Tiempo">{captura.condicionesMeteo}</Fila>
         )}
-        {captura.latitud !== null && captura.longitud !== null && (
-          <Fila titulo="Punto exacto">
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${captura.latitud},${captura.longitud}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-acento underline underline-offset-2"
-            >
-              {captura.latitud.toFixed(5)}, {captura.longitud.toFixed(5)} ↗
-            </a>
-          </Fila>
-        )}
+        {/* El punto exacto solo se enseña a quien ha entrado. La web es
+            pública, y publicar las coordenadas al metro de cada captura es
+            regalar los puestos y, de paso, dejar un rastro de por dónde
+            andamos. El sitio (el embalse) sí sale para todo el mundo. */}
+        {captura.latitud !== null &&
+          captura.longitud !== null &&
+          (usuario ? (
+            <Fila titulo="Punto exacto">
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${captura.latitud},${captura.longitud}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-acento underline underline-offset-2"
+              >
+                {captura.latitud.toFixed(5)}, {captura.longitud.toFixed(5)} ↗
+              </a>
+            </Fila>
+          ) : (
+            <Fila titulo="Punto exacto">
+              <Link
+                href="/entrar"
+                className="font-semibold text-acento underline underline-offset-2"
+              >
+                Entra para verlo
+              </Link>
+            </Fila>
+          ))}
       </dl>
 
       {captura.notas && (
