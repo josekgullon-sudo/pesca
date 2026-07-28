@@ -273,6 +273,15 @@ export default async function FichaSitio({
         </div>
       </header>
 
+      {usuario?.esAdmin && (
+        <SubirFoto
+          tipo="sitio"
+          slug={sitio.slug}
+          nombre={sitio.nombre}
+          tieneFoto={Boolean(sitio.imagenUrl)}
+        />
+      )}
+
       {/* Lo urgente primero: si hay un aviso sanitario grave, se ve antes que
           nada, y a ancho completo en las dos versiones. */}
       {avisoGrave && (
@@ -460,15 +469,6 @@ export default async function FichaSitio({
           )}
 
           <AvisoLegal variante="destacado" />
-
-          {usuario?.esAdmin && (
-            <SubirFoto
-              tipo="sitio"
-              slug={sitio.slug}
-              nombre={sitio.nombre}
-              tieneFoto={Boolean(sitio.imagenUrl)}
-            />
-          )}
         </div>
       </section>
 

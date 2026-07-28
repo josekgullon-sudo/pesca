@@ -190,6 +190,17 @@ export default async function FichaEspecie({
         </div>
       </header>
 
+      {/* Al lado de la foto, no en la columna lateral: quien viene a cambiar
+          una imagen la está mirando, y ahí abajo no lo encontraba nadie. */}
+      {usuario?.esAdmin && (
+        <SubirFoto
+          tipo="especie"
+          slug={especie.slug}
+          nombre={especie.nombreComun}
+          tieneFoto={Boolean(especie.imagenUrl)}
+        />
+      )}
+
       {/* El semáforo va lo primero y a ancho completo: es el dato que decide
           qué haces con el pez que tienes en la mano. */}
       <div className="mb-8">
@@ -336,15 +347,6 @@ export default async function FichaEspecie({
           )}
 
           <AvisoLegal variante="destacado" />
-
-          {usuario?.esAdmin && (
-            <SubirFoto
-              tipo="especie"
-              slug={especie.slug}
-              nombre={especie.nombreComun}
-              tieneFoto={Boolean(especie.imagenUrl)}
-            />
-          )}
         </aside>
       </div>
     </article>
