@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AvisoLegal } from "@/components/AvisoLegal";
+import { metadatosDePagina } from "@/lib/marca";
 
-export const metadata: Metadata = { title: "Normas de uso" };
+export const metadata: Metadata = metadatosDePagina({
+  titulo: "Normas de uso",
+  descripcion:
+    "Qué se puede publicar aquí y qué no, y cómo se modera lo que sube la gente.",
+  ruta: "/normas",
+});
 
 export default function PaginaNormas() {
   return (

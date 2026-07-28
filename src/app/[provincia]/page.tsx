@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { FiltrosSitios } from "@/components/FiltrosSitios";
 import { TarjetaSitio } from "@/components/TarjetaSitio";
 import { AVISO_ABUNDANCIAS_ESTIMADAS } from "@/lib/avisos";
@@ -10,8 +11,10 @@ import {
   urlConFiltros,
   type ParamsBusqueda,
 } from "@/lib/filtros-sitios";
+import { metadatosDePagina } from "@/lib/marca";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
+import { schemaMigas } from "@/lib/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -22,17 +25,21 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { provincia } = await params;
   const p = await prisma.provincia.findUnique({
-    where: { slug: provincia },
+    where: { slug: provincia, publicada: true },
     select: { nombre: true, descripcion: true },
   });
   if (!p) return { title: "Provincia" };
 
-  return {
-    title: `Dónde pescar en ${p.nombre}: embalses, ríos y especies`,
-    description:
+  // Cada combinación de filtros genera una URL distinta con el mismo contenido:
+  // la canónica que pone `metadatosDePagina` es lo que evita que Google las
+  // indexe todas y se repartan la fuerza entre decenas de copias.
+  return metadatosDePagina({
+    titulo: `Dónde pescar en ${p.nombre}: embalses, ríos y especies`,
+    descripcion:
       p.descripcion.slice(0, 155) ||
       `Guía de pesca de la provincia de ${p.nombre}.`,
-  };
+    ruta: `/${provincia}`,
+  });
 }
 
 export default async function PaginaProvincia({
@@ -82,6 +89,19 @@ export default async function PaginaProvincia({
 
   return (
     <div className="space-y-6">
+      <DatosEstructurados
+        schema={schemaMigas([
+          { nombre: "Inicio", ruta: "/" },
+          { nombre: `Pescar en ${provincia.nombre}`, ruta: `/${provincia.slug}` },
+        ])}
+      />
+
+      <nav aria-label="Migas de pan" className="text-sm">
+        <Link href="/" className="text-texto-suave underline underline-offset-2">
+          Inicio
+        </Link>
+      </nav>
+
       {provincia.descripcion && (
         <p className="max-w-prose text-lg leading-relaxed text-texto-suave">
           {provincia.descripcion}

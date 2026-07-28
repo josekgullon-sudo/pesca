@@ -4,7 +4,10 @@ import { usuarioActual } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BorrarCuenta, CambiarContrasena } from "./FormulariosCuenta";
 
-export const metadata: Metadata = { title: "Mi cuenta" };
+export const metadata: Metadata = {
+  title: "Mi cuenta",
+  robots: { index: false, follow: false },
+};
 export const dynamic = "force-dynamic";
 
 export default async function PaginaCuenta() {

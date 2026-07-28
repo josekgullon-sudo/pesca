@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { BandaSitio } from "@/components/BandaSitio";
 import { FotoEspecie } from "@/components/FotoEspecie";
@@ -7,6 +8,15 @@ import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import { ETIQUETA_TIPO_SITIO, type TipoSitio } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
 import { provinciasPublicadas } from "@/lib/provincias";
+
+// El título y la descripción los pone el layout —si se repitieran aquí, la
+// plantilla «%s · Mapa de Pesca» dejaría el nombre dos veces—, así que solo
+// hace falta la canónica, para que las visitas con ?utm_... no cuenten como
+// otra portada distinta.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: { url: "/" },
+};
 
 export const dynamic = "force-dynamic";
 

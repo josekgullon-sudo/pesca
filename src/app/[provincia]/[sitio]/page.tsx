@@ -5,6 +5,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { BarraAbundancia } from "@/components/BarraAbundancia";
 import { CapturasDelSitio } from "@/components/CapturasDelSitio";
+import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { MejorEpoca } from "@/components/MejorEpoca";
 import { EtiquetaLegal } from "@/components/SemaforoLegal";
 import {
@@ -22,8 +23,10 @@ import {
   type TipoAparejo,
   type TipoSitio,
 } from "@/lib/enums";
+import { metadatosDePagina } from "@/lib/marca";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
+import { schemaMigas, schemaSitio } from "@/lib/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -50,15 +53,29 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { provincia, sitio } = await params;
   const datos = await prisma.sitio.findFirst({
-    where: { slug: sitio, provincia: { slug: provincia } },
-    select: { nombre: true, tipo: true, municipio: true, descripcion: true },
+    where: { slug: sitio, provincia: { slug: provincia, publicada: true } },
+    select: {
+      nombre: true,
+      tipo: true,
+      municipio: true,
+      descripcion: true,
+      imagenUrl: true,
+      provincia: { select: { nombre: true } },
+    },
   });
   if (!datos) return { title: "Sitio" };
 
-  return {
-    title: `${datos.nombre}: qué se pesca y cómo llegar`,
-    description: datos.descripcion.slice(0, 155),
-  };
+  return metadatosDePagina({
+    titulo: `${datos.nombre}: qué se pesca y cómo llegar`,
+    descripcion:
+      datos.descripcion.slice(0, 155) ||
+      `Pesca en ${datos.nombre}, ${datos.municipio} (${datos.provincia.nombre}).`,
+    ruta: `/${provincia}/${sitio}`,
+    tipo: "article",
+    // La foto del embalse es lo que se ve al compartir el enlace. Sin ella,
+    // WhatsApp y Twitter enseñan una tarjeta vacía y nadie la abre.
+    imagen: datos.imagenUrl,
+  });
 }
 
 const CLASE_PROBABILIDAD: Record<Probabilidad, string> = {
@@ -160,6 +177,29 @@ export default async function FichaSitio({
 
   return (
     <article>
+      <DatosEstructurados
+        schema={[
+          schemaSitio({
+            nombre: sitio.nombre,
+            descripcion: sitio.descripcion,
+            municipio: sitio.municipio,
+            latitud: sitio.latitud,
+            longitud: sitio.longitud,
+            imagenUrl: sitio.imagenUrl,
+            ruta: `/${provincia.slug}/${sitio.slug}`,
+            provincia: provincia.nombre,
+          }),
+          schemaMigas([
+            { nombre: "Inicio", ruta: "/" },
+            { nombre: `Pescar en ${provincia.nombre}`, ruta: `/${provincia.slug}` },
+            {
+              nombre: sitio.nombre,
+              ruta: `/${provincia.slug}/${sitio.slug}`,
+            },
+          ]),
+        ]}
+      />
+
       {/* Foto de cabecera cuando la hay, con su crédito: las de Commons son
           Creative Commons con obligación de atribuir. */}
       {sitio.imagenUrl && (
@@ -193,7 +233,18 @@ export default async function FichaSitio({
       )}
 
       <header className="mb-8">
-        <nav aria-label="Migas de pan" className="mb-2 text-sm">
+        {/* Las mismas migas que se declaran en JSON-LD: Google penaliza marcar
+            una ruta de navegación que el visitante no ve. */}
+        <nav
+          aria-label="Migas de pan"
+          className="mb-2 flex flex-wrap items-center gap-x-2 text-sm"
+        >
+          <Link href="/" className="text-texto-suave underline underline-offset-2">
+            Inicio
+          </Link>
+          <span aria-hidden className="text-texto-suave">
+            ›
+          </span>
           <Link
             href={`/${provincia.slug}`}
             className="font-semibold text-acento underline underline-offset-2"

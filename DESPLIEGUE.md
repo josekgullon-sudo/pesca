@@ -44,8 +44,9 @@ cd pesca
 git checkout claude/fishing-app-sevilla-mdhbzr
 
 # 6. Configuración. El AUTH_SECRET se genera solo; no lo copies de ningún sitio.
+#    URL_BASE sale de DOMINIO, así que normalmente no hay que ponerla.
 cat > .env <<EOF
-DOMINIO=tu-dominio.es
+DOMINIO=mapadepesca.es
 AUTH_SECRET=$(openssl rand -base64 32)
 SEED_PASSWORD=una-contraseña-larga-tuya
 EOF
@@ -87,6 +88,30 @@ En el panel de tu proveedor de dominios, un registro `A`:
 Tarda entre unos minutos y unas horas. Cuando resuelva, Caddy pide el
 certificado solo la primera vez que alguien entre.
 
+Comprueba que ha resuelto antes de levantar el compose normal:
+
+```bash
+dig +short mapadepesca.es
+```
+
+Si no devuelve la IP de tu servidor, Caddy intentará sacar el certificado, Let's
+Encrypt le dirá que no y se quedará reintentando.
+
+### Después de que esté en línea
+
+```bash
+curl -s https://mapadepesca.es/robots.txt
+curl -s https://mapadepesca.es/sitemap.xml | head
+```
+
+Las URLs que salgan ahí tienen que ser las de tu dominio. Si salen con
+`mapadepesca.es` y tu dominio es otro, falta `URL_BASE` en el `.env` (por
+defecto se construye con `https://$DOMINIO`).
+
+Luego, en [Google Search Console](https://search.google.com/search-console),
+añade la propiedad del dominio y manda el sitemap. Es lo que hace que Google
+descubra las páginas en días en vez de en semanas.
+
 ## Lo recomendado: un VPS pequeño
 
 Un servidor de 4-6 € al mes sobra de largo. Sirve cualquiera con Docker:
@@ -97,7 +122,7 @@ Hetzner, DigitalOcean, OVH, Contabo.
 git clone <repo> pesca && cd pesca
 
 cat > .env <<EOF
-DOMINIO=pescasevilla.es
+DOMINIO=mapadepesca.es
 AUTH_SECRET=$(openssl rand -base64 32)
 SEED_PASSWORD=una-contraseña-larga-tuya
 EOF

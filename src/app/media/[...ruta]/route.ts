@@ -10,8 +10,9 @@ import { rutaEnDisco } from "@/lib/imagenes";
  * que había entonces: una foto subida en producción daba 404 hasta el siguiente
  * build. Esta ruta las lee del disco en cada petición.
  *
- * La sesión la exige el middleware, que cubre /media: las fotos de las capturas
- * no son accesibles con solo conocer la URL.
+ * Es pública, como el resto de la web: las fotos se ven en las fichas de sitio,
+ * en las de especie y en el ranking sin necesidad de entrar. Lo que decide qué
+ * puede indexar Google es robots.txt, no esta ruta.
  */
 
 const TIPOS: Record<string, string> = {
@@ -44,8 +45,10 @@ export async function GET(
         "Content-Type": tipo,
         "Content-Length": String(info.size),
         // El nombre del fichero es aleatorio y nunca se reescribe, así que se
-        // puede cachear para siempre. `private` porque va detrás de la sesión.
-        "Cache-Control": "private, max-age=31536000, immutable",
+        // puede cachear para siempre. `public` para que también cacheen el
+        // proxy y cualquier CDN que se ponga delante: son los ficheros más
+        // pesados de la web y los que más veces se piden.
+        "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
   } catch {

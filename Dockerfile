@@ -1,4 +1,4 @@
-# Imagen de producción de Pesca Sevilla.
+# Imagen de producción de Mapa de Pesca.
 #
 # Va con node_modules completos en vez de con la salida `standalone` de Next a
 # propósito: la app usa dos módulos nativos (better-sqlite3 y sharp) y el CLI de

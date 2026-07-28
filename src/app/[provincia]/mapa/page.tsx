@@ -9,6 +9,7 @@ import {
   urlConFiltros,
   type ParamsBusqueda,
 } from "@/lib/filtros-sitios";
+import { metadatosDePagina } from "@/lib/marca";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
 
@@ -24,10 +25,13 @@ export async function generateMetadata({
     where: { slug: provincia },
     select: { nombre: true },
   });
-  return {
-    title: `Mapa de pesca de ${p?.nombre ?? "la provincia"}`,
-    description: `Dónde están los embalses y ríos de ${p?.nombre ?? "la provincia"} para pescar.`,
-  };
+  // Los filtros viajan en la URL: sin la canónica que pone el ayudante, cada
+  // combinación sería otra página con el mismo mapa.
+  return metadatosDePagina({
+    titulo: `Mapa de pesca de ${p?.nombre ?? "la provincia"}`,
+    descripcion: `Dónde están los embalses y ríos de ${p?.nombre ?? "la provincia"} para pescar.`,
+    ruta: `/${provincia}/mapa`,
+  });
 }
 
 export default async function PaginaMapa({

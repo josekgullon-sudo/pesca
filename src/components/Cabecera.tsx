@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { salir } from "@/app/entrar/actions";
 import { auth } from "@/lib/auth";
+import { NOMBRE } from "@/lib/marca";
 import { rutaDeSitios } from "@/lib/provincias";
 import { NavegacionCabecera } from "./Navegacion";
 
@@ -15,7 +16,7 @@ export async function Cabecera() {
           href="/"
           className="shrink-0 text-2xl font-bold tracking-tight text-cabecera-texto"
         >
-          Pesca Sevilla
+          {NOMBRE}
         </Link>
 
         {/* En escritorio la navegación va aquí; en móvil, en la barra de abajo. */}

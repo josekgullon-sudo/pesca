@@ -39,7 +39,13 @@ export async function generateMetadata({
     where: { id },
     select: { especie: { select: { nombreComun: true } } },
   });
-  return { title: c ? `${c.especie.nombreComun}` : "Captura" };
+  // Sin indexar: la ficha lleva el nombre de quien la subió y su foto. Quien
+  // apunta una captura no espera acabar en los resultados de Google por ello.
+  // El listado y el ranking sí se indexan, que es donde está el contenido.
+  return {
+    title: c ? `${c.especie.nombreComun}` : "Captura",
+    robots: { index: false, follow: true },
+  };
 }
 
 export default async function FichaCaptura({

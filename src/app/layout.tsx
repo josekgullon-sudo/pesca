@@ -2,9 +2,12 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { Cabecera } from "@/components/Cabecera";
+import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { NavegacionInferior } from "@/components/Navegacion";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
+import { DESCRIPCION, LEMA, NOMBRE, URL_BASE } from "@/lib/marca";
 import { rutaDeSitios } from "@/lib/provincias";
+import { schemaWebSite } from "@/lib/schema";
 import "./globals.css";
 
 // No usamos fuentes web a propósito: la app se abre sin cobertura y con una
@@ -12,13 +15,24 @@ import "./globals.css";
 // Además así el build del VPS no depende de que Google Fonts responda.
 
 export const metadata: Metadata = {
+  // Sin esto, las URLs de Open Graph y las canónicas salen relativas y ni
+  // Google ni las redes sociales las resuelven.
+  metadataBase: new URL(URL_BASE),
   title: {
-    default: "Pesca Sevilla",
-    template: "%s · Pesca Sevilla",
+    default: `${NOMBRE} — ${LEMA}`,
+    template: `%s · ${NOMBRE}`,
   },
-  description:
-    "Guía de sitios, especies y aparejos para pescar en la provincia de Sevilla, " +
-    "y diario de nuestras capturas.",
+  description: DESCRIPCION,
+  applicationName: NOMBRE,
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    siteName: NOMBRE,
+    title: `${NOMBRE} — ${LEMA}`,
+    description: DESCRIPCION,
+  },
+  twitter: { card: "summary_large_image" },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
@@ -40,6 +54,8 @@ export default async function RootLayout({
   return (
     <html lang="es">
       <body className="antialiased">
+        <DatosEstructurados schema={schemaWebSite()} />
+
         <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col">
           <Cabecera />
 

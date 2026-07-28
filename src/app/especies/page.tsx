@@ -9,8 +9,15 @@ import {
 } from "@/lib/enums";
 import { usuarioOpcional } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { metadatosDePagina } from "@/lib/marca";
 
-export const metadata: Metadata = { title: "Especies" };
+export const metadata: Metadata = metadatosDePagina({
+  titulo: "Peces de agua dulce de España: qué se puede pescar y qué no",
+  descripcion:
+    "Todas las especies de la guía con su situación legal: cuáles se pueden " +
+    "pescar, cuáles hay que devolver y cuáles no se pueden devolver al agua.",
+  ruta: "/especies",
+});
 export const dynamic = "force-dynamic";
 
 /**

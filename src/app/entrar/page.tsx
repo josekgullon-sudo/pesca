@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FormularioEntrar } from "./FormularioEntrar";
 
-export const metadata: Metadata = { title: "Entrar" };
+export const metadata: Metadata = {
+  title: "Entrar",
+  robots: { index: false, follow: false },
+};
 
 export default function PaginaEntrar() {
   return (

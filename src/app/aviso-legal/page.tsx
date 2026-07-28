@@ -2,8 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
+import { metadatosDePagina } from "@/lib/marca";
 
-export const metadata: Metadata = { title: "Aviso legal y privacidad" };
+export const metadata: Metadata = metadatosDePagina({
+  titulo: "Aviso legal y privacidad",
+  descripcion:
+    "Quién hay detrás de la web, qué datos se guardan y cómo pedir que se borren.",
+  ruta: "/aviso-legal",
+});
 
 /**
  * OJO, ESTO HAY QUE COMPLETARLO ANTES DE PUBLICAR.

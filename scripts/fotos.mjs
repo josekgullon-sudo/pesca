@@ -19,7 +19,7 @@ import sharp from "sharp";
 import { prisma } from "../src/lib/prisma.ts";
 
 const CARPETA = path.join(process.cwd(), "datos");
-const AGENTE = "PescaSevilla/1.0 (https://github.com/josekgullon-sudo/pesca)";
+const AGENTE = "MapaDePesca/1.0 (https://mapadepesca.es)";
 
 // --- Funciones puras, separadas para poder probarlas sin red ---------------
 

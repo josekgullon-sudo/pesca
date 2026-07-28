@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Ranking } from "@/components/Ranking";
+import { metadatosDePagina } from "@/lib/marca";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
 
@@ -17,10 +18,11 @@ export async function generateMetadata({
   });
   const nombre = p?.nombre ?? "la provincia";
 
-  return {
-    title: `Ranking de pesca de ${nombre}: las capturas más grandes`,
-    description: `Las piezas más grandes pescadas en ${nombre}, el récord de cada especie y quién va ganando.`,
-  };
+  return metadatosDePagina({
+    titulo: `Ranking de pesca de ${nombre}: las capturas más grandes`,
+    descripcion: `Las piezas más grandes pescadas en ${nombre}, el récord de cada especie y quién va ganando.`,
+    ruta: `/${provincia}/ranking`,
+  });
 }
 
 export default async function RankingProvincia({

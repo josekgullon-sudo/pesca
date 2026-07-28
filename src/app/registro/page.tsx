@@ -4,7 +4,10 @@ import { redirect } from "next/navigation";
 import { usuarioOpcional } from "@/lib/auth";
 import { FormularioRegistro } from "./FormularioRegistro";
 
-export const metadata: Metadata = { title: "Crear cuenta" };
+export const metadata: Metadata = {
+  title: "Crear cuenta",
+  robots: { index: false, follow: false },
+};
 export const dynamic = "force-dynamic";
 
 export default async function PaginaRegistro() {

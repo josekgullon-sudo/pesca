@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { FormularioCaptura } from "./FormularioCaptura";
 
-export const metadata: Metadata = { title: "Registrar captura" };
+export const metadata: Metadata = {
+  title: "Registrar captura",
+  robots: { index: false, follow: false },
+};
 export const dynamic = "force-dynamic";
 
 export default async function NuevaCaptura({

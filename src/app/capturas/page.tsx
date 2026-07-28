@@ -2,8 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
 import { prisma } from "@/lib/prisma";
+import { metadatosDePagina } from "@/lib/marca";
 
-export const metadata: Metadata = { title: "Capturas" };
+export const metadata: Metadata = metadatosDePagina({
+  titulo: "Capturas de la comunidad",
+  descripcion:
+    "Lo último que se ha pescado y dónde: especie, peso y sitio de cada " +
+    "captura registrada.",
+  ruta: "/capturas",
+});
 export const dynamic = "force-dynamic";
 
 type Params = Record<string, string | string[] | undefined>;

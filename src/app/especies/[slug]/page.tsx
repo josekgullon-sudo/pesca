@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { BarraAbundancia } from "@/components/BarraAbundancia";
+import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { FotoEspecie } from "@/components/FotoEspecie";
 import { SemaforoLegal } from "@/components/SemaforoLegal";
 import { AVISO_ABUNDANCIAS_ESTIMADAS } from "@/lib/avisos";
@@ -16,7 +17,9 @@ import {
   type TipoAparejo,
   type TipoSitio,
 } from "@/lib/enums";
+import { metadatosDePagina } from "@/lib/marca";
 import { prisma } from "@/lib/prisma";
+import { schemaEspecie, schemaMigas } from "@/lib/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -45,9 +48,26 @@ export async function generateMetadata({
   const { slug } = await params;
   const especie = await prisma.especie.findUnique({
     where: { slug },
-    select: { nombreComun: true },
+    select: {
+      nombreComun: true,
+      nombreCientifico: true,
+      descripcion: true,
+      imagenUrl: true,
+    },
   });
-  return { title: especie?.nombreComun ?? "Especie" };
+  if (!especie) return { title: "Especie" };
+
+  return metadatosDePagina({
+    // Quien busca "carpa" quiere saber si se puede pescar y cómo, no leer una
+    // enciclopedia: el título lo dice y así compite con las fichas genéricas.
+    titulo: `${especie.nombreComun}: cómo pescarla y qué dice la ley`,
+    descripcion:
+      especie.descripcion.slice(0, 155) ||
+      `${especie.nombreComun} (${especie.nombreCientifico}): dónde está, cómo pescarla y su situación legal.`,
+    ruta: `/especies/${slug}`,
+    tipo: "article",
+    imagen: especie.imagenUrl,
+  });
 }
 
 /** Con estas no se puede ni salir a buscarlas, así que no se recomiendan aparejos. */
@@ -73,6 +93,44 @@ export default async function FichaEspecie({
 
   return (
     <article>
+      <DatosEstructurados
+        schema={[
+          schemaEspecie({
+            nombreComun: especie.nombreComun,
+            nombreCientifico: especie.nombreCientifico,
+            descripcion: especie.descripcion,
+            imagenUrl: especie.imagenUrl,
+            ruta: `/especies/${especie.slug}`,
+          }),
+          schemaMigas([
+            { nombre: "Inicio", ruta: "/" },
+            { nombre: "Especies", ruta: "/especies" },
+            {
+              nombre: especie.nombreComun,
+              ruta: `/especies/${especie.slug}`,
+            },
+          ]),
+        ]}
+      />
+
+      <nav
+        aria-label="Migas de pan"
+        className="mb-4 flex flex-wrap items-center gap-x-2 text-sm"
+      >
+        <Link href="/" className="text-texto-suave underline underline-offset-2">
+          Inicio
+        </Link>
+        <span aria-hidden className="text-texto-suave">
+          ›
+        </span>
+        <Link
+          href="/especies"
+          className="font-semibold text-acento underline underline-offset-2"
+        >
+          Especies
+        </Link>
+      </nav>
+
       {/* Con foto, cabecera grande; sin ella, la silueta pequeña al lado del
           título, que ocupando media pantalla quedaría ridícula. */}
       {especie.imagenUrl && (
