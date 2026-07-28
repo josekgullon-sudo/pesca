@@ -127,17 +127,34 @@ jobs:
           USUARIO: ${{ secrets.SSH_USUARIO }}
           DIRECTORIO: ${{ vars.DIRECTORIO_PESCA }}
         run: |
-          # El script viaja por la entrada estándar, así que el servidor
-          # ejecuta la versión que hay en esta rama y no una copia vieja.
           # Sin ConnectTimeout, una dirección equivocada tarda dos minutos en
           # rendirse y el registro no dice nada útil mientras tanto.
-          ssh -o IdentitiesOnly=yes \
-              -o StrictHostKeyChecking=yes \
-              -o ConnectTimeout=15 \
-              -i ~/.ssh/clave \
-              "$USUARIO@$SERVIDOR" \
-              "DIRECTORIO_PESCA='${DIRECTORIO:-}' RAMA_PESCA='${{ github.ref_name }}' bash -s" \
-              < docker/desplegar.sh
+          SSH=(ssh -o IdentitiesOnly=yes
+                   -o StrictHostKeyChecking=yes
+                   -o ConnectTimeout=15
+                   -i ~/.ssh/clave
+                   "$USUARIO@$SERVIDOR")
+
+          # El script se copia y se ejecuta desde un fichero, en dos pasos.
+          #
+          # Con `bash -s` leyéndolo de la entrada estándar parecía más limpio,
+          # pero dentro se llama a `docker compose exec -T`, que también lee de
+          # ahí: se tragaba el resto del script y el despliegue terminaba en
+          # silencio a mitad, con código de salida 0. Costaba verlo porque
+          # salía en verde.
+          #
+          # Se copia en cada despliegue, así que el servidor ejecuta siempre la
+          # versión de esta rama y no una que quedara ahí hace meses.
+          "${SSH[@]}" "cat > /tmp/desplegar-pesca.sh" < docker/desplegar.sh
+
+          "${SSH[@]}" -n "
+            DIRECTORIO_PESCA='${DIRECTORIO:-}' \
+            RAMA_PESCA='${{ github.ref_name }}' \
+            bash /tmp/desplegar-pesca.sh
+            salida=\$?
+            rm -f /tmp/desplegar-pesca.sh
+            exit \$salida
+          "
 
       - name: Borrar la clave
         if: always()

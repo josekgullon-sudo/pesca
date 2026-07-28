@@ -74,17 +74,20 @@ else
 fi
 
 paso "Reconstruyendo y levantando"
-docker compose up -d --build
+docker compose up -d --build </dev/null
 
 paso "Comprobando que responde"
 # Se pregunta desde dentro del contenedor porque el puerto 3000 no está
 # publicado al exterior: delante va Caddy. Node 22 ya trae fetch.
+#
+# El `< /dev/null` es obligatorio: `exec -T` se queda con la entrada estándar
+# de quien llamó al script si no se le dice otra cosa.
 comprobar() {
   docker compose exec -T app node -e '
     fetch("http://127.0.0.1:3000/")
       .then((r) => process.exit(r.ok ? 0 : 1))
       .catch(() => process.exit(1));
-  ' >/dev/null 2>&1
+  ' </dev/null >/dev/null 2>&1
 }
 
 respondio=no

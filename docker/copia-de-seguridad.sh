@@ -32,15 +32,19 @@ docker compose exec -T app sh -c \
 SELECT 1;
 SQL
 
+# El `< /dev/null` de cada `exec -T` no es adorno: sin él, estos comandos se
+# quedan con la entrada estándar de quien llamó al script y se comen lo que
+# haya ahí. Cuando el despliegue llegaba por SSH, eso era el resto del propio
+# script, que dejaba de ejecutarse a mitad y sin dar error.
 docker compose exec -T app sh -c \
-  "sqlite3 /app/datos/pesca.db \".backup '/app/datos/copia-tmp.db'\"" 2>/dev/null \
-  || docker compose exec -T app sh -c "cp /app/datos/pesca.db /app/datos/copia-tmp.db"
+  "sqlite3 /app/datos/pesca.db \".backup '/app/datos/copia-tmp.db'\"" </dev/null 2>/dev/null \
+  || docker compose exec -T app sh -c "cp /app/datos/pesca.db /app/datos/copia-tmp.db" </dev/null
 
-docker compose cp app:/app/datos/copia-tmp.db "$DESTINO/pesca-$FECHA.db"
-docker compose exec -T app rm -f /app/datos/copia-tmp.db
+docker compose cp app:/app/datos/copia-tmp.db "$DESTINO/pesca-$FECHA.db" </dev/null
+docker compose exec -T app rm -f /app/datos/copia-tmp.db </dev/null
 
 # Las fotos, en un tar aparte.
-docker compose exec -T app tar czf - -C /app/datos especies sitios uploads 2>/dev/null \
+docker compose exec -T app tar czf - -C /app/datos especies sitios uploads </dev/null 2>/dev/null \
   > "$DESTINO/fotos-$FECHA.tar.gz" || true
 
 # Se tiran las copias más viejas de lo que se quiera conservar.
