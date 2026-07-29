@@ -13,7 +13,20 @@ const nextConfig: NextConfig = {
       { source: "/sitios/:slug", destination: "/sevilla/:slug", permanent: true },
     ];
   },
-  /* config options here */
+  experimental: {
+    /*
+     * Las acciones de servidor vienen limitadas a 1 MB de cuerpo, y por ahí se
+     * suben las fotos: las de las capturas y las de las fichas. Una foto de
+     * móvil pesa 3-5 MB, así que con el valor por defecto la petición se
+     * rechazaba con un 413 ANTES de llegar al código —de ahí la pantalla de
+     * «Application error» sin nada en el registro de la aplicación—.
+     *
+     * 24 MB da margen para varias fotos de una captura. Tiene que ir por encima
+     * de TAMANO_MAXIMO_BYTES * (fotos por captura) de src/lib/imagenes.ts: si se
+     * baja uno sin el otro, vuelve el mismo fallo silencioso.
+     */
+    serverActions: { bodySizeLimit: "24mb" },
+  },
 };
 
 export default nextConfig;

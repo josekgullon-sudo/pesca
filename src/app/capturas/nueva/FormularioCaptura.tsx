@@ -4,6 +4,12 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { crearCaptura, type EstadoCaptura } from "../acciones";
+import {
+  mensajeDemasiadoGrande,
+  mensajeEnvioDemasiadoGrande,
+  TAMANO_MAXIMO_BYTES,
+  TAMANO_TOTAL_MAXIMO_BYTES,
+} from "@/lib/imagenes-comun";
 
 type Opcion = { id: string; nombre: string };
 type EspecieOpcion = Opcion & { estadoLegal: string; slug: string };
@@ -161,9 +167,32 @@ export function FormularioCaptura({
   const resto = especies.filter((e) => !sitio?.especiesIds.includes(e.id));
   const mostradas = verTodas ? [...delSitio, ...resto] : delSitio;
 
+  // Las fotos van en una acción de servidor, y Next limita el cuerpo de esas
+  // peticiones. Si se pasa, la rechaza con un 413 en la capa de transporte:
+  // el formulario nunca llega a ejecutarse y el usuario ve una pantalla de
+  // error en blanco. Por eso se comprueba aquí antes de enviar nada.
+  const [avisoFotos, setAvisoFotos] = useState<string | null>(null);
+
   function anadirFotos(lista: FileList | null) {
     if (!lista) return;
-    setFotos((previas) => [...previas, ...Array.from(lista)].slice(0, 6));
+    const nuevas = Array.from(lista);
+
+    const grande = nuevas.find((f) => f.size > TAMANO_MAXIMO_BYTES);
+    if (grande) {
+      setAvisoFotos(mensajeDemasiadoGrande(grande.name));
+      return;
+    }
+
+    setFotos((previas) => {
+      const juntas = [...previas, ...nuevas].slice(0, 6);
+      const total = juntas.reduce((suma, f) => suma + f.size, 0);
+      if (total > TAMANO_TOTAL_MAXIMO_BYTES) {
+        setAvisoFotos(mensajeEnvioDemasiadoGrande());
+        return previas;
+      }
+      setAvisoFotos(null);
+      return juntas;
+    });
   }
 
   return (
@@ -218,6 +247,15 @@ export function FormularioCaptura({
           className="sr-only"
           onChange={(e) => anadirFotos(e.target.files)}
         />
+
+        {avisoFotos && (
+          <p
+            role="alert"
+            className="mt-3 rounded-lg bg-rojo-fondo p-3 font-semibold text-rojo-texto"
+          >
+            {avisoFotos}
+          </p>
+        )}
 
         {previas.length > 0 && (
           <ul className="mt-3 grid grid-cols-3 gap-2">

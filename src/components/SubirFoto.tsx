@@ -1,8 +1,13 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { subirFoto, type EstadoSubida } from "@/app/admin/acciones";
+import {
+  mensajeDemasiadoGrande,
+  TAMANO_MAXIMO_BYTES,
+  TAMANO_MAXIMO_MB,
+} from "@/lib/imagenes-comun";
 
 /**
  * Formulario para cambiar la foto de una especie o de un sitio.
@@ -24,6 +29,10 @@ export function SubirFoto({
 }) {
   const [estado, accion] = useActionState<EstadoSubida, FormData>(subirFoto, null);
   const formulario = useRef<HTMLFormElement>(null);
+  // Se comprueba aquí y no solo en el servidor: si el fichero se envía y se
+  // pasa del tamaño máximo, Next lo rechaza en la capa de transporte con un
+  // 413 y el usuario ve una pantalla de error en blanco, sin mensaje.
+  const [demasiadoGrande, setDemasiadoGrande] = useState<string | null>(null);
 
   return (
     <details className="mt-6 rounded-xl border-2 border-dashed border-borde p-4">
@@ -52,12 +61,28 @@ export function SubirFoto({
             name="foto"
             accept="image/*"
             required
+            onChange={(e) => {
+              const f = e.currentTarget.files?.[0];
+              setDemasiadoGrande(
+                f && f.size > TAMANO_MAXIMO_BYTES
+                  ? mensajeDemasiadoGrande(f.name)
+                  : null,
+              );
+            }}
             className="mt-1 block w-full rounded-lg border-2 border-borde bg-fondo-elevado p-2"
           />
           <p className="mt-1 text-sm text-texto-suave">
-            Se redimensiona a 1600 px y se guarda en WebP. Da igual el tamaño
-            que subas.
+            Se redimensiona a 1600 px y se guarda en WebP. Máximo{" "}
+            {TAMANO_MAXIMO_MB} MB por fichero.
           </p>
+          {demasiadoGrande && (
+            <p
+              role="alert"
+              className="mt-2 rounded-lg bg-rojo-fondo p-3 font-semibold text-rojo-texto"
+            >
+              {demasiadoGrande}
+            </p>
+          )}
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -82,7 +107,7 @@ export function SubirFoto({
           </p>
         )}
 
-        <Boton />
+        <Boton bloqueado={demasiadoGrande !== null} />
       </form>
     </details>
   );
@@ -113,12 +138,12 @@ function Campo({
   );
 }
 
-function Boton() {
+function Boton({ bloqueado }: { bloqueado: boolean }) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || bloqueado}
       className="inline-flex min-h-touch items-center rounded-xl bg-acento px-5 font-bold text-acento-texto disabled:opacity-60"
     >
       {pending ? "Subiendo…" : "Guardar la foto"}

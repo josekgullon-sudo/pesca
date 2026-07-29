@@ -2,6 +2,12 @@ import { randomBytes } from "node:crypto";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
+import {
+  mensajeDemasiadoGrande,
+  TAMANO_MAXIMO_BYTES,
+} from "./imagenes-comun";
+
+export * from "./imagenes-comun";
 
 /**
  * Guardado de imágenes en el sistema de ficheros local.
@@ -33,8 +39,17 @@ const TIPOS_ACEPTADOS = new Set([
   "image/avif",
 ]);
 
-/** Tope antes de procesar. Un móvil no manda 25 MB en una foto normal. */
-const TAMANO_MAXIMO_BYTES = 25 * 1024 * 1024;
+/*
+ * El tope por fichero vive en `imagenes-comun.ts` para que lo pueda importar
+ * también el cliente y avisar antes de enviar.
+ *
+ * OJO: va de la mano de `serverActions.bodySizeLimit` en next.config.ts, que
+ * limita el cuerpo ENTERO de la petición. Si el tope por fichero sube por
+ * encima de aquel, la petición se rechaza con un 413 antes de llegar aquí y el
+ * usuario ve una pantalla de error en blanco sin nada en el registro de la
+ * aplicación. Que estén en ficheros distintos es lo que lo hace fácil de
+ * romper, así que se dice en los dos sitios.
+ */
 
 export class ErrorImagen extends Error {}
 
@@ -77,7 +92,7 @@ export async function guardarImagen(
 ): Promise<string> {
   if (archivo.size === 0) throw new ErrorImagen("El archivo está vacío.");
   if (archivo.size > TAMANO_MAXIMO_BYTES) {
-    throw new ErrorImagen("La imagen pesa más de 25 MB.");
+    throw new ErrorImagen(mensajeDemasiadoGrande(archivo.name));
   }
   if (archivo.type && !TIPOS_ACEPTADOS.has(archivo.type)) {
     throw new ErrorImagen(`Formato no admitido: ${archivo.type}`);
