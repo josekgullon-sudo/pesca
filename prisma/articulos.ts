@@ -242,4 +242,238 @@ En los embalses de riego —Torre del Águila, Puebla de Cazalla— el nivel cam
 
 En la [ficha de cada sitio](/sevilla) tienes marcados los meses buenos, y en los embalses hay enlace para consultar el nivel antes de ir.`,
   },
+
+  {
+    slug: "que-cebo-para-carpa",
+    titulo: "Qué cebo usar para la carpa (y por qué el maíz nunca falla)",
+    entradilla:
+      "Maíz, masilla, boilies o lombriz: cuándo funciona cada uno, qué cuesta y con cuál empezar si no has pescado carpa nunca.",
+    provincia: null,
+    diasAtras: 30,
+    contenido: `La carpa come casi de todo, y esa es la buena noticia: es la especie con la que más barato se empieza y la que más veces salva un día. La mala es que en un embalse con mucha presión se vuelve desconfiada y ahí sí empieza a importar lo que le pongas.
+
+## Maíz dulce
+
+El de bote, del supermercado. Es el cebo con el que más carpas se han pescado en este país y sigue siendo el primero que recomendaría a cualquiera.
+
+- **Cuesta menos de un euro** el bote y da para una tarde.
+- Se ve desde lejos: el amarillo destaca en el fondo.
+- Va bien en el anzuelo directamente, dos o tres granos.
+
+Si vas a llevar un solo cebo, lleva este.
+
+## Masilla de pan
+
+Miga de pan amasada con un poco de agua hasta que queda pegajosa. Gratis, y en aguas donde se pesca mucho con maíz a veces funciona mejor justo por eso.
+
+Se le puede añadir matalahúva (anís en grano), que es el truco de toda la vida en Andalucía. Aguanta menos en el anzuelo que el maíz, así que hay que recogerlo y volver a montar más a menudo.
+
+## Lombriz
+
+Universal: entra la carpa, el barbo, el carpín y casi todo lo demás. Si no sabes qué hay en el sitio, empieza por aquí.
+
+El inconveniente es que atrae también a lo que no buscas —cangrejo rojo sobre todo—, y en aguas con mucho cangrejo te quedas sin cebo cada dos minutos.
+
+## Boilies
+
+Las bolas de las marcas de carpfishing. Están pensadas justo para eso: **son demasiado grandes para que se las coman los peces pequeños**, así que filtran. En un sitio donde el alburno o el carpín te vacían el anzuelo, resuelven el problema.
+
+Cuestan bastante más y necesitan montaje aparte (pelo). No son para el primer día.
+
+## Cebar o no cebar
+
+Echar un puñado de maíz cada pocos minutos en el mismo punto concentra los peces. Funciona, sobre todo en sesiones largas.
+
+Dos avisos: comprueba que el engodo está permitido donde estés, porque hay tramos donde no lo está, y no te pases. Una carpa que se llena con lo que echas ya no tiene motivo para coger tu anzuelo.
+
+## Dónde probar
+
+En la [guía de sitios](/sevilla) tienes marcado en qué embalses hay más carpa y con qué probabilidad. Los de riego —Torre del Águila, Puebla de Cazalla— van llenos.`,
+  },
+
+  {
+    slug: "como-leer-un-embalse",
+    titulo: "Cómo leer un embalse: dónde están los peces",
+    entradilla:
+      "Un embalse no es agua uniforme. Estos son los sitios donde de verdad hay pesca, y por qué llegar a la orilla y tirar al medio casi nunca funciona.",
+    provincia: null,
+    diasAtras: 26,
+    contenido: `El error que más veces separa un buen día de uno malo no es el cebo ni la caña: es tirar donde no hay nada. Un embalse tiene mucha agua vacía y unos pocos puntos donde se concentra todo.
+
+## Los peces están en los bordes de algo
+
+No en el centro del agua. Buscan un **cambio**: donde el fondo pasa de piedra a arena, donde termina la vegetación, donde se hunde un árbol, donde una loma sumergida corta la profundidad. Ahí hay refugio y hay comida.
+
+Si desde la orilla ves agua uniforme sin nada, muévete.
+
+## Las colas
+
+Donde el río entra en el embalse. Es lo primero que miraría en cualquier sitio nuevo:
+
+- Entra agua más fresca y con más oxígeno.
+- Trae comida arrastrada.
+- Es más somera, y en primavera es donde primero se calienta.
+
+En primavera y otoño, las colas concentran una barbaridad.
+
+## La estructura sumergida
+
+Piedra, troncos, ramas, muros viejos. El black bass **vive ahí**: es un depredador de emboscada y necesita algo detrás de lo que esconderse.
+
+Cuando el embalse baja se ve dónde está esa estructura. Merece la pena fijarse y acordarse, porque cuando vuelva a subir seguirá ahí.
+
+## Las orillas con viento de cara
+
+Cuesta pescar, pero el viento empuja el plancton contra esa orilla, detrás van los peces pequeños y detrás los grandes. Una orilla batida suele tener más vida que la abrigada.
+
+## Las sombras
+
+En verano y en Andalucía, decisivo. Bajo un árbol que da al agua, junto a un muro, en la parte que el sol da más tarde. Con calor los peces se meten donde el agua está unos grados más fresca.
+
+## El nivel del agua manda sobre todo lo demás
+
+En los embalses de riego el nivel se mueve mucho. Cuando sueltan agua, los peces se descolocan y pasan días desorientados; cuando sube y cubre vegetación que estaba seca, se pegan un festín y pican como locos.
+
+Consultar el nivel antes de ir cambia más el resultado que cambiar de cebo. En la [ficha de cada embalse](/sevilla) hay enlace para mirarlo.
+
+## Y lo más importante
+
+Si en cuarenta minutos no ha pasado nada, cambia de sitio. Insistir donde no hay nada es lo que hace que la gente vuelva a casa diciendo que no picaba.`,
+  },
+
+  {
+    slug: "pesca-sin-muerte",
+    titulo: "Pesca sin muerte: qué es exactamente y cómo se hace bien",
+    entradilla:
+      "No es solo devolver el pez. Tiene reglas concretas de anzuelo y manejo, y en algunos tramos es obligatoria.",
+    provincia: null,
+    diasAtras: 20,
+    contenido: `«Pesca sin muerte» o «captura y suelta» significa devolver vivo todo lo que se pesca. Suena obvio, pero es un régimen con reglas concretas, y en bastantes tramos **no es una elección: es obligatorio**.
+
+## Qué exige normalmente
+
+Donde está establecida como régimen, lo habitual es:
+
+- **Anzuelo sin arponcillo** (sin muerte), o con el arponcillo aplastado con unos alicates.
+- Devolución **inmediata** de todo lo capturado.
+- A menudo, prohibición de usar sacadera de nudos o de tener el pez fuera del agua más de lo justo.
+
+Los detalles y los tramos concretos van en la orden de vedas de cada comunidad, y cambian de una temporada a otra. Compruébalo antes de salir.
+
+## Por qué sin arponcillo
+
+El arponcillo es la lengüeta que impide que el anzuelo salga. Ayuda a no perder el pez, pero para sacarlo hay que desgarrar, y en un pez que vas a devolver eso es exactamente lo que no quieres.
+
+Sin arponcillo el anzuelo sale casi solo. Se pierden algunas capturas —hay que mantener la línea tensa— y a cambio el pez se va entero.
+
+Aplastarlo con unos alicates cuesta cinco segundos y vale para cualquier anzuelo que ya tengas.
+
+## Cómo se hace bien
+
+Está explicado en detalle en [cómo devolver un pez al agua sin matarlo](/blog/devolver-un-pez-al-agua), pero en corto: manos mojadas, el menor tiempo fuera posible, sujetar en horizontal y esperar a que se vaya solo.
+
+## Ojo: no vale para todo
+
+Aquí está el matiz que más se incumple. **Con las especies exóticas invasoras fuera de sus áreas delimitadas, devolverlas al agua es justo lo contrario de lo que dice la ley**: hay obligación de sacrificarlas.
+
+Black bass, lucio, carpa común y trucha arcoíris. La mentalidad de captura y suelta, que en un barbo es lo correcto, en un lucio fuera de su área es una infracción. Está contado entero en [qué hacer con un black bass](/blog/especies-invasoras-que-hacer).
+
+## Y con las de devolución obligatoria
+
+Al revés: barbo, boga y trucha común vuelven al agua **siempre**, estés en el régimen que estés. Ahí no hay elección.
+
+Cuál es cuál, en la [guía de especies](/especies).`,
+  },
+
+  {
+    slug: "black-bass-sevilla",
+    titulo: "Dónde pescar black bass en Sevilla",
+    entradilla:
+      "Los embalses con mejor población de la provincia, qué señuelo llevar a cada uno y, sobre todo, en cuáles se puede devolver al agua y en cuáles no.",
+    provincia: "sevilla",
+    diasAtras: 12,
+    contenido: `El black bass es la especie que mueve más pesca deportiva en la provincia, y Sevilla tiene sitios buenos de verdad. Antes de los sitios, lo que hay que saber sí o sí.
+
+## Lo primero: no en todas partes se devuelve
+
+El black bass es **especie exótica invasora**. Solo se puede pescar con normalidad —y devolver al agua— dentro de las **aguas delimitadas** que fija la orden de vedas. Fuera de ellas hay obligación de sacrificarlo.
+
+En la [página de la provincia](/sevilla) está el listado completo tal cual figura en el boletín, y cada ficha de sitio dice si está dentro o fuera. Míralo antes de ir, no después.
+
+## Los sitios
+
+**Embalse José Torán.** El mejor de la provincia para bass y escenario habitual de las competiciones de la federación sevillana. Aguas limpias sobre el Retortillo, con mucha estructura sumergida: piedra, troncos, ramas. Está lejos —hora y cuarto desde la capital— pero merece el viaje. [Ficha completa](/sevilla/jose-toran).
+
+**Embalse de El Pintado.** Sierra Norte, agua limpia y fría. Otro de los buenos, con mucha orilla que trabajar.
+
+**Embalse de Torre del Águila.** El más cercano a la capital de los que tienen bass en cantidad. Es de riego, así que el nivel se mueve mucho: consúltalo antes.
+
+**Embalse de La Minilla** y **Embalse del Agrio**. Poblaciones más discretas, pero menos gente.
+
+## Qué llevar
+
+- **Vinilo tipo senko o gusano de 9-10 cm.** El de partida. Negro para agua turbia, sandía con purpurina para agua clara.
+- **Vinilo shad de 7-8 cm** en verde sandía.
+- **Popper o paseante de superficie de 6-7 cm.** Para el amanecer, que es cuando de verdad funciona.
+- **Crankbait pequeño.** Para localizar peces rápido en un embalse grande.
+
+Todo montado en cabeza plomada o en texas rig si vas a meterte entre la estructura.
+
+## Cuándo
+
+Abril y mayo lo mejor, octubre muy bueno. En verano solo la primera hora del día y el atardecer: a mediodía en agosto no comen.
+
+Está detallado en [cuándo pescar en Sevilla](/blog/cuando-pescar-sevilla).
+
+## Cómo se pesca aquí
+
+Peinando estructura, no agua abierta. El bass está pegado a algo: piedra, troncos, vegetación, una pared. Lanza al borde de eso y trabaja despacio. Si en media hora no pasa nada, cambia de punto antes que de señuelo.`,
+  },
+
+  {
+    slug: "pescar-con-ninos",
+    titulo: "Pescar con niños: cómo hacer que quieran repetir",
+    entradilla:
+      "El error es llevarlos a por el pez grande. Con qué especies, cuánto rato y qué equipo para que salga bien la primera vez.",
+    provincia: null,
+    diasAtras: 4,
+    contenido: `La pesca con niños se estropea casi siempre por lo mismo: el adulto va a pescar y el niño va de acompañante. Al cuarto de hora se aburre, y ya no hay quien lo levante otro día.
+
+Le das la vuelta con tres decisiones.
+
+## Muchas picadas, no peces grandes
+
+Un niño no quiere una carpa de cinco kilos: quiere que pase algo. Cinco alburnos de veinte gramos en media hora enganchan infinitamente más que una espera de dos horas a por algo gordo.
+
+Así que: anzuelo pequeño, flotador, lombriz o un grano de maíz, y a una orilla con peces pequeños. El [Guadaíra a su paso por Oromana](/sevilla/guadaira-oromana) va bien para esto y está a veinte minutos de Sevilla.
+
+## Corto
+
+Una hora. Hora y media como mucho. Se termina **cuando todavía se lo está pasando bien**, no cuando ya está harto: eso es lo que hace que pida volver.
+
+## Que haga cosas
+
+Que monte el cebo, que recoja, que suelte el pez. Si su papel es estar sentado y callado mientras otro pesca, ha perdido.
+
+## El equipo
+
+- Una caña corta, de 2 a 2,40 m. Con una de tres metros no puede.
+- Flotador, que se ve y da emoción.
+- Anzuelos pequeños, del 12 al 16.
+- **Un quitanzuelos**, y que aprenda a usarlo desde el primer día.
+
+## Lo que sí hay que enseñar desde el principio
+
+Las manos mojadas antes de tocar un pez, y devolverlo bien. Aprenden eso en la primera salida y ya no se les olvida. Está en [cómo devolver un pez al agua](/blog/devolver-un-pez-al-agua).
+
+Y que hay peces que se devuelven siempre y otros que no se pueden devolver. No hace falta el detalle legal, pero sí que entiendan que no todos los peces son iguales.
+
+## Papeles y seguridad
+
+- **La licencia**: los menores necesitan la suya, y según la edad autorización del padre o tutor. Míralo en el [portal oficial](https://www.juntadeandalucia.es/organismos/sostenibilidadmedioambienteyeconomiaazul/areas/flora-fauna-silvestres/caza-pesca.html).
+- **Chaleco** si la orilla tiene pendiente o el agua está honda. En los embalses de la sierra las bajadas son empinadas y la piedra suelta resbala.
+- Gorra, agua y crema. En verano, temprano.
+
+Y elige sitio de acceso fácil. En la [guía](/sevilla) están marcados: no lleves a un niño de seis años a una orilla donde hay que bajar agarrándose.`,
+  },
 ];
