@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { usuarioOpcional } from "./auth";
 import { prisma } from "./prisma";
 
 /**
@@ -6,11 +7,22 @@ import { prisma } from "./prisma";
  *
  * Una provincia sin publicar responde 404 aunque exista en la base de datos:
  * es la forma de tenerlas todas creadas sin que Google indexe páginas vacías.
+ *
+ * Con una excepción: un administrador sí la ve, en vista previa y con un aviso
+ * encima. Publicar a ciegas no tiene sentido —hay que poder leer los textos y
+ * las fichas antes de darle al botón— y el 404 dejaba la única forma de
+ * revisarlo en publicarlo primero, que es justo al revés.
  */
 
 export async function cargarProvincia(slug: string) {
   const provincia = await prisma.provincia.findUnique({ where: { slug } });
-  if (!provincia || !provincia.publicada) notFound();
+  if (!provincia) notFound();
+
+  if (!provincia.publicada) {
+    const usuario = await usuarioOpcional();
+    if (!usuario?.esAdmin) notFound();
+  }
+
   return provincia;
 }
 

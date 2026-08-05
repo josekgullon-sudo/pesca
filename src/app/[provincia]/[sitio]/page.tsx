@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Prisma } from "@/generated/prisma/client";
+import { AvisoBorrador } from "@/components/AvisoBorrador";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { BarraAbundancia } from "@/components/BarraAbundancia";
 import { CapturasDelSitio } from "@/components/CapturasDelSitio";
@@ -42,9 +43,16 @@ import { ubicacionActual } from "@/lib/ubicacion-servidor";
 
 export const dynamic = "force-dynamic";
 
-async function cargarSitio(provinciaSlug: string, slug: string) {
+/**
+ * La ficha. Solo de provincias publicadas, salvo que quien mire sea
+ * administrador: entonces se ve en vista previa, igual que la provincia.
+ */
+async function cargarSitio(provinciaSlug: string, slug: string, esAdmin: boolean) {
   return prisma.sitio.findFirst({
-    where: { slug, provincia: { slug: provinciaSlug, publicada: true } },
+    where: {
+      slug,
+      provincia: { slug: provinciaSlug, ...(esAdmin ? {} : { publicada: true }) },
+    },
     include: {
       especies: {
         include: { especie: true },
@@ -65,19 +73,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { provincia, sitio } = await params;
   const datos = await prisma.sitio.findFirst({
-    where: { slug: sitio, provincia: { slug: provincia, publicada: true } },
+    where: { slug: sitio, provincia: { slug: provincia } },
     select: {
       nombre: true,
       tipo: true,
       municipio: true,
       descripcion: true,
       imagenUrl: true,
-      provincia: { select: { nombre: true } },
+      provincia: { select: { nombre: true, publicada: true } },
     },
   });
   if (!datos) return { title: "Sitio" };
 
-  return metadatosDePagina({
+  const meta = metadatosDePagina({
     titulo: `${datos.nombre}: qué se pesca y cómo llegar`,
     descripcion:
       datos.descripcion.slice(0, 155) ||
@@ -88,6 +96,12 @@ export async function generateMetadata({
     // WhatsApp y Twitter enseñan una tarjeta vacía y nadie la abre.
     imagen: datos.imagenUrl,
   });
+
+  // De una provincia sin publicar solo ve la ficha un administrador; a Google
+  // le llega un 404. El noindex es el cinturón por si eso cambiara.
+  return datos.provincia.publicada
+    ? meta
+    : { ...meta, robots: { index: false, follow: false } };
 }
 
 const CLASE_PROBABILIDAD: Record<Probabilidad, string> = {
@@ -160,9 +174,9 @@ export default async function FichaSitio({
 }) {
   const { provincia: slugProvincia, sitio: slugSitio } = await params;
   const provincia = await cargarProvincia(slugProvincia);
-  const [sitio, usuario, ubicacion] = await Promise.all([
-    cargarSitio(slugProvincia, slugSitio),
-    usuarioOpcional(),
+  const usuario = await usuarioOpcional();
+  const [sitio, ubicacion] = await Promise.all([
+    cargarSitio(slugProvincia, slugSitio, Boolean(usuario?.esAdmin)),
     ubicacionActual(),
   ]);
   if (!sitio) notFound();
@@ -286,6 +300,12 @@ export default async function FichaSitio({
           )}
         </div>
       </header>
+
+      {!provincia.publicada && (
+        <div className="mb-8">
+          <AvisoBorrador provincia={provincia.nombre} slug={provincia.slug} />
+        </div>
+      )}
 
       {usuario?.esAdmin && (
         <SubirFoto

@@ -1,5 +1,8 @@
 /**
- * Las otras siete provincias de Andalucía.
+ * Las provincias andaluzas que todavía son un armazón.
+ *
+ * Cádiz salió de aquí: está trabajada al nivel de Sevilla y vive en
+ * `cadiz.ts`. Estas seis siguen con la plantilla común.
  *
  * **Ninguna de estas provincias se publica al sembrar.** Esto es un armazón,
  * no una guía terminada, y hay que saber qué fiabilidad tiene cada cosa antes
@@ -242,179 +245,6 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     avisosSanitarios:
       "Zona apartada y con cobertura de móvil irregular: avisa a alguien de " +
       "dónde vas.",
-    mejorEpoca: PRIMAVERA_Y_OTONO,
-    urlNivelAgua: null,
-  },
-
-  // -------------------------------------------------------------------------
-  // Cádiz
-  // -------------------------------------------------------------------------
-  {
-    slug: "bornos",
-    provincia: "cadiz",
-    nombre: "Embalse de Bornos",
-    tipo: "embalse",
-    municipio: "Bornos / Villamartín",
-    latitud: 36.82,
-    longitud: -5.72,
-    descripcion:
-      "Sobre el Guadalete, en plena campiña de la sierra de Cádiz y con " +
-      "Villamartín y Bornos a un lado y otro. Es de los más pescados de la " +
-      "provincia: orillas largas, acceso cómodo y mucha carpa. Agua turbia " +
-      "casi siempre, con lo que eso implica para pescar a la vista.",
-    capacidadHm3: null,
-    accesoDescripcion:
-      "Varias entradas desde la carretera entre Bornos y Villamartín, con " +
-      "sitio para aparcar cerca de la orilla.",
-    dificultadAcceso: "facil",
-    tieneSombra: false,
-    navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
-    avisosSanitarios: `${SOL_Y_AGUA} ${NIVEL_VARIABLE}`,
-    mejorEpoca: PRIMAVERA_Y_OTONO,
-    urlNivelAgua: null,
-  },
-  {
-    slug: "arcos-de-la-frontera",
-    provincia: "cadiz",
-    nombre: "Embalse de Arcos de la Frontera",
-    tipo: "embalse",
-    municipio: "Arcos de la Frontera",
-    latitud: 36.75,
-    longitud: -5.75,
-    descripcion:
-      "El siguiente escalón del Guadalete después de Bornos, pegado al " +
-      "pueblo de Arcos. Es pequeño comparado con sus vecinos, pero por eso " +
-      "mismo se recorre entero en una jornada y se llega desde el casco " +
-      "urbano en minutos.",
-    capacidadHm3: null,
-    accesoDescripcion:
-      "Desde el propio Arcos, por los caminos que bordean la lámina. Es de " +
-      "los pocos de la provincia a los que se puede ir andando desde el " +
-      "pueblo.",
-    dificultadAcceso: "facil",
-    tieneSombra: false,
-    navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
-    avisosSanitarios: SOL_Y_AGUA,
-    mejorEpoca: PRIMAVERA_Y_OTONO,
-    urlNivelAgua: null,
-  },
-  {
-    slug: "guadalcacin",
-    provincia: "cadiz",
-    nombre: "Embalse de Guadalcacín",
-    tipo: "embalse",
-    municipio: "Jerez de la Frontera / San José del Valle",
-    latitud: 36.7,
-    longitud: -5.65,
-    descripcion:
-      "El grande de Cádiz, sobre el Majaceite, en el término de Jerez. " +
-      "Lámina muy extensa con colas que se alargan hacia la sierra. Por " +
-      "tamaño y por proximidad a Jerez es el sitio de referencia de la " +
-      "provincia para embarcación.",
-    capacidadHm3: null,
-    accesoDescripcion:
-      "Por la carretera de San José del Valle y por los caminos que salen " +
-      "de la zona de la presa. Algunas orillas solo son cómodas desde barca.",
-    dificultadAcceso: "media",
-    tieneSombra: false,
-    navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
-    avisosSanitarios: `${SOL_Y_AGUA} ${NIVEL_VARIABLE}`,
-    mejorEpoca: PRIMAVERA_Y_OTONO,
-    urlNivelAgua: null,
-  },
-  {
-    slug: "zahara-el-gastor",
-    provincia: "cadiz",
-    nombre: "Embalse de Zahara-El Gastor",
-    tipo: "embalse",
-    municipio: "Zahara de la Sierra / El Gastor",
-    latitud: 36.85,
-    longitud: -5.4,
-    descripcion:
-      "El más bonito de la provincia, con Zahara de la Sierra y su castillo " +
-      "asomados encima y la sierra de Grazalema al fondo. Agua limpia de " +
-      "montaña y orillas de piedra. Está dentro del entorno del parque " +
-      "natural, así que conviene mirar qué se puede hacer y dónde.",
-    capacidadHm3: null,
-    accesoDescripcion:
-      "Desde Zahara de la Sierra y desde la carretera hacia El Gastor. Hay " +
-      "zonas de uso público junto a la lámina.",
-    dificultadAcceso: "media",
-    tieneSombra: true,
-    navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
-    avisosSanitarios:
-      "Entorno de parque natural: además de la normativa de pesca puede " +
-      "haber restricciones de acceso, de baño y de navegación. " +
-      ORILLA_CON_PENDIENTE,
-    mejorEpoca: PRIMAVERA_Y_OTONO,
-    urlNivelAgua: null,
-  },
-  {
-    slug: "los-hurones",
-    provincia: "cadiz",
-    nombre: "Embalse de Los Hurones",
-    tipo: "embalse",
-    municipio: "Algar",
-    latitud: 36.71,
-    longitud: -5.55,
-    descripcion:
-      "Encajonado entre laderas de monte por encima de Algar, sobre el " +
-      "Majaceite. Es de abastecimiento y está bastante resguardado: mucha " +
-      "profundidad y orillas de difícil acceso, pero un entorno que compensa.",
-    capacidadHm3: null,
-    accesoDescripcion:
-      "Por la carretera que sube desde Algar hacia la presa. Bajar a la " +
-      "orilla cuesta y en varios puntos no hay bajada practicable.",
-    dificultadAcceso: "dificil",
-    tieneSombra: true,
-    navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
-    avisosSanitarios:
-      "Embalse de abastecimiento: puede haber limitaciones de acceso. " +
-      ORILLA_CON_PENDIENTE,
-    mejorEpoca: PRIMAVERA_Y_OTONO,
-    urlNivelAgua: null,
-  },
-  {
-    slug: "barbate",
-    provincia: "cadiz",
-    nombre: "Embalse del Barbate",
-    tipo: "embalse",
-    municipio: "Alcalá de los Gazules",
-    latitud: 36.44,
-    longitud: -5.68,
-    descripcion:
-      "En el corazón de los Alcornocales, sobre el río Barbate. Alcornocal " +
-      "cerrado alrededor y una lámina larga que se estrecha hacia las colas. " +
-      "De los pocos sitios de la provincia con sombra de verdad en verano.",
-    capacidadHm3: null,
-    accesoDescripcion:
-      "Desde Alcalá de los Gazules por los caminos del parque. Buena parte " +
-      "del entorno es parque natural y no todo el monte es transitable.",
-    dificultadAcceso: "media",
-    tieneSombra: true,
-    navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
-    avisosSanitarios:
-      "Parque natural de Los Alcornocales: normativa propia de acceso y de " +
-      "uso, además de la de pesca. En verano hay riesgo alto de incendio; " +
-      "nada de fuego.",
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
   },
@@ -1207,9 +1037,6 @@ const SIERRA = new Set([
   "zufre",
   "jarrama",
   "la-colada",
-  "zahara-el-gastor",
-  "los-hurones",
-  "barbate",
   "bembezar",
   "tranco-de-beas",
   "la-bolera",
@@ -1246,14 +1073,6 @@ export const DESCRIPCIONES_ANDALUCIA: Record<string, string> = {
     "en la raya con Portugal, donde se pesca solo y se camina mucho. Y en la " +
     "costa, el Piedras, a media hora de las playas. Aviso aparte para el río " +
     "Tinto: sus aguas son ácidas por la minería y no albergan pesca.",
-  cadiz:
-    "La provincia de Cádiz se pesca casi entera sobre dos ríos: el Guadalete " +
-    "y el Barbate. Del primero cuelgan Bornos, Arcos y, por el Majaceite, " +
-    "Guadalcacín y Los Hurones; son embalses de campiña, de agua turbia y " +
-    "mucha carpa, con acceso fácil desde Jerez y Villamartín. Del segundo, " +
-    "el embalse del Barbate, ya dentro de los Alcornocales, con sombra de " +
-    "verdad. Y arriba, Zahara-El Gastor, a los pies de Grazalema, que es el " +
-    "más bonito de todos.",
   cordoba:
     "Córdoba tiene el embalse más grande de Andalucía, Iznájar, en el " +
     "extremo sur donde la provincia se junta con Granada y Málaga. El resto " +

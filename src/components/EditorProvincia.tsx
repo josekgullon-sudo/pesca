@@ -38,12 +38,22 @@ export function EditorProvincia({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="titulo-seccion font-bold">{provincia.nombre}</h2>
-        <Link
-          href="/admin/provincias"
-          className="font-semibold text-acento underline underline-offset-4"
-        >
-          Volver a la lista
-        </Link>
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Sin publicar la página responde 404 a todo el mundo menos a ti:
+              es la única forma de leer los textos antes de publicarlos. */}
+          <Link
+            href={`/${provincia.slug}`}
+            className="font-semibold text-acento underline underline-offset-4"
+          >
+            {provincia.publicada ? "Ver la página" : "Ver la vista previa"}
+          </Link>
+          <Link
+            href="/admin/provincias"
+            className="font-semibold text-acento underline underline-offset-4"
+          >
+            Volver a la lista
+          </Link>
+        </div>
       </div>
 
       {sitios === 0 && (

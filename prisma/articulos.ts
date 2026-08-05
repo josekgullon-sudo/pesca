@@ -476,4 +476,55 @@ Y que hay peces que se devuelven siempre y otros que no se pueden devolver. No h
 
 Y elige sitio de acceso fácil. En la [guía](/sevilla) están marcados: no lleves a un niño de seis años a una orilla donde hay que bajar agarrándose.`,
   },
+  {
+    slug: "donde-pescar-en-cadiz",
+    titulo: "Dónde pescar en Cádiz: guía de embalses",
+    entradilla:
+      "Nueve embalses, tres paisajes distintos y un viento que decide la jornada. Cuál elegir según lo que busques y de dónde salgas.",
+    provincia: "cadiz",
+    diasAtras: 2,
+    contenido: `La pesca continental de Cádiz se entiende con un mapa y dos ríos. Todo lo demás son detalles.
+
+## El Guadalete: de la sierra a la campiña
+
+El Guadalete baja de Grazalema y deja embalses por el camino, y no se parecen en nada entre el primero y el último.
+
+Arriba está [Zahara-El Gastor](/cadiz/zahara-el-gastor), con el pueblo y su castillo colgados encima. Agua clara de sierra, orillas de piedra. Que se vea el fondo cambia la pesca: el pez te ve venir, así que afina el bajo y trabaja despacio. Es también el más bonito de la provincia, y eso cuenta.
+
+Abajo, ya en la campiña, [Bornos](/cadiz/bornos) y [Arcos](/cadiz/arcos-de-la-frontera). Agua turbia, fondo de fango y carpa por todas partes. Son los dos sitios de diario de la comarca porque se llega en coche hasta casi la orilla. Si vas a estrenarte en la provincia, empieza por aquí.
+
+Por el Majaceite, afluente del Guadalete, cuelgan otros dos: [Guadalcacín](/cadiz/guadalcacin), el más grande de Cádiz y el sitio para embarcación, y [Los Hurones](/cadiz/los-hurones), encajonado sobre Algar, el más escondido y el más incómodo de pescar desde orilla.
+
+## Los Alcornocales: sombra y madera en el agua
+
+Al sur el paisaje cambia por completo. El [embalse del Barbate](/cadiz/barbate) y el [Celemín](/cadiz/celemin) están metidos en el alcornocal, y eso significa dos cosas.
+
+La primera, sombra de verdad en verano, que en esta provincia no la hay en casi ningún sitio. La segunda, y más importante para pescar: donde el monte llega a la orilla, mete troncos y ramas en el agua. Esa estructura sumergida es exactamente lo que busca el black bass. **Pesca los bordes, no el centro.**
+
+A cambio, el entorno es parque natural: hay normativa propia de acceso, circulación y fuego además de la de pesca.
+
+## El Campo de Gibraltar: aquí manda el levante
+
+[Guadarranque](/cadiz/guadarranque) y [Charco Redondo](/cadiz/charco-redondo) están en cuencas costeras, a pocos kilómetros del mar. Son el sitio de casa de toda la comarca de Algeciras y Los Barrios.
+
+Y tienen un factor que en el resto de la provincia es una molestia y aquí es el que decide la jornada: **el levante**. Con viento fuerte del este la orilla oeste se hace impescable y el lance se va a paseo. Si sopla, cámbiate de lado antes de montar el equipo, no después.
+
+## Cómo elegir
+
+- **Primera vez, sin complicaciones**: Bornos o Arcos. Acceso fácil, carpa segura.
+- **A por black bass**: Barbate o Guadalcacín.
+- **Un día bonito**: Zahara-El Gastor.
+- **Sombra en verano**: Barbate, Celemín o Charco Redondo.
+- **Con barca**: Guadalcacín.
+
+En la [guía de Cádiz](/cadiz) tienes cada uno con sus especies, su acceso y a cuánto te pilla desde tu código postal.
+
+## Dos cosas antes de salir
+
+**La licencia.** Hace falta licencia de pesca continental andaluza en vigor, y seguro de responsabilidad civil. Lo tienes explicado en [este artículo](/blog/licencia-de-pesca-andalucia).
+
+**Y las especies invasoras.** Esta es la importante y la que más gente se salta. En Andalucía, el black bass, el lucio, la carpa común y la trucha arcoíris solo se pueden devolver al agua dentro de unas aguas concretas, las llamadas *áreas delimitadas*. Fuera de ellas hay obligación de sacrificarlos.
+
+Ese listado va por provincia y cambia con la orden de vedas. **Míralo en el boletín antes de ir**, no te fíes de lo que valga en la provincia de al lado. Está explicado en [qué hacer con un black bass](/blog/especies-invasoras-que-hacer), y el enlace al portal oficial lo tienes en la propia página de la provincia.`,
+  },
 ];

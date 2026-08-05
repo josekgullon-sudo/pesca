@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AvisoBorrador } from "@/components/AvisoBorrador";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { FiltrosSitios } from "@/components/FiltrosSitios";
 import { SelectorUbicacion } from "@/components/SelectorUbicacion";
@@ -28,21 +29,26 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { provincia } = await params;
   const p = await prisma.provincia.findUnique({
-    where: { slug: provincia, publicada: true },
-    select: { nombre: true, descripcion: true },
+    where: { slug: provincia },
+    select: { nombre: true, descripcion: true, publicada: true },
   });
   if (!p) return { title: "Provincia" };
 
   // Cada combinación de filtros genera una URL distinta con el mismo contenido:
   // la canónica que pone `metadatosDePagina` es lo que evita que Google las
   // indexe todas y se repartan la fuerza entre decenas de copias.
-  return metadatosDePagina({
+  const meta = metadatosDePagina({
     titulo: `Dónde pescar en ${p.nombre}: embalses, ríos y especies`,
     descripcion:
       p.descripcion.slice(0, 155) ||
       `Guía de pesca de la provincia de ${p.nombre}.`,
     ruta: `/${provincia}`,
   });
+
+  // Sin publicar solo la ve un administrador, así que Google recibe un 404 y
+  // nunca llega aquí. El noindex va igualmente: si algún día cambia la forma
+  // de autenticar, el borrador sigue sin poder indexarse por descuido.
+  return p.publicada ? meta : { ...meta, robots: { index: false, follow: false } };
 }
 
 export default async function PaginaProvincia({
@@ -54,6 +60,9 @@ export default async function PaginaProvincia({
 }) {
   const { provincia: slugProvincia } = await params;
   const provincia = await cargarProvincia(slugProvincia);
+  // Si se está viendo sin publicar es que quien mira es administrador:
+  // `cargarProvincia` responde 404 a cualquier otro.
+  const enBorrador = !provincia.publicada;
   const filtros = leerFiltros(await searchParams);
   const ubicacion = await ubicacionActual();
 
@@ -124,6 +133,10 @@ export default async function PaginaProvincia({
           { nombre: `Pescar en ${provincia.nombre}`, ruta: `/${provincia.slug}` },
         ])}
       />
+
+      {enBorrador && (
+        <AvisoBorrador provincia={provincia.nombre} slug={provincia.slug} />
+      )}
 
       <nav aria-label="Migas de pan" className="text-sm">
         <Link href="/" className="text-texto-suave underline underline-offset-2">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AvisoBorrador } from "@/components/AvisoBorrador";
 import { FiltrosSitios } from "@/components/FiltrosSitios";
 import { MapaSitios } from "@/components/MapaSitios";
 import { AVISO_COORDENADAS_APROXIMADAS } from "@/lib/avisos";
@@ -26,15 +27,18 @@ export async function generateMetadata({
   const { provincia } = await params;
   const p = await prisma.provincia.findUnique({
     where: { slug: provincia },
-    select: { nombre: true },
+    select: { nombre: true, publicada: true },
   });
   // Los filtros viajan en la URL: sin la canónica que pone el ayudante, cada
   // combinación sería otra página con el mismo mapa.
-  return metadatosDePagina({
+  const meta = metadatosDePagina({
     titulo: `Mapa de pesca de ${p?.nombre ?? "la provincia"}`,
     descripcion: `Dónde están los embalses y ríos de ${p?.nombre ?? "la provincia"} para pescar.`,
     ruta: `/${provincia}/mapa`,
   });
+
+  // Una provincia sin publicar solo la ve un administrador. Ver page.tsx.
+  return p?.publicada ? meta : { ...meta, robots: { index: false, follow: false } };
 }
 
 export default async function PaginaMapa({
@@ -119,6 +123,10 @@ export default async function PaginaMapa({
           Ver lista
         </Link>
       </div>
+
+      {!provincia.publicada && (
+        <AvisoBorrador provincia={provincia.nombre} slug={provincia.slug} />
+      )}
 
       <SelectorUbicacion actual={ubicacion} variante="barra" />
 

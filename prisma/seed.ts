@@ -32,6 +32,15 @@ import {
   ESPECIES_POR_SITIO_ANDALUCIA,
   SITIOS_ANDALUCIA,
 } from "./andalucia";
+import {
+  CADIZ_AGUA_CLARA,
+  CADIZ_AGUA_TURBIA,
+  CADIZ_SPINNING,
+  DESCRIPCION_CADIZ,
+  ESPECIES_POR_SITIO_CADIZ,
+  NOTAS_LEGALES_CADIZ,
+  SITIOS_CADIZ,
+} from "./cadiz";
 import { distanciaKm, tiempoEnCocheAprox } from "../src/lib/ubicacion";
 
 const PRIMAVERA_Y_OTONO = [3, 4, 5, 6, 9, 10, 11];
@@ -102,7 +111,7 @@ const PROVINCIAS: ProvinciaSeed[] = [
   // delimitadas para especies exóticas invasoras de cada provincia, que sale
   // del boletín y no se deduce. Ver el comentario de cabecera de andalucia.ts.
   { slug: "huelva", nombre: "Huelva", comunidad: "Andalucía", latitud: 37.6, longitud: -6.9, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.huelva },
-  { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.cadiz },
+  { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: false, descripcion: DESCRIPCION_CADIZ, notasLegales: NOTAS_LEGALES_CADIZ },
   { slug: "malaga", nombre: "Málaga", comunidad: "Andalucía", latitud: 36.8, longitud: -4.6, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.malaga },
   { slug: "cordoba", nombre: "Córdoba", comunidad: "Andalucía", latitud: 38.0, longitud: -4.8, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.cordoba },
   { slug: "jaen", nombre: "Jaén", comunidad: "Andalucía", latitud: 38.0, longitud: -3.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.jaen },
@@ -626,7 +635,7 @@ const SITIOS: SitioSeed[] = [
  * `eeiComprobado: false`: nadie ha mirado todavía si salen en el listado de
  * áreas delimitadas de su provincia.
  */
-for (const s of SITIOS_ANDALUCIA) {
+for (const s of [...SITIOS_CADIZ, ...SITIOS_ANDALUCIA]) {
   const km = Math.round(distanciaKm(DOS_HERMANAS, s) * 1.3);
   SITIOS.push({
     ...s,
@@ -1459,16 +1468,19 @@ const SITIOS_SPINNING = [
   "agrio",
   "guadalquivir-cantillana-alcala-del-rio",
   "viar-melonares-cantillana",
+  // Cádiz, que ya está trabajada al nivel de Sevilla.
+  ...CADIZ_SPINNING,
 ];
 
 const SITIOS_FONDO = SITIOS.map((s) => s.slug);
 
-const SITIOS_AGUA_CLARA = ["jose-toran", "la-minilla", "cala", "huesna", "el-pintado"];
+const SITIOS_AGUA_CLARA = ["jose-toran", "la-minilla", "cala", "huesna", "el-pintado", ...CADIZ_AGUA_CLARA];
 const SITIOS_AGUA_TURBIA = [
   "torre-del-aguila",
   "puebla-de-cazalla",
   "guadalquivir-cantillana-alcala-del-rio",
   "guadaira-oromana",
+  ...CADIZ_AGUA_TURBIA,
 ];
 const SITIOS_CON_CORRIENTE = [
   "guadalquivir-cantillana-alcala-del-rio",
@@ -1755,6 +1767,7 @@ async function main() {
   let nSitioEspecie = 0;
   const TODAS_ESPECIES_POR_SITIO = {
     ...ESPECIES_POR_SITIO_ANDALUCIA,
+    ...ESPECIES_POR_SITIO_CADIZ,
     ...ESPECIES_POR_SITIO,
   };
   for (const [sitioSlug, filas] of Object.entries(TODAS_ESPECIES_POR_SITIO)) {
@@ -1813,16 +1826,30 @@ async function main() {
     ),
   );
   const hoy = new Date();
+  const provinciasPublicadasPorSlug = new Set(
+    (
+      await prisma.provincia.findMany({
+        where: { publicada: true },
+        select: { slug: true },
+      })
+    ).map((p) => p.slug),
+  );
+
   for (const a of ARTICULOS) {
     const publicadaEl = new Date(hoy);
     publicadaEl.setDate(publicadaEl.getDate() - a.diasAtras);
     publicadaEl.setHours(9, 0, 0, 0);
 
+    // Un artículo de provincia enlaza a las fichas de esa provincia. Si la
+    // provincia no está publicada, esos enlaces son 404: el artículo espera
+    // con ella y sale solo el día que se publique.
+    const suProvincia = a.provincia ? provinciasPublicadasPorSlug.has(a.provincia) : true;
+
     const datos = {
       titulo: a.titulo,
       entradilla: a.entradilla,
       contenido: a.contenido,
-      publicada: true,
+      publicada: suProvincia,
       publicadaEl,
       provinciaId: a.provincia ? (provinciasPorSlug.get(a.provincia) ?? null) : null,
     };
