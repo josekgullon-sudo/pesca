@@ -145,7 +145,33 @@ jobs:
           #
           # Se copia en cada despliegue, así que el servidor ejecuta siempre la
           # versión de esta rama y no una que quedara ahí hace meses.
-          "${SSH[@]}" "cat > /tmp/desplegar-pesca.sh" < docker/desplegar.sh
+          #
+          # Con reintentos, y solo en esta primera conexión. Dos despliegues
+          # seguidos se pisan: mientras el anterior reconstruye la imagen, el
+          # servidor va justo de CPU y el sshd tarda más de los quince segundos
+          # del ConnectTimeout. Eso dejó producción un commit por detrás con el
+          # despliegue en rojo y nadie mirando.
+          #
+          # Reintentar es seguro precisamente aquí: copiar un fichero no cambia
+          # nada. El despliegue de abajo NO se reintenta, que ese sí toca la
+          # base de datos y las copias de seguridad.
+          copiado=no
+          for intento in 1 2 3 4; do
+            if "${SSH[@]}" "cat > /tmp/desplegar-pesca.sh" < docker/desplegar.sh; then
+              copiado=si
+              break
+            fi
+            espera=$((intento * 20))
+            echo "→ No se ha podido conectar (intento $intento). Reintento en ${espera}s..."
+            sleep "$espera"
+          done
+
+          if [ "$copiado" != "si" ]; then
+            echo "::error::No se ha podido conectar por SSH tras cuatro intentos."
+            echo "Si el despliegue anterior seguía reconstruyendo, vuelve a lanzar"
+            echo "este mismo desde la pestaña Actions con «Re-run jobs»."
+            exit 1
+          fi
 
           "${SSH[@]}" -n "
             DIRECTORIO_PESCA='${DIRECTORIO:-}' \
