@@ -13,6 +13,8 @@ export default async function ListaProvincias() {
       publicada: true,
       areasDelimitadasEEI: true,
       _count: { select: { sitios: true } },
+      // Los que todavía nadie ha buscado en el listado de áreas delimitadas.
+      sitios: { where: { eeiComprobado: false }, select: { id: true } },
     },
   });
 
@@ -30,7 +32,11 @@ export default async function ListaProvincias() {
 
       <ul className="grid gap-4 lg:grid-cols-2">
         {provincias.map((p) => {
-          const listo = p._count.sitios > 0 && p.areasDelimitadasEEI.length > 30;
+          const sinComprobar = p.sitios.length;
+          const listo =
+            p._count.sitios > 0 &&
+            p.areasDelimitadasEEI.length > 30 &&
+            sinComprobar === 0;
           return (
             <li key={p.slug}>
               <Link
@@ -68,6 +74,17 @@ export default async function ListaProvincias() {
                       ? "✓ Áreas delimitadas EEI"
                       : "· Faltan las áreas delimitadas EEI"}
                   </li>
+                  {p._count.sitios > 0 && (
+                    <li
+                      className={
+                        sinComprobar === 0 ? "text-verde-texto" : "text-texto-suave"
+                      }
+                    >
+                      {sinComprobar === 0
+                        ? "✓ Cada sitio comprobado contra el listado"
+                        : `· ${sinComprobar} sitios sin comprobar contra el listado`}
+                    </li>
+                  )}
                 </ul>
 
                 {!p.publicada && listo && (

@@ -78,6 +78,7 @@ export default async function PaginaProvincia({
         longitud: true,
         avisosSanitarios: true,
         esAreaDelimitadaEEI: true,
+        eeiComprobado: true,
         imagenUrl: true,
         especies: {
           select: {

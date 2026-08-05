@@ -127,6 +127,16 @@ model Sitio {
   /// las especies exóticas invasoras (black bass, lucio, carpa, trucha arcoíris).
   esAreaDelimitadaEEI Boolean @default(false)
 
+  /// Si alguien ha mirado de verdad la orden de vedas para este sitio.
+  ///
+  /// Sin esto, un sitio recién cargado sale con `esAreaDelimitadaEEI` en false,
+  /// que no significa «no está en el listado»: significa «nadie lo ha mirado».
+  /// Y esas dos cosas dicen lo contrario a quien tiene un black bass en la
+  /// mano —devolverlo o sacrificarlo—, así que el «no lo sé» tiene que poder
+  /// escribirse. Mientras esté en false la web dice que no lo sabe, y la
+  /// provincia no se puede publicar.
+  eeiComprobado Boolean @default(false)
+
   notasLegales     String @default("")
   avisosSanitarios String @default("")
 

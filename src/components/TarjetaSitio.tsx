@@ -25,6 +25,7 @@ export type SitioTarjeta = {
   tieneSombra: boolean;
   avisosSanitarios: string;
   esAreaDelimitadaEEI: boolean;
+  eeiComprobado: boolean;
   imagenUrl: string | null;
   especies: {
     abundancia: number;
@@ -134,10 +135,18 @@ export function TarjetaSitio({
                 Con sombra
               </li>
             )}
-            {!sitio.esAreaDelimitadaEEI && (
-              <li className="rounded-lg bg-ambar-fondo px-2 py-1 text-ambar-texto">
-                Fuera de área EEI
+            {/* «Sin comprobar» y «fuera del área» no son lo mismo: el segundo
+                obliga a sacrificar el pez y el primero no dice nada. */}
+            {!sitio.eeiComprobado ? (
+              <li className="rounded-lg bg-chip-fondo px-2 py-1 text-chip-texto">
+                Área EEI sin comprobar
               </li>
+            ) : (
+              !sitio.esAreaDelimitadaEEI && (
+                <li className="rounded-lg bg-ambar-fondo px-2 py-1 text-ambar-texto">
+                  Fuera de área EEI
+                </li>
+              )
             )}
             {esAvisoGrave(sitio.avisosSanitarios) && (
               <li className="rounded-lg bg-rojo-fondo px-2 py-1 text-rojo-texto">

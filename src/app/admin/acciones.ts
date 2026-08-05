@@ -260,6 +260,27 @@ export async function guardarProvincia(
     };
   }
 
+  // El listado de la provincia no basta: hay que haber mirado sitio por sitio
+  // cuáles salen en él. Mientras queden sin comprobar, la web tendría que
+  // decir «no lo sé» en una página publicada, y eso no se sostiene.
+  const sinComprobar = await prisma.sitio.findMany({
+    where: { provincia: { slug }, eeiComprobado: false },
+    select: { nombre: true },
+    orderBy: { nombre: "asc" },
+  });
+  if (publicada && sinComprobar.length > 0) {
+    const nombres = sinComprobar.slice(0, 5).map((s) => s.nombre).join(", ");
+    return {
+      error:
+        `Quedan ${sinComprobar.length} sitios sin comprobar contra el listado ` +
+        `de áreas delimitadas: ${nombres}` +
+        (sinComprobar.length > 5 ? " y otros más." : ".") +
+        " Hasta que se sepa de cada uno si está dentro o fuera, la provincia " +
+        "no se puede publicar: de eso depende si un black bass se devuelve al " +
+        "agua o hay que sacrificarlo.",
+    };
+  }
+
   try {
     await prisma.provincia.update({
       where: { slug },
@@ -276,4 +297,68 @@ export async function guardarProvincia(
   } catch {
     return { error: "No se ha podido guardar." };
   }
+}
+
+// ---------------------------------------------------------------------------
+// Áreas delimitadas, sitio por sitio
+// ---------------------------------------------------------------------------
+
+export type EstadoEEI = { error: string } | { ok: string } | null;
+
+/**
+ * Marca un sitio como dentro o fuera del listado de áreas delimitadas.
+ *
+ * Es el paso que no puede hacer nadie más: hay que leer el listado de la orden
+ * de vedas de la provincia y buscar en él el nombre del embalse o del tramo.
+ * Hasta que se hace, el sitio queda con `eeiComprobado` en false y la web dice
+ * abiertamente que no lo sabe, en vez de dar por buena la respuesta que manda
+ * sacrificar el pez.
+ *
+ * Se puede volver atrás: «no lo sé» es un estado tan legítimo como los otros
+ * dos, y quien se equivoque marcando tiene que poder deshacerlo.
+ */
+export async function marcarAreaEEI(
+  _previo: EstadoEEI,
+  fd: FormData,
+): Promise<EstadoEEI> {
+  try {
+    await exigirAdmin();
+  } catch {
+    return { error: "Solo un administrador puede tocar esto." };
+  }
+
+  const slug = texto(fd, "sitio");
+  const valor = texto(fd, "valor");
+  if (!["dentro", "fuera", "no-lo-se"].includes(valor)) {
+    return { error: "Valor no válido." };
+  }
+
+  const sitio = await prisma.sitio.findUnique({
+    where: { slug },
+    select: { nombre: true, provincia: { select: { slug: true } } },
+  });
+  if (!sitio) return { error: "Ese sitio no existe." };
+
+  try {
+    await prisma.sitio.update({
+      where: { slug },
+      data: {
+        esAreaDelimitadaEEI: valor === "dentro",
+        eeiComprobado: valor !== "no-lo-se",
+      },
+    });
+  } catch {
+    return { error: "No se ha podido guardar." };
+  }
+
+  revalidatePath(`/${sitio.provincia.slug}`, "layout");
+  revalidatePath("/admin/provincias", "layout");
+
+  const dicho =
+    valor === "dentro"
+      ? "dentro del área delimitada"
+      : valor === "fuera"
+        ? "fuera del área delimitada"
+        : "sin comprobar";
+  return { ok: `${sitio.nombre}: ${dicho}.` };
 }

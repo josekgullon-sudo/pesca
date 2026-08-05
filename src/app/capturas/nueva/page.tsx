@@ -17,6 +17,10 @@ export default async function NuevaCaptura({
 
   const [sitios, especies, aparejos, tecnicas] = await Promise.all([
     prisma.sitio.findMany({
+      // Solo los de provincias publicadas. Los de las que están a medias
+      // existen en la base de datos pero no tienen página: dejar registrar una
+      // captura en uno de ellos crearía una ficha que enlaza a un 404.
+      where: { provincia: { publicada: true } },
       orderBy: { tiempoCocheMin: "asc" },
       select: {
         id: true,

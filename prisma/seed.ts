@@ -27,6 +27,12 @@ import {
 } from "../src/lib/avisos";
 import { prisma } from "../src/lib/prisma";
 import { ARTICULOS } from "./articulos";
+import {
+  DESCRIPCIONES_ANDALUCIA,
+  ESPECIES_POR_SITIO_ANDALUCIA,
+  SITIOS_ANDALUCIA,
+} from "./andalucia";
+import { distanciaKm, tiempoEnCocheAprox } from "../src/lib/ubicacion";
 
 const PRIMAVERA_Y_OTONO = [3, 4, 5, 6, 9, 10, 11];
 const TEMPORADA_LARGA = [3, 4, 5, 6, 7, 8, 9, 10];
@@ -90,15 +96,27 @@ const PROVINCIAS: ProvinciaSeed[] = [
       "seguro de responsabilidad civil.",
     urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA,
   },
-  // --- Pendientes de datos. No se publican hasta tenerlos. ---
-  { slug: "huelva", nombre: "Huelva", comunidad: "Andalucía", latitud: 37.6, longitud: -6.9, publicada: false },
-  { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: false },
-  { slug: "malaga", nombre: "Málaga", comunidad: "Andalucía", latitud: 36.8, longitud: -4.6, publicada: false },
-  { slug: "cordoba", nombre: "Córdoba", comunidad: "Andalucía", latitud: 38.0, longitud: -4.8, publicada: false },
-  { slug: "jaen", nombre: "Jaén", comunidad: "Andalucía", latitud: 38.0, longitud: -3.4, publicada: false },
-  { slug: "granada", nombre: "Granada", comunidad: "Andalucía", latitud: 37.3, longitud: -3.4, publicada: false },
-  { slug: "almeria", nombre: "Almería", comunidad: "Andalucía", latitud: 37.2, longitud: -2.4, publicada: false },
+  // --- Pendientes de la orden de vedas. No se publican hasta tenerla. ---
+  //
+  // Sitios y descripción sí llevan: lo que falta es el listado de áreas
+  // delimitadas para especies exóticas invasoras de cada provincia, que sale
+  // del boletín y no se deduce. Ver el comentario de cabecera de andalucia.ts.
+  { slug: "huelva", nombre: "Huelva", comunidad: "Andalucía", latitud: 37.6, longitud: -6.9, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.huelva },
+  { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.cadiz },
+  { slug: "malaga", nombre: "Málaga", comunidad: "Andalucía", latitud: 36.8, longitud: -4.6, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.malaga },
+  { slug: "cordoba", nombre: "Córdoba", comunidad: "Andalucía", latitud: 38.0, longitud: -4.8, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.cordoba },
+  { slug: "jaen", nombre: "Jaén", comunidad: "Andalucía", latitud: 38.0, longitud: -3.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.jaen },
+  { slug: "granada", nombre: "Granada", comunidad: "Andalucía", latitud: 37.3, longitud: -3.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.granada },
+  { slug: "almeria", nombre: "Almería", comunidad: "Andalucía", latitud: 37.2, longitud: -2.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.almeria },
 ];
+
+/**
+ * Dos Hermanas, que es desde donde están medidas las distancias de referencia
+ * de la guía. Para los sitios de las otras provincias no tiene sentido
+ * teclearlas a mano una a una: se calculan desde aquí con el mismo estimador
+ * que usa la web. Son orientativas, como todo lo que sale de esa cuenta.
+ */
+const DOS_HERMANAS = { latitud: 37.2827, longitud: -5.9219 };
 
 // ---------------------------------------------------------------------------
 // Sitios
@@ -122,6 +140,12 @@ type SitioSeed = {
   distanciaDesdeDosHermanasKm: number;
   tiempoCocheMin: number;
   esAreaDelimitadaEEI: boolean;
+  /**
+   * Si alguien ha buscado de verdad este sitio en el listado de la orden de
+   * vedas. Obligatorio a propósito: sin él, un sitio nuevo entraría como
+   * «fuera del área», que es la respuesta que manda sacrificar el pez.
+   */
+  eeiComprobado: boolean;
   notasLegales: string;
   avisosSanitarios: string;
   mejorEpoca: number[];
@@ -153,6 +177,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 40,
     tiempoCocheMin: 35,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales: EN_AREA_DELIMITADA,
     avisosSanitarios:
       "Sin apenas sombra: gorra, crema y agua de sobra, sobre todo de mayo a " +
@@ -184,6 +209,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 110,
     tiempoCocheMin: 75,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales:
       EN_AREA_DELIMITADA +
       " Al ser escenario de competición, comprueba el calendario federativo " +
@@ -217,6 +243,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 120,
     tiempoCocheMin: 90,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales:
       EN_AREA_DELIMITADA +
       " Está dentro del Parque Natural Sierra Norte de Sevilla: respeta la " +
@@ -250,6 +277,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 70,
     tiempoCocheMin: 60,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales:
       EN_AREA_DELIMITADA +
       " Es embalse de abastecimiento de agua potable: el baño y la navegación " +
@@ -282,6 +310,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 105,
     tiempoCocheMin: 80,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales:
       EN_AREA_DELIMITADA +
       " Embalse de abastecimiento: prohibido el baño y la navegación.",
@@ -313,6 +342,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 55,
     tiempoCocheMin: 50,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales:
       EN_AREA_DELIMITADA +
       " Embalse de abastecimiento: prohibido el baño y la navegación, y hay " +
@@ -343,6 +373,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 110,
     tiempoCocheMin: 85,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales:
       EN_AREA_DELIMITADA +
       " Embalse de abastecimiento: prohibido el baño y la navegación. Parte del " +
@@ -376,6 +407,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 100,
     tiempoCocheMin: 80,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales: EN_AREA_DELIMITADA,
     avisosSanitarios:
       "Lámina pequeña: en veranos secos puede quedar en muy poca agua y con la " +
@@ -405,6 +437,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 65,
     tiempoCocheMin: 60,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales: EN_AREA_DELIMITADA,
     avisosSanitarios: "Sin avisos específicos. Orilla con vegetación baja.",
     mejorEpoca: PRIMAVERA_Y_OTONO,
@@ -432,6 +465,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 65,
     tiempoCocheMin: 50,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales: EN_AREA_DELIMITADA,
     avisosSanitarios:
       "Campiña abierta, sin sombra y con mucho calor de junio a septiembre. " +
@@ -462,6 +496,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 60,
     tiempoCocheMin: 55,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales:
       EN_AREA_DELIMITADA +
       " Comprueba antes de ir qué accesos están abiertos: hay zonas del entorno " +
@@ -500,6 +535,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 18,
     tiempoCocheMin: 20,
     esAreaDelimitadaEEI: false,
+    eeiComprobado: true,
     notasLegales:
       "VERIFICAR CON EL AYUNTAMIENTO ANTES DE IR. La zona municipal habilitada " +
       "para la pesca es el tramo Molino de la Aceña – Molino del Realaje. " +
@@ -536,6 +572,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 45,
     tiempoCocheMin: 40,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales:
       EN_AREA_DELIMITADA +
       " El área delimitada es exactamente el tramo entre las presas de " +
@@ -570,6 +607,7 @@ const SITIOS: SitioSeed[] = [
     distanciaDesdeDosHermanasKm: 60,
     tiempoCocheMin: 50,
     esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
     notasLegales:
       EN_AREA_DELIMITADA +
       " El área delimitada llega desde la presa de Melonares hasta Cantillana: " +
@@ -581,6 +619,21 @@ const SITIOS: SitioSeed[] = [
     urlNivelAgua: null,
   },
 ];
+
+/**
+ * Los sitios de las otras siete provincias andaluzas. Llegan sin las
+ * distancias desde Dos Hermanas, que se calculan aquí, y todos con
+ * `eeiComprobado: false`: nadie ha mirado todavía si salen en el listado de
+ * áreas delimitadas de su provincia.
+ */
+for (const s of SITIOS_ANDALUCIA) {
+  const km = Math.round(distanciaKm(DOS_HERMANAS, s) * 1.3);
+  SITIOS.push({
+    ...s,
+    distanciaDesdeDosHermanasKm: km,
+    tiempoCocheMin: tiempoEnCocheAprox(distanciaKm(DOS_HERMANAS, s)),
+  });
+}
 
 // ---------------------------------------------------------------------------
 // Especies
@@ -1696,8 +1749,15 @@ async function main() {
   };
 
   // --- Sitio <-> Especie ---------------------------------------------------
+  // Las de Sevilla salen de pescar allí; las de las otras provincias son la
+  // composición típica de embalse andaluz como punto de partida, y la web lo
+  // dice en cada ficha. Se afinan solas con las capturas que se registren.
   let nSitioEspecie = 0;
-  for (const [sitioSlug, filas] of Object.entries(ESPECIES_POR_SITIO)) {
+  const TODAS_ESPECIES_POR_SITIO = {
+    ...ESPECIES_POR_SITIO_ANDALUCIA,
+    ...ESPECIES_POR_SITIO,
+  };
+  for (const [sitioSlug, filas] of Object.entries(TODAS_ESPECIES_POR_SITIO)) {
     const sitioId = exigir(sitios, sitioSlug, "sitio");
     for (const [especieSlug, abundancia, probabilidadCaptura, mejorTecnica, notas] of filas) {
       const especieId = exigir(especies, especieSlug, "especie");

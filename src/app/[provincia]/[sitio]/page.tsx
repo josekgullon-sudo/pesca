@@ -13,6 +13,7 @@ import { SubirFoto } from "@/components/SubirFoto";
 import {
   AVISO_ABUNDANCIAS_ESTIMADAS,
   AVISO_COORDENADAS_APROXIMADAS,
+  AVISO_EEI_SIN_COMPROBAR,
 } from "@/lib/avisos";
 import {
   ETIQUETA_DIFICULTAD,
@@ -488,7 +489,17 @@ export default async function FichaSitio({
         <div className="space-y-3">
           <div className="rounded-xl border-2 border-ambar-texto/25 bg-ambar-fondo p-4 text-ambar-texto">
             <h3 className="font-bold">Normativa de este sitio</h3>
-            <p className="mt-1 leading-relaxed">{sitio.notasLegales}</p>
+            {/* El «no lo sabemos» va delante de todo lo demás y con esas
+                palabras. Callarlo dejaría que se leyera el silencio como un
+                «no está en el área», que es la respuesta que manda matar. */}
+            {!sitio.eeiComprobado && (
+              <p className="mt-1 font-semibold leading-relaxed">
+                {AVISO_EEI_SIN_COMPROBAR}
+              </p>
+            )}
+            {sitio.notasLegales && (
+              <p className="mt-1 leading-relaxed">{sitio.notasLegales}</p>
+            )}
           </div>
 
           {!avisoGrave && sitio.avisosSanitarios && (

@@ -60,7 +60,7 @@ export default async function PaginaCapturas({
       select: { slug: true, nombreComun: true },
     }),
     prisma.sitio.findMany({
-      where: { capturas: { some: {} } },
+      where: { capturas: { some: {} }, provincia: { publicada: true } },
       orderBy: { nombre: "asc" },
       select: { slug: true, nombre: true },
     }),

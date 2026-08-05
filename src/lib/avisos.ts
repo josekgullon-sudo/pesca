@@ -36,6 +36,21 @@ export const AVISO_FUERA_DE_AREA_DELIMITADA =
   "aquí, hay obligación de sacrificarlos y no devolverlos al agua.";
 
 /**
+ * Lo que se dice de un sitio cuyo estado EEI no ha comprobado nadie todavía.
+ *
+ * No es lo mismo «no está en el listado» que «no lo hemos mirado», aunque en
+ * la base de datos las dos cosas empiecen siendo un false. La primera manda
+ * sacrificar el pez; la segunda no manda nada. Confundirlas es la forma más
+ * fácil que tiene esta web de hacer daño de verdad.
+ */
+export const AVISO_EEI_SIN_COMPROBAR =
+  "Todavía no hemos comprobado si este sitio está dentro de las áreas " +
+  "delimitadas para especies exóticas invasoras. Míralo en la orden de vedas " +
+  "antes de decidir qué hacer con un black bass, un lucio, una carpa común o " +
+  "una trucha arcoíris: de eso depende si se devuelve al agua o hay " +
+  "obligación de sacrificarlo.";
+
+/**
  * Las abundancias y probabilidades de captura del seed son una estimación de
  * partida, no un dato oficial. Se afinan solas a medida que registramos capturas.
  */
