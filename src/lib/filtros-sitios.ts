@@ -49,11 +49,25 @@ export function leerFiltros(params: ParamsBusqueda): FiltrosSitios {
   };
 }
 
-export function construirWhere(f: FiltrosSitios): Prisma.SitioWhereInput {
+/**
+ * El `where` de Prisma.
+ *
+ * El filtro de tiempo es el único que se puede quedar fuera: `tiempoCocheMin`
+ * está medido desde Dos Hermanas, así que si el visitante ha dicho de dónde
+ * sale, filtrar por esa columna le enseñaría «a menos de 40 minutos» de un
+ * pueblo en el que no vive. En ese caso se salta aquí y se aplica después,
+ * sobre el tiempo estimado desde su punto.
+ */
+export function construirWhere(
+  f: FiltrosSitios,
+  opciones: { tiempoAparte?: boolean } = {},
+): Prisma.SitioWhereInput {
   return {
     ...(f.tipo ? { tipo: f.tipo } : {}),
     ...(f.dificultad ? { dificultadAcceso: f.dificultad } : {}),
-    ...(f.tiempo ? { tiempoCocheMin: { lte: f.tiempo } } : {}),
+    ...(f.tiempo && !opciones.tiempoAparte
+      ? { tiempoCocheMin: { lte: f.tiempo } }
+      : {}),
     ...(f.especie
       ? { especies: { some: { especie: { slug: f.especie } } } }
       : {}),

@@ -12,6 +12,9 @@ import {
 import { metadatosDePagina } from "@/lib/marca";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
+import { SelectorUbicacion } from "@/components/SelectorUbicacion";
+import { distanciaKm, tiempoEnCocheAprox } from "@/lib/ubicacion";
+import { ubicacionActual } from "@/lib/ubicacion-servidor";
 
 export const dynamic = "force-dynamic";
 
@@ -44,10 +47,14 @@ export default async function PaginaMapa({
   const { provincia: slugProvincia } = await params;
   const provincia = await cargarProvincia(slugProvincia);
   const filtros = leerFiltros(await searchParams);
+  const ubicacion = await ubicacionActual();
 
   const [sitios, especies] = await Promise.all([
     prisma.sitio.findMany({
-      where: { ...construirWhere(filtros), provinciaId: provincia.id },
+      where: {
+        ...construirWhere(filtros, { tiempoAparte: Boolean(ubicacion) }),
+        provinciaId: provincia.id,
+      },
       orderBy: { tiempoCocheMin: "asc" },
       select: {
         slug: true,
@@ -67,19 +74,31 @@ export default async function PaginaMapa({
     }),
   ]);
 
-  const puntos = sitios.map((s) => ({
-    slug: s.slug,
-    nombre: s.nombre,
-    tipo: s.tipo,
-    municipio: s.municipio,
-    tiempoCocheMin: s.tiempoCocheMin,
-    latitud: s.latitud,
-    longitud: s.longitud,
-    avisoGrave: s.avisosSanitarios
-      .toUpperCase()
-      .includes("AVISO SANITARIO GRAVE"),
-    provincia: provincia.slug,
-  }));
+  const puntos = sitios
+    .map((s) => ({
+      slug: s.slug,
+      nombre: s.nombre,
+      tipo: s.tipo,
+      municipio: s.municipio,
+      tiempoCocheMin: s.tiempoCocheMin,
+      tiempoUsuarioMin: ubicacion
+        ? tiempoEnCocheAprox(distanciaKm(ubicacion, s))
+        : undefined,
+      latitud: s.latitud,
+      longitud: s.longitud,
+      avisoGrave: s.avisosSanitarios
+        .toUpperCase()
+        .includes("AVISO SANITARIO GRAVE"),
+      provincia: provincia.slug,
+    }))
+    // Con ubicación el filtro de tiempo se aplica aquí, contra el tiempo
+    // estimado desde su punto. Ver `construirWhere`.
+    .filter(
+      (p) =>
+        !ubicacion ||
+        !filtros.tiempo ||
+        (p.tiempoUsuarioMin ?? 0) <= filtros.tiempo,
+    );
 
   return (
     <div className="contenedor space-y-6 py-10 md:py-14">
@@ -100,6 +119,8 @@ export default async function PaginaMapa({
           Ver lista
         </Link>
       </div>
+
+      <SelectorUbicacion actual={ubicacion} variante="barra" />
 
       <div className="md:grid md:grid-cols-[17rem_1fr] md:items-start md:gap-8">
         <div className="order-2 mt-6 md:order-1 md:mt-0 md:sticky md:top-6">

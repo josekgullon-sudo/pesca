@@ -30,6 +30,14 @@ import { usuarioOpcional } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
 import { schemaMigas, schemaSitio } from "@/lib/schema";
+import { SelectorUbicacion } from "@/components/SelectorUbicacion";
+import {
+  distanciaKm,
+  formatearKm,
+  formatearTiempo,
+  tiempoEnCocheAprox,
+} from "@/lib/ubicacion";
+import { ubicacionActual } from "@/lib/ubicacion-servidor";
 
 export const dynamic = "force-dynamic";
 
@@ -151,11 +159,16 @@ export default async function FichaSitio({
 }) {
   const { provincia: slugProvincia, sitio: slugSitio } = await params;
   const provincia = await cargarProvincia(slugProvincia);
-  const [sitio, usuario] = await Promise.all([
+  const [sitio, usuario, ubicacion] = await Promise.all([
     cargarSitio(slugProvincia, slugSitio),
     usuarioOpcional(),
+    ubicacionActual(),
   ]);
   if (!sitio) notFound();
+
+  // Si el visitante ha dicho de dónde sale, el dato de cabecera es el suyo. El
+  // de Dos Hermanas solo le sirve a quien vive en Dos Hermanas.
+  const desdeMiCasaKm = ubicacion ? distanciaKm(ubicacion, sitio) : null;
 
   const avisoGrave = sitio.avisosSanitarios
     .toUpperCase()
@@ -303,9 +316,16 @@ export default async function FichaSitio({
       <section className="lg:hidden">
         <h2 className="sr-only">Datos generales</h2>
         <dl className="grid grid-cols-2 gap-3">
-        <Dato titulo="Desde Dos Hermanas">
-          {sitio.tiempoCocheMin} min · {sitio.distanciaDesdeDosHermanasKm} km
-        </Dato>
+        {desdeMiCasaKm !== null ? (
+          <Dato titulo={`Desde ${ubicacion!.etiqueta}`}>
+            aprox. {formatearTiempo(tiempoEnCocheAprox(desdeMiCasaKm))} ·{" "}
+            {formatearKm(desdeMiCasaKm)}
+          </Dato>
+        ) : (
+          <Dato titulo="Desde Dos Hermanas">
+            {sitio.tiempoCocheMin} min · {sitio.distanciaDesdeDosHermanasKm} km
+          </Dato>
+        )}
         <Dato titulo="Acceso">
           {ETIQUETA_DIFICULTAD[sitio.dificultadAcceso as DificultadAcceso].replace(
             "Acceso ",
@@ -328,6 +348,20 @@ export default async function FichaSitio({
       <section>
         <h2 className="mb-2 text-xl font-bold">Cómo se llega</h2>
         <p className="max-w-prose leading-relaxed">{sitio.accesoDescripcion}</p>
+
+        {/* Aquí es donde alguien se pregunta cuánto tarda, así que aquí es
+            donde tiene sentido poder decir de dónde sale. Solo se monta una
+            vez en la página: el formulario lleva ids y duplicarlo los rompe. */}
+        <div className="mt-4">
+          <SelectorUbicacion actual={ubicacion} variante="linea" />
+          {desdeMiCasaKm !== null && (
+            <p className="mt-2 max-w-prose text-sm leading-relaxed text-texto-suave">
+              Los {formatearTiempo(tiempoEnCocheAprox(desdeMiCasaKm))} son una
+              estimación a partir de la línea recta, no una ruta: por carretera
+              de montaña o con el embalse al final de un carril, cuenta más.
+            </p>
+          )}
+        </div>
         <p className="mt-3 text-sm leading-relaxed text-texto-suave">
           {AVISO_COORDENADAS_APROXIMADAS}
         </p>
@@ -426,9 +460,16 @@ export default async function FichaSitio({
       <section className="hidden lg:block">
         <h2 className="sr-only">Datos generales</h2>
         <dl className="grid grid-cols-2 gap-3">
-          <Dato titulo="Desde Dos Hermanas">
-            {sitio.tiempoCocheMin} min · {sitio.distanciaDesdeDosHermanasKm} km
-          </Dato>
+          {desdeMiCasaKm !== null ? (
+            <Dato titulo={`Desde ${ubicacion!.etiqueta}`}>
+              aprox. {formatearTiempo(tiempoEnCocheAprox(desdeMiCasaKm))} ·{" "}
+              {formatearKm(desdeMiCasaKm)}
+            </Dato>
+          ) : (
+            <Dato titulo="Desde Dos Hermanas">
+              {sitio.tiempoCocheMin} min · {sitio.distanciaDesdeDosHermanasKm} km
+            </Dato>
+          )}
           <Dato titulo="Acceso">
             {ETIQUETA_DIFICULTAD[
               sitio.dificultadAcceso as DificultadAcceso

@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import { useEffect } from "react";
 import { ETIQUETA_TIPO_SITIO, type TipoSitio } from "@/lib/enums";
+import { formatearTiempo } from "@/lib/ubicacion";
 
 export type SitioMapa = {
   slug: string;
@@ -12,6 +13,8 @@ export type SitioMapa = {
   tipo: string;
   municipio: string;
   tiempoCocheMin: number;
+  /** Minutos estimados desde donde esté el visitante, si lo ha dicho. */
+  tiempoUsuarioMin?: number;
   latitud: number;
   longitud: number;
   avisoGrave: boolean;
@@ -92,7 +95,9 @@ export default function MapaLeaflet({ sitios }: { sitios: SitioMapa[] }) {
               {ETIQUETA_TIPO_SITIO[s.tipo as TipoSitio]} · {s.municipio}
             </span>
             <span className="block text-sm">
-              A {s.tiempoCocheMin} min en coche
+              {s.tiempoUsuarioMin !== undefined
+                ? `A aprox. ${formatearTiempo(s.tiempoUsuarioMin)} en coche`
+                : `A ${s.tiempoCocheMin} min en coche`}
             </span>
             {s.avisoGrave && (
               <span className="mt-1 block text-sm font-bold text-[#b3261e]">

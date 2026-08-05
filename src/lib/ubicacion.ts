@@ -139,6 +139,59 @@ export function formatearKm(km: number): string {
   return km < 10 ? `${km.toFixed(1)} km` : `${Math.round(km)} km`;
 }
 
+/**
+ * Cuánto se tarda en coche, estimado.
+ *
+ * Lo que la gente pregunta no es «cuántos kilómetros hay» sino «cuánto tardo».
+ * Un servicio de rutas de verdad —Google, OSRM— daría el minuto exacto, pero
+ * trae clave, coste y una llamada externa por cada sitio de la lista.
+ *
+ * Así que se estima en dos pasos, y los dos se quedan cortos a propósito:
+ *
+ *  1. **De la línea recta a la carretera.** En España la carretera es de media
+ *     un 25-30 % más larga que la línea recta. Se usa 1,3 porque los embalses
+ *     están donde están: al final de una comarcal con curvas, no en la autovía.
+ *  2. **De los kilómetros a los minutos.** A tramos, porque no se va igual en
+ *     los primeros veinte kilómetros que en doscientos de autovía.
+ *
+ * El resultado se redondea a cuartos de hora arriba de una hora: dar «87 min»
+ * finge una precisión que este cálculo no tiene. Y en la interfaz siempre va
+ * con su «aprox.» delante, porque es una estimación, no una ruta.
+ */
+export function tiempoEnCocheAprox(kmEnLineaRecta: number): number {
+  const porCarretera = kmEnLineaRecta * 1.3;
+
+  // km/h medios de cada tramo, acumulando: los primeros kilómetros son de
+  // travesía y rotondas; a partir de ahí ya se coge carretera abierta.
+  const tramos: [limiteKm: number, velocidad: number][] = [
+    [15, 40],
+    [50, 70],
+    [Infinity, 85],
+  ];
+
+  let restan = porCarretera;
+  let horas = 0;
+  let desde = 0;
+  for (const [limite, velocidad] of tramos) {
+    if (restan <= 0) break;
+    const enEsteTramo = Math.min(restan, limite - desde);
+    horas += enEsteTramo / velocidad;
+    restan -= enEsteTramo;
+    desde = limite;
+  }
+
+  const minutos = horas * 60;
+  return minutos < 60 ? Math.round(minutos / 5) * 5 : Math.round(minutos / 15) * 15;
+}
+
+/** «45 min», «1 h 15 min», «2 h». */
+export function formatearTiempo(minutos: number): string {
+  if (minutos < 60) return `${minutos} min`;
+  const horas = Math.floor(minutos / 60);
+  const resto = minutos % 60;
+  return resto === 0 ? `${horas} h` : `${horas} h ${resto} min`;
+}
+
 /** La cookie guarda «lat|lon|aproximada|etiqueta». Formato plano, sin JSON. */
 export function serializar(u: Ubicacion): string {
   return [

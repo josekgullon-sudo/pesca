@@ -10,7 +10,7 @@ import {
 } from "@/lib/ubicacion";
 
 /**
- * Elegir desde dónde se miden las distancias.
+ * Elegir desde dónde se miden las distancias y los tiempos.
  *
  * Dos vías a propósito. El GPS es preciso pero pide permiso, y mucha gente lo
  * deniega —con razón—; el código postal no pide nada y es lo que se teclea sin
@@ -19,8 +19,21 @@ import {
  * La elección se guarda en una cookie porque quien ordena la lista por
  * cercanía es el servidor: con localStorage habría que reordenar en el cliente
  * después de pintar, y se vería el salto.
+ *
+ * Sobre lo visible que tiene que ser: la primera versión era un enlace de
+ * texto pequeño al lado del contador de sitios, y no lo encontraba nadie. Si
+ * la web presume de decirte cuánto tardas, la casilla donde se dice desde
+ * dónde sales no puede estar escondida. De ahí la variante `barra`, que ocupa
+ * una franja entera y dice «código postal» con esas palabras.
  */
-export function SelectorUbicacion({ actual }: { actual: Ubicacion | null }) {
+export function SelectorUbicacion({
+  actual,
+  variante = "linea",
+}: {
+  actual: Ubicacion | null;
+  /** `barra` para cabeceras de página; `linea` para meterlo entre otros datos. */
+  variante?: "linea" | "barra";
+}) {
   const [abierto, setAbierto] = useState(false);
   const [cp, setCp] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -86,13 +99,63 @@ export function SelectorUbicacion({ actual }: { actual: Ubicacion | null }) {
   }
 
   if (!abierto) {
+    if (variante === "barra") {
+      return (
+        <div className="tarjeta flex flex-wrap items-center gap-x-5 gap-y-3 p-4">
+          <p className="flex-auto leading-relaxed">
+            {actual ? (
+              <>
+                <span aria-hidden className="mr-1.5">📍</span>
+                Tiempos y distancias desde{" "}
+                <strong>{actual.etiqueta}</strong>
+                {actual.aproximada && (
+                  <span className="text-texto-suave">
+                    {" "}
+                    — el código postal solo llega al centro de la provincia, así
+                    que son orientativos.
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                <strong>¿Cuánto tardas tú a cada embalse?</strong>{" "}
+                <span className="text-texto-suave">
+                  Pon tu código postal y la web recalcula las distancias y los
+                  tiempos desde tu casa, y ordena los sitios por lo que te pilla
+                  más cerca.
+                </span>
+              </>
+            )}
+          </p>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setAbierto(true)}
+              className="inline-flex min-h-touch items-center rounded-xl bg-acento px-5 font-bold text-acento-texto hover:brightness-110"
+            >
+              {actual ? "Cambiar" : "Poner mi código postal"}
+            </button>
+            {actual && (
+              <button
+                type="button"
+                onClick={borrar}
+                className="inline-flex min-h-touch items-center rounded-xl border-2 border-borde bg-fondo-elevado px-4 font-semibold hover:border-acento"
+              >
+                Quitar
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
         {actual ? (
           <>
             <span className="text-texto-suave">
-              Distancias desde <strong className="text-texto">{actual.etiqueta}</strong>
-              {actual.aproximada && " (aproximadas)"}
+              Desde <strong className="text-texto">{actual.etiqueta}</strong>
+              {actual.aproximada && " (aproximado)"}
             </span>
             <button
               type="button"
@@ -115,7 +178,7 @@ export function SelectorUbicacion({ actual }: { actual: Ubicacion | null }) {
             onClick={() => setAbierto(true)}
             className="font-semibold text-acento underline underline-offset-2"
           >
-            Ordenar por lo que me pilla más cerca
+            📍 Pon tu código postal y verás cuánto tardas
           </button>
         )}
       </div>
@@ -137,22 +200,13 @@ export function SelectorUbicacion({ actual }: { actual: Ubicacion | null }) {
       </div>
 
       <p className="mt-1 text-sm leading-relaxed text-texto-suave">
-        Sirve para ordenar los sitios por cercanía. No se envía a ninguna parte:
-        se guarda en tu navegador.
+        Sirve para calcular cuánto tardas a cada sitio y ordenarlos por
+        cercanía. No se envía a ninguna parte: se guarda en tu navegador.
       </p>
 
-      <button
-        type="button"
-        onClick={usarGps}
-        disabled={buscando}
-        className="mt-4 inline-flex min-h-touch w-full items-center justify-center rounded-xl bg-acento px-5 font-bold text-acento-texto disabled:opacity-60"
-      >
-        {buscando ? "Buscando el punto…" : "Usar mi ubicación"}
-      </button>
-
       <form onSubmit={usarCp} className="mt-4">
-        <label htmlFor="cp" className="block text-sm font-semibold">
-          O tu código postal
+        <label htmlFor="cp" className="block font-semibold">
+          Tu código postal
         </label>
         <div className="mt-1 flex gap-2">
           <input
@@ -163,22 +217,32 @@ export function SelectorUbicacion({ actual }: { actual: Ubicacion | null }) {
               setError(null);
             }}
             inputMode="numeric"
+            autoFocus
             maxLength={5}
             placeholder="41700"
             className="min-h-touch w-32 rounded-xl border-2 border-borde bg-fondo-elevado px-3 text-lg tabular-nums"
           />
           <button
             type="submit"
-            className="inline-flex min-h-touch items-center rounded-xl border-2 border-borde bg-fondo-elevado px-5 font-semibold hover:border-acento"
+            className="inline-flex min-h-touch items-center rounded-xl bg-acento px-6 font-bold text-acento-texto hover:brightness-110"
           >
             Usarlo
           </button>
         </div>
         <p className="mt-1 text-sm text-texto-suave">
-          Con el código postal la distancia sale desde el centro de tu
-          provincia, así que es orientativa.
+          Con el código postal la cuenta sale desde el centro de tu provincia,
+          así que es orientativa.
         </p>
       </form>
+
+      <button
+        type="button"
+        onClick={usarGps}
+        disabled={buscando}
+        className="mt-4 inline-flex min-h-touch w-full items-center justify-center rounded-xl border-2 border-borde bg-fondo-elevado px-5 font-semibold hover:border-acento disabled:opacity-60"
+      >
+        {buscando ? "Buscando el punto…" : "O usar mi ubicación (más exacto)"}
+      </button>
 
       {error && (
         <p role="alert" className="mt-3 rounded-lg bg-ambar-fondo p-3 text-ambar-texto">

@@ -4,6 +4,7 @@ import { BandaSitio } from "@/components/BandaSitio";
 import { FotoEspecie } from "@/components/FotoEspecie";
 import { MapaSitios } from "@/components/MapaSitios";
 import { Portada } from "@/components/Portada";
+import { SelectorUbicacion } from "@/components/SelectorUbicacion";
 import { usuarioOpcional } from "@/lib/auth";
 import { AVISO_COORDENADAS_APROXIMADAS } from "@/lib/avisos";
 import { formatearFechaCorta, formatearPeso } from "@/lib/formato";
@@ -11,6 +12,13 @@ import { ETIQUETA_TIPO_SITIO, type TipoSitio } from "@/lib/enums";
 import { prisma } from "@/lib/prisma";
 import { articulosPublicados } from "@/lib/blog";
 import { provinciasPublicadas, rutaDeSitios } from "@/lib/provincias";
+import {
+  distanciaKm,
+  formatearKm,
+  formatearTiempo,
+  tiempoEnCocheAprox,
+} from "@/lib/ubicacion";
+import { ubicacionActual } from "@/lib/ubicacion-servidor";
 
 // El título y la descripción los pone el layout —si se repitieran aquí, la
 // plantilla «%s · Mapa de Pesca» dejaría el nombre dos veces—, así que solo
@@ -29,7 +37,10 @@ function mesActual() {
 }
 
 export default async function Home() {
-  const usuario = await usuarioOpcional();
+  const [usuario, ubicacion] = await Promise.all([
+    usuarioOpcional(),
+    ubicacionActual(),
+  ]);
   const mes = mesActual();
 
   const [
@@ -104,7 +115,17 @@ export default async function Home() {
       return false;
     }
   });
-  const destacados = (enTemporada.length >= 3 ? enTemporada : sitios).slice(0, 3);
+  // Con ubicación, los tres que se enseñan son los que le pillan más cerca a
+  // quien mira, no los más cercanos a Dos Hermanas. Sin ella, el orden que
+  // trae la consulta.
+  const candidatos = enTemporada.length >= 3 ? enTemporada : sitios;
+  const destacados = (
+    ubicacion
+      ? candidatos
+          .map((s) => ({ ...s, distanciaUsuarioKm: distanciaKm(ubicacion, s) }))
+          .sort((a, b) => a.distanciaUsuarioKm - b.distanciaUsuarioKm)
+      : candidatos.map((s) => ({ ...s, distanciaUsuarioKm: undefined }))
+  ).slice(0, 3);
 
   // Los puntos del mapa de la portada. Se pintan todos los sitios cargados, no
   // solo los destacados: el mapa vale precisamente para ver el conjunto.
@@ -114,6 +135,9 @@ export default async function Home() {
     tipo: s.tipo,
     municipio: s.municipio,
     tiempoCocheMin: s.tiempoCocheMin,
+    tiempoUsuarioMin: ubicacion
+      ? tiempoEnCocheAprox(distanciaKm(ubicacion, s))
+      : undefined,
     latitud: s.latitud,
     longitud: s.longitud,
     avisoGrave: s.avisosSanitarios
@@ -193,6 +217,13 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* --- De dónde sale quien mira. Va pegado a la portada y no enterrado
+          más abajo: es lo que convierte una lista genérica de embalses en «lo
+          que tengo yo a mano», y si no se ve, no se usa. --- */}
+      <div className="contenedor pt-6">
+        <SelectorUbicacion actual={ubicacion} variante="barra" />
+      </div>
 
       <div className="contenedor space-y-16 py-12 md:py-16">
         {/* --- Qué es esto, para quien cae aquí desde Google y no sabe qué
@@ -358,7 +389,19 @@ export default async function Home() {
                       </div>
                     </div>
                     <p className="p-4 font-bold tabular-nums text-acento">
-                      A {s.tiempoCocheMin} min en coche
+                      {s.distanciaUsuarioKm !== undefined ? (
+                        <>
+                          A aprox.{" "}
+                          {formatearTiempo(
+                            tiempoEnCocheAprox(s.distanciaUsuarioKm),
+                          )}{" "}
+                          <span className="font-normal text-texto-suave">
+                            ({formatearKm(s.distanciaUsuarioKm)} en línea recta)
+                          </span>
+                        </>
+                      ) : (
+                        <>A {s.tiempoCocheMin} min en coche</>
+                      )}
                     </p>
                   </Link>
                 </li>

@@ -16,7 +16,7 @@ import { metadatosDePagina } from "@/lib/marca";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
 import { schemaMigas } from "@/lib/schema";
-import { distanciaKm } from "@/lib/ubicacion";
+import { distanciaKm, tiempoEnCocheAprox } from "@/lib/ubicacion";
 import { ubicacionActual } from "@/lib/ubicacion-servidor";
 
 export const dynamic = "force-dynamic";
@@ -59,7 +59,10 @@ export default async function PaginaProvincia({
 
   const [sitiosBrutos, especies] = await Promise.all([
     prisma.sitio.findMany({
-      where: { ...construirWhere(filtros), provinciaId: provincia.id },
+      where: {
+        ...construirWhere(filtros, { tiempoAparte: Boolean(ubicacion) }),
+        provinciaId: provincia.id,
+      },
       // Lo más cerca primero: casi siempre es el criterio que decide.
       orderBy: { tiempoCocheMin: "asc" },
       select: {
@@ -98,7 +101,17 @@ export default async function PaginaProvincia({
   // que es lo que trae la guía.
   const sitios = ubicacion
     ? sitiosBrutos
-        .map((s) => ({ ...s, distanciaUsuarioKm: distanciaKm(ubicacion, s) }))
+        .map((s) => {
+          const distanciaUsuarioKm = distanciaKm(ubicacion, s);
+          return {
+            ...s,
+            distanciaUsuarioKm,
+            tiempoUsuarioMin: tiempoEnCocheAprox(distanciaUsuarioKm),
+          };
+        })
+        // El filtro de tiempo, ahora sí, contra el suyo y no contra el de Dos
+        // Hermanas. Ver `construirWhere`.
+        .filter((s) => !filtros.tiempo || s.tiempoUsuarioMin <= filtros.tiempo)
         .sort((a, b) => a.distanciaUsuarioKm - b.distanciaUsuarioKm)
     : sitiosBrutos;
 
@@ -142,6 +155,12 @@ export default async function PaginaProvincia({
         </p>
       )}
 
+      {/* A ancho completo y antes de los filtros. Estaba en un enlace pequeño
+          al lado del contador de sitios y no lo veía nadie, que es tanto como
+          no tenerlo: sin esto la lista se ordena desde Dos Hermanas, que a
+          quien viene de fuera no le dice nada. */}
+      <SelectorUbicacion actual={ubicacion} variante="barra" />
+
       {/* En escritorio los filtros se quedan fijos a la izquierda mientras se
           recorre la lista; en móvil van arriba, plegados. */}
       <div className="md:grid md:grid-cols-[17rem_1fr] md:items-start md:gap-8">
@@ -157,7 +176,11 @@ export default async function PaginaProvincia({
               {sitios.length === 1 ? "1 sitio" : `${sitios.length} sitios`}
               {ubicacion && ", del más cercano al más lejano"}
             </p>
-            <SelectorUbicacion actual={ubicacion} />
+            {ubicacion && (
+              <p className="text-sm text-texto-suave">
+                Los tiempos en coche son estimados desde {ubicacion.etiqueta}.
+              </p>
+            )}
           </div>
 
           {sitios.length === 0 ? (
