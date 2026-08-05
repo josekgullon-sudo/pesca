@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BandaSitio } from "./BandaSitio";
+import { formatearKm } from "@/lib/ubicacion";
 import {
   ETIQUETA_DIFICULTAD,
   ETIQUETA_TIPO_SITIO,
@@ -8,6 +9,8 @@ import {
 } from "@/lib/enums";
 
 export type SitioTarjeta = {
+  /** Distancia en línea recta desde donde esté el visitante, si la ha dado. */
+  distanciaUsuarioKm?: number;
   slug: string;
   nombre: string;
   tipo: string;
@@ -83,13 +86,26 @@ export function TarjetaSitio({
                 {sitio.municipio}
               </p>
             </div>
+            {/* Si el visitante ha dicho de dónde sale, manda su distancia. La
+                de Dos Hermanas solo tiene sentido para quien vive allí. */}
             <p className="shrink-0 rounded-lg bg-black/45 px-2.5 py-1 text-right backdrop-blur-sm">
-              <span className="block font-bold tabular-nums text-white">
-                {sitio.tiempoCocheMin} min
-              </span>
-              <span className="block text-xs tabular-nums text-white/75">
-                {sitio.distanciaDesdeDosHermanasKm} km
-              </span>
+              {sitio.distanciaUsuarioKm !== undefined ? (
+                <>
+                  <span className="block font-bold tabular-nums text-white">
+                    {formatearKm(sitio.distanciaUsuarioKm)}
+                  </span>
+                  <span className="block text-xs text-white/75">en línea recta</span>
+                </>
+              ) : (
+                <>
+                  <span className="block font-bold tabular-nums text-white">
+                    {sitio.tiempoCocheMin} min
+                  </span>
+                  <span className="block text-xs tabular-nums text-white/75">
+                    {sitio.distanciaDesdeDosHermanasKm} km
+                  </span>
+                </>
+              )}
             </p>
           </div>
         </div>

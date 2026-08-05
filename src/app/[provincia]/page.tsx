@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { FiltrosSitios } from "@/components/FiltrosSitios";
+import { SelectorUbicacion } from "@/components/SelectorUbicacion";
 import { TarjetaSitio } from "@/components/TarjetaSitio";
 import { AVISO_ABUNDANCIAS_ESTIMADAS } from "@/lib/avisos";
 import {
@@ -15,6 +16,8 @@ import { metadatosDePagina } from "@/lib/marca";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
 import { schemaMigas } from "@/lib/schema";
+import { distanciaKm } from "@/lib/ubicacion";
+import { ubicacionActual } from "@/lib/ubicacion-servidor";
 
 export const dynamic = "force-dynamic";
 
@@ -52,8 +55,9 @@ export default async function PaginaProvincia({
   const { provincia: slugProvincia } = await params;
   const provincia = await cargarProvincia(slugProvincia);
   const filtros = leerFiltros(await searchParams);
+  const ubicacion = await ubicacionActual();
 
-  const [sitios, especies] = await Promise.all([
+  const [sitiosBrutos, especies] = await Promise.all([
     prisma.sitio.findMany({
       where: { ...construirWhere(filtros), provinciaId: provincia.id },
       // Lo más cerca primero: casi siempre es el criterio que decide.
@@ -67,6 +71,8 @@ export default async function PaginaProvincia({
         tiempoCocheMin: true,
         distanciaDesdeDosHermanasKm: true,
         tieneSombra: true,
+        latitud: true,
+        longitud: true,
         avisosSanitarios: true,
         esAreaDelimitadaEEI: true,
         imagenUrl: true,
@@ -86,6 +92,15 @@ export default async function PaginaProvincia({
       select: { slug: true, nombreComun: true },
     }),
   ]);
+
+  // Con ubicación, la lista se ordena por lo que pilla más cerca y cada tarjeta
+  // enseña esa distancia. Sin ella se mantiene el orden por tiempo en coche,
+  // que es lo que trae la guía.
+  const sitios = ubicacion
+    ? sitiosBrutos
+        .map((s) => ({ ...s, distanciaUsuarioKm: distanciaKm(ubicacion, s) }))
+        .sort((a, b) => a.distanciaUsuarioKm - b.distanciaUsuarioKm)
+    : sitiosBrutos;
 
   return (
     <div className="contenedor space-y-6 py-10 md:py-14">
@@ -137,9 +152,13 @@ export default async function PaginaProvincia({
         </div>
 
         <div className="mt-6 md:mt-0">
-          <p className="mb-4 font-semibold text-texto-suave">
-            {sitios.length === 1 ? "1 sitio" : `${sitios.length} sitios`}
-          </p>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="font-semibold text-texto-suave">
+              {sitios.length === 1 ? "1 sitio" : `${sitios.length} sitios`}
+              {ubicacion && ", del más cercano al más lejano"}
+            </p>
+            <SelectorUbicacion actual={ubicacion} />
+          </div>
 
           {sitios.length === 0 ? (
             <p className="tarjeta p-4 leading-relaxed">
