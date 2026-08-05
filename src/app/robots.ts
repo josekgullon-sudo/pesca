@@ -24,6 +24,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: ["/", "/media/sitios/", "/media/especies/"],
       disallow: [
+        "/admin",
         "/cuenta",
         "/entrar",
         "/registro",

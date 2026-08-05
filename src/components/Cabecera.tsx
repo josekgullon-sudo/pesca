@@ -9,6 +9,7 @@ import { NavegacionCabecera } from "./Navegacion";
 export async function Cabecera() {
   const [sesion, rutaSitios] = await Promise.all([auth(), rutaDeSitios()]);
   const nombre = sesion?.user?.name;
+  const esAdmin = sesion?.user?.rol === "admin";
 
   return (
     // Pegajosa en escritorio: los listados son largos y tener siempre a mano la
@@ -31,6 +32,14 @@ export async function Cabecera() {
 
         {nombre ? (
           <div className="flex shrink-0 items-center gap-1">
+            {esAdmin && (
+              <Link
+                href="/admin"
+                className="hidden min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-cabecera-texto hover:bg-white/10 md:inline-flex"
+              >
+                Admin
+              </Link>
+            )}
             <Link
               href="/cuenta"
               className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-cabecera-texto hover:bg-white/10"

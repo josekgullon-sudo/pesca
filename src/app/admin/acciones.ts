@@ -102,3 +102,178 @@ export async function subirFoto(
   revalidatePath("/", "layout");
   return { ok: "Foto cambiada." };
 }
+
+// ---------------------------------------------------------------------------
+// Artículos del blog
+// ---------------------------------------------------------------------------
+
+export type EstadoArticulo = { error: string } | { ok: string; slug: string } | null;
+
+/** Convierte un título en algo que sirva de URL. */
+function aSlug(texto: string): string {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 70);
+}
+
+/**
+ * Crea o actualiza un artículo.
+ *
+ * El slug se calcula del título la primera vez y **no se vuelve a tocar** al
+ * editar: cambiarlo rompería el enlace que ya esté indexado o compartido, y
+ * dejaría un 404 donde había contenido.
+ */
+export async function guardarArticulo(
+  _previo: EstadoArticulo,
+  fd: FormData,
+): Promise<EstadoArticulo> {
+  try {
+    await exigirAdmin();
+  } catch {
+    return { error: "Solo un administrador puede escribir artículos." };
+  }
+
+  const slugExistente = texto(fd, "slug");
+  const titulo = texto(fd, "titulo");
+  const entradilla = texto(fd, "entradilla");
+  const contenido = texto(fd, "contenido");
+  const provinciaId = texto(fd, "provinciaId");
+  const publicada = fd.get("publicada") === "si";
+
+  if (titulo.length < 5) return { error: "El título es demasiado corto." };
+  if (entradilla.length < 20) {
+    return { error: "La entradilla es lo que sale en Google: escribe al menos una frase." };
+  }
+  if (contenido.length < 100) return { error: "El artículo es demasiado corto." };
+
+  const datos = {
+    titulo,
+    entradilla,
+    contenido,
+    publicada,
+    provinciaId: provinciaId || null,
+  };
+
+  try {
+    if (slugExistente) {
+      const antes = await prisma.articulo.findUnique({
+        where: { slug: slugExistente },
+        select: { publicadaEl: true },
+      });
+      await prisma.articulo.update({
+        where: { slug: slugExistente },
+        data: {
+          ...datos,
+          // La fecha se pone la primera vez que se publica y ya no se mueve.
+          publicadaEl: antes?.publicadaEl ?? (publicada ? new Date() : null),
+        },
+      });
+      revalidatePath("/blog");
+      revalidatePath(`/blog/${slugExistente}`);
+      return { ok: "Guardado.", slug: slugExistente };
+    }
+
+    const slug = aSlug(titulo);
+    if (!slug) return { error: "Del título no sale una dirección válida." };
+    if (await prisma.articulo.findUnique({ where: { slug }, select: { id: true } })) {
+      return { error: `Ya hay un artículo en /blog/${slug}. Cambia el título.` };
+    }
+
+    await prisma.articulo.create({
+      data: { slug, ...datos, publicadaEl: publicada ? new Date() : null },
+    });
+    revalidatePath("/blog");
+    return { ok: "Artículo creado.", slug };
+  } catch {
+    return { error: "No se ha podido guardar." };
+  }
+}
+
+/** Publica o retira un artículo sin abrirlo. */
+export async function alternarPublicacion(fd: FormData): Promise<void> {
+  await exigirAdmin();
+  const slug = texto(fd, "slug");
+  const a = await prisma.articulo.findUnique({
+    where: { slug },
+    select: { publicada: true, publicadaEl: true },
+  });
+  if (!a) return;
+
+  await prisma.articulo.update({
+    where: { slug },
+    data: {
+      publicada: !a.publicada,
+      publicadaEl: a.publicadaEl ?? (!a.publicada ? new Date() : null),
+    },
+  });
+  revalidatePath("/blog");
+  revalidatePath("/admin/articulos");
+}
+
+// ---------------------------------------------------------------------------
+// Provincias
+// ---------------------------------------------------------------------------
+
+export type EstadoProvincia = { error: string } | { ok: string } | null;
+
+/**
+ * Textos legales y descripción de una provincia.
+ *
+ * Publicar una provincia sin su listado de áreas delimitadas para especies
+ * invasoras es peligroso: ese dato decide si un black bass se devuelve al agua
+ * o hay obligación de sacrificarlo. Por eso no se deja marcar «publicada» si
+ * ese campo está vacío.
+ */
+export async function guardarProvincia(
+  _previo: EstadoProvincia,
+  fd: FormData,
+): Promise<EstadoProvincia> {
+  try {
+    await exigirAdmin();
+  } catch {
+    return { error: "Solo un administrador puede tocar esto." };
+  }
+
+  const slug = texto(fd, "slug");
+  const areasDelimitadasEEI = texto(fd, "areasDelimitadasEEI");
+  const publicada = fd.get("publicada") === "si";
+
+  if (publicada && areasDelimitadasEEI.length < 30) {
+    return {
+      error:
+        "No se puede publicar una provincia sin su listado de áreas delimitadas " +
+        "para especies invasoras. Es el dato que decide si un black bass se " +
+        "devuelve al agua o hay que sacrificarlo.",
+    };
+  }
+
+  const sitios = await prisma.sitio.count({ where: { provincia: { slug } } });
+  if (publicada && sitios === 0) {
+    return {
+      error:
+        "Esta provincia no tiene ningún sitio cargado. Publicarla dejaría una " +
+        "página vacía, que es lo que Google penaliza como página puente.",
+    };
+  }
+
+  try {
+    await prisma.provincia.update({
+      where: { slug },
+      data: {
+        descripcion: texto(fd, "descripcion"),
+        areasDelimitadasEEI,
+        notasLegales: texto(fd, "notasLegales"),
+        urlOrdenDeVedas: texto(fd, "urlOrdenDeVedas") || null,
+        publicada,
+      },
+    });
+    revalidatePath("/", "layout");
+    return { ok: publicada ? "Guardado y publicada." : "Guardado. Sigue sin publicar." };
+  } catch {
+    return { error: "No se ha podido guardar." };
+  }
+}
