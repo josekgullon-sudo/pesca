@@ -33,6 +33,7 @@ export function EditorProvincia({
     guardarProvincia,
     null,
   );
+  const sinEEI = provincia.areasDelimitadasEEI.trim().length < 30;
 
   return (
     <div className="space-y-6">
@@ -153,8 +154,34 @@ export function EditorProvincia({
           <span>
             <span className="font-semibold">Publicada</span>
             <span className="block text-sm text-texto-suave">
-              Sin marcar, /{provincia.slug} devuelve 404 y no entra en el
-              sitemap.
+              Sin marcar, /{provincia.slug} solo la ves tú, en vista previa: al
+              resto del mundo le devuelve 404 y no entra en el sitemap.
+            </span>
+          </span>
+        </label>
+
+        {/* La salida cuando falta el listado. No es un atajo para saltarse el
+            aviso: es la forma de publicarlo *con* el aviso, y de que quien lo
+            marca sepa lo que está marcando. */}
+        <label className="flex items-start gap-3 rounded-xl border-2 border-rojo-texto/30 bg-rojo-fondo p-4 text-rojo-texto">
+          <input
+            type="checkbox"
+            name="publicarConAviso"
+            value="si"
+            defaultChecked={sinEEI && provincia.publicada}
+            className="mt-1 h-5 w-5"
+          />
+          <span>
+            <span className="font-bold">
+              Publicar aunque falte el listado de áreas EEI
+            </span>
+            <span className="mt-1 block max-w-prose leading-relaxed">
+              La página sale con un aviso en rojo arriba del todo diciendo que
+              no hemos contrastado qué embalses están dentro de las áreas
+              delimitadas, y remitiendo a la orden de vedas. El resto de la
+              guía —dónde está cada sitio, cómo se llega, qué hay— vale igual.
+              En cuanto pegues el listado y marques los sitios, el aviso
+              desaparece solo.
             </span>
           </span>
         </label>

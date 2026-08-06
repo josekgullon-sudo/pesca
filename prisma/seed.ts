@@ -105,13 +105,17 @@ const PROVINCIAS: ProvinciaSeed[] = [
       "seguro de responsabilidad civil.",
     urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA,
   },
-  // --- Pendientes de la orden de vedas. No se publican hasta tenerla. ---
+  // --- Cádiz va publicada con aviso; el resto, pendientes. ---
   //
   // Sitios y descripción sí llevan: lo que falta es el listado de áreas
   // delimitadas para especies exóticas invasoras de cada provincia, que sale
   // del boletín y no se deduce. Ver el comentario de cabecera de andalucia.ts.
   { slug: "huelva", nombre: "Huelva", comunidad: "Andalucía", latitud: 37.6, longitud: -6.9, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.huelva },
-  { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: false, descripcion: DESCRIPCION_CADIZ, notasLegales: NOTAS_LEGALES_CADIZ },
+  // Publicada sin su listado de áreas delimitadas, a propósito y con el aviso
+  // en rojo que sale arriba de /cadiz mientras `areasDelimitadasEEI` esté
+  // vacío. Los nueve sitios siguen con `eeiComprobado: false`: la web dice que
+  // no lo sabe, que es distinto de decir que no están en el área.
+  { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: true, descripcion: DESCRIPCION_CADIZ, notasLegales: NOTAS_LEGALES_CADIZ, urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA },
   { slug: "malaga", nombre: "Málaga", comunidad: "Andalucía", latitud: 36.8, longitud: -4.6, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.malaga },
   { slug: "cordoba", nombre: "Córdoba", comunidad: "Andalucía", latitud: 38.0, longitud: -4.8, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.cordoba },
   { slug: "jaen", nombre: "Jaén", comunidad: "Andalucía", latitud: 38.0, longitud: -3.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.jaen },

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AvisoBorrador } from "@/components/AvisoBorrador";
+import { AvisoEEIProvincia } from "@/components/AvisoEEIProvincia";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { FiltrosSitios } from "@/components/FiltrosSitios";
 import { SelectorUbicacion } from "@/components/SelectorUbicacion";
@@ -63,6 +64,9 @@ export default async function PaginaProvincia({
   // Si se está viendo sin publicar es que quien mira es administrador:
   // `cargarProvincia` responde 404 a cualquier otro.
   const enBorrador = !provincia.publicada;
+  // Publicada pero sin el listado de la orden de vedas. Se puede —el resto de
+  // la guía vale igual—, pero entonces hay que decirlo bien alto.
+  const sinListadoEEI = provincia.areasDelimitadasEEI.trim().length < 30;
   const filtros = leerFiltros(await searchParams);
   const ubicacion = await ubicacionActual();
 
@@ -167,6 +171,18 @@ export default async function PaginaProvincia({
         <p className="max-w-prose text-lg leading-relaxed text-texto-suave">
           {provincia.descripcion}
         </p>
+      )}
+
+      {/* Si la provincia está publicada sin su listado de áreas delimitadas,
+          el aviso va aquí: arriba, antes de ver un solo embalse. Abajo, junto
+          al resto de notas legales, no lo leería nadie, y el silencio en este
+          punto concreto se interpreta como «no está en área delimitada», que
+          es la respuesta que manda sacrificar el pez. */}
+      {sinListadoEEI && (
+        <AvisoEEIProvincia
+          provincia={provincia.nombre}
+          urlOrdenDeVedas={provincia.urlOrdenDeVedas}
+        />
       )}
 
       {/* A ancho completo y antes de los filtros. Estaba en un enlace pequeño

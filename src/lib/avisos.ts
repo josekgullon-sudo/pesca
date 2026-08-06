@@ -43,6 +43,29 @@ export const AVISO_FUERA_DE_AREA_DELIMITADA =
  * sacrificar el pez; la segunda no manda nada. Confundirlas es la forma más
  * fácil que tiene esta web de hacer daño de verdad.
  */
+/**
+ * Lo que se dice en una provincia publicada de la que todavía no tenemos el
+ * listado de áreas delimitadas.
+ *
+ * Publicar así es una decisión legítima —las fichas valen igual para saber
+ * dónde están los embalses, cómo se llega y qué hay— pero con una condición
+ * innegociable: que la web lo diga. Si se calla, el visitante lee el silencio
+ * como «no está en área delimitada», y esa es justo la respuesta que obliga a
+ * sacrificar el pez. Por eso este aviso va arriba del todo y no en el pie.
+ */
+export const TITULO_EEI_PROVINCIA_SIN_LISTADO =
+  "Ojo: no tenemos el listado de áreas para especies invasoras de esta provincia";
+
+export const AVISO_EEI_PROVINCIA_SIN_LISTADO =
+  "En Andalucía, el black bass, el lucio, la carpa común y la trucha arcoíris " +
+  "solo se pueden devolver al agua dentro de unas aguas concretas —las áreas " +
+  "delimitadas—. Fuera de ellas hay obligación de sacrificarlos. Ese listado " +
+  "va por provincia, sale de la orden de vedas y todavía no lo hemos " +
+  "contrastado para esta: no sabemos cuáles de estos embalses están dentro y " +
+  "cuáles no, y no vamos a suponerlo. Todo lo demás de la guía sirve igual, " +
+  "pero antes de decidir qué haces con uno de esos cuatro peces, míralo en el " +
+  "boletín oficial.";
+
 export const AVISO_EEI_SIN_COMPROBAR =
   "Todavía no hemos comprobado si este sitio está dentro de las áreas " +
   "delimitadas para especies exóticas invasoras. Míralo en la orden de vedas " +

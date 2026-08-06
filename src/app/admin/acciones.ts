@@ -241,15 +241,8 @@ export async function guardarProvincia(
   const slug = texto(fd, "slug");
   const areasDelimitadasEEI = texto(fd, "areasDelimitadasEEI");
   const publicada = fd.get("publicada") === "si";
-
-  if (publicada && areasDelimitadasEEI.length < 30) {
-    return {
-      error:
-        "No se puede publicar una provincia sin su listado de áreas delimitadas " +
-        "para especies invasoras. Es el dato que decide si un black bass se " +
-        "devuelve al agua o hay que sacrificarlo.",
-    };
-  }
+  // Publicar reconociendo que no tenemos el listado. Ver más abajo.
+  const conAviso = fd.get("publicarConAviso") === "si";
 
   const sitios = await prisma.sitio.count({ where: { provincia: { slug } } });
   if (publicada && sitios === 0) {
@@ -260,24 +253,32 @@ export async function guardarProvincia(
     };
   }
 
-  // El listado de la provincia no basta: hay que haber mirado sitio por sitio
-  // cuáles salen en él. Mientras queden sin comprobar, la web tendría que
-  // decir «no lo sé» en una página publicada, y eso no se sostiene.
-  const sinComprobar = await prisma.sitio.findMany({
+  // Falta el listado de áreas delimitadas, o falta comprobar sitios contra él.
+  //
+  // Publicar así es una decisión que se puede tomar: el resto de la guía
+  // —dónde está cada embalse, cómo se llega, qué hay— vale exactamente igual.
+  // Lo que no se puede es publicarla en silencio, porque entonces el visitante
+  // lee la ausencia del dato como «no está en área delimitada» y esa es la
+  // respuesta que obliga a sacrificar el pez.
+  //
+  // Así que no se bloquea: se pide decirlo a propósito, y la provincia sale
+  // con el aviso en rojo arriba del todo. Marcar esta casilla es asumir eso.
+  const sinComprobar = await prisma.sitio.count({
     where: { provincia: { slug }, eeiComprobado: false },
-    select: { nombre: true },
-    orderBy: { nombre: "asc" },
   });
-  if (publicada && sinComprobar.length > 0) {
-    const nombres = sinComprobar.slice(0, 5).map((s) => s.nombre).join(", ");
+  const faltaEEI = areasDelimitadasEEI.length < 30 || sinComprobar > 0;
+
+  if (publicada && faltaEEI && !conAviso) {
+    const queFalta =
+      areasDelimitadasEEI.length < 30
+        ? "Falta el listado de áreas delimitadas para especies invasoras."
+        : `Quedan ${sinComprobar} sitios sin comprobar contra el listado.`;
     return {
       error:
-        `Quedan ${sinComprobar.length} sitios sin comprobar contra el listado ` +
-        `de áreas delimitadas: ${nombres}` +
-        (sinComprobar.length > 5 ? " y otros más." : ".") +
-        " Hasta que se sepa de cada uno si está dentro o fuera, la provincia " +
-        "no se puede publicar: de eso depende si un black bass se devuelve al " +
-        "agua o hay que sacrificarlo.",
+        `${queFalta} Es el dato que decide si un black bass se devuelve al ` +
+        "agua o hay que sacrificarlo. Puedes publicarla igualmente, pero " +
+        "entonces marca la casilla de abajo: la página saldrá con un aviso " +
+        "en rojo diciendo que no lo sabemos, que es lo único honesto.",
     };
   }
 
