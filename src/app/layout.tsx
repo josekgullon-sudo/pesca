@@ -101,6 +101,11 @@ export default async function RootLayout({
                         </Link>
                       </li>
                       <li>
+                        <Link href="/calendario" className="hover:text-acento">
+                          Calendario solunar
+                        </Link>
+                      </li>
+                      <li>
                         <Link href="/especies" className="hover:text-acento">
                           Especies
                         </Link>

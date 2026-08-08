@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Prisma } from "@/generated/prisma/client";
 import { AvisoBorrador } from "@/components/AvisoBorrador";
 import { AvisoLegal } from "@/components/AvisoLegal";
+import { ResumenSolunar } from "@/components/ResumenSolunar";
 import { BarraAbundancia } from "@/components/BarraAbundancia";
 import { CapturasDelSitio } from "@/components/CapturasDelSitio";
 import { BandaSitio } from "@/components/BandaSitio";
@@ -40,6 +41,7 @@ import {
   tiempoEnCocheAprox,
 } from "@/lib/ubicacion";
 import { ubicacionActual } from "@/lib/ubicacion-servidor";
+import { diaLocalDe, medianocheLocal } from "@/lib/fechas-solunar";
 
 export const dynamic = "force-dynamic";
 
@@ -184,6 +186,9 @@ export default async function FichaSitio({
   // Si el visitante ha dicho de dónde sale, el dato de cabecera es el suyo. El
   // de Dos Hermanas solo le sirve a quien vive en Dos Hermanas.
   const desdeMiCasaKm = ubicacion ? distanciaKm(ubicacion, sitio) : null;
+
+  const local = diaLocalDe(new Date());
+  const hoy = medianocheLocal(local.anio, local.mes, local.dia);
 
   const avisoGrave = sitio.avisosSanitarios
     .toUpperCase()
@@ -366,6 +371,15 @@ export default async function FichaSitio({
         <p className="max-w-prose leading-relaxed">{sitio.descripcion}</p>
       </section>
 
+      <ResumenSolunar
+        latitud={sitio.latitud}
+        longitud={sitio.longitud}
+        mejorEpoca={sitio.mejorEpoca}
+        hoy={hoy}
+        enlaceCalendario={`/${provincia.slug}/${sitio.slug}/calendario`}
+        titulo={`Cuándo ir a ${sitio.nombre}`}
+      />
+
       <section>
         <h2 className="mb-2 text-xl font-bold">Cómo se llega</h2>
         <p className="max-w-prose leading-relaxed">{sitio.accesoDescripcion}</p>
@@ -373,13 +387,6 @@ export default async function FichaSitio({
         {/* Aquí es donde alguien se pregunta cuánto tarda, así que aquí es
             donde tiene sentido poder decir de dónde sale. Solo se monta una
             vez en la página: el formulario lleva ids y duplicarlo los rompe. */}
-        <Link
-          href={`/${provincia.slug}/${sitio.slug}/calendario`}
-          className="mt-4 inline-flex min-h-touch items-center rounded-xl border-2 border-borde bg-fondo-elevado px-5 font-semibold hover:border-acento"
-        >
-          🌙 Calendario solunar de {sitio.nombre}
-        </Link>
-
         <div className="mt-4">
           <SelectorUbicacion actual={ubicacion} variante="linea" />
           {desdeMiCasaKm !== null && (

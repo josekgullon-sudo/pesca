@@ -451,7 +451,13 @@ function solape(a: Periodo, b: Periodo): number {
 
 export function indiceDePesca(
   dia: DiaSolunar,
-  opciones: { enTemporada?: boolean } = {},
+  /**
+   * `enTemporada` en `null` significa que no se sabe, no que sea que no: es el
+   * caso del calendario general, donde todavía no hay un embalse elegido.
+   * Entonces esa pata sale del reparto y las otras dos se reescalan a 100, en
+   * vez de restar puntos por un dato que nadie ha comprobado.
+   */
+  opciones: { enTemporada?: boolean | null } = {},
 ): Indice {
   // --- Luz: solape de los periodos con las dos horas de penumbra ---
   const franjas: Periodo[] = [];
@@ -472,9 +478,17 @@ export function indiceDePesca(
   const ciclo = (Math.cos(4 * Math.PI * dia.fase.fraccion) + 1) / 2;
   const luna = Math.round(MAX.luna * ciclo);
 
-  const temporada = opciones.enTemporada ? MAX.temporada : Math.round(MAX.temporada * 0.4);
+  const sinSitio = opciones.enTemporada === null || opciones.enTemporada === undefined;
+  const temporada = sinSitio
+    ? 0
+    : opciones.enTemporada
+      ? MAX.temporada
+      : Math.round(MAX.temporada * 0.4);
 
-  const total = luz + luna + temporada;
+  // Sin temporada, luz y luna reparten los 100 puntos entre las dos.
+  const total = sinSitio
+    ? Math.round(((luz + luna) / (MAX.luz + MAX.luna)) * 100)
+    : luz + luna + temporada;
   const { titular, descripcion } = etiquetaDe(total);
 
   return { total, desglose: { luz, luna, temporada }, titular, descripcion };

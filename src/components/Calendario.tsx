@@ -124,6 +124,7 @@ export function Calendario({
   mes,
   hoy,
   baseUrl,
+  paramsExtra,
   nombreSitio,
 }: {
   punto: Punto;
@@ -132,15 +133,30 @@ export function Calendario({
   mes: number;
   /** Medianoche local de hoy, para marcarlo y para los próximos siete días. */
   hoy: Date;
-  /** Ruta de esta página, para navegar entre meses. */
+  /** Ruta de esta página, sin parámetros, para navegar entre meses. */
   baseUrl: string;
+  /** Parámetros que hay que conservar al cambiar de mes (p. ej. el embalse). */
+  paramsExtra?: Record<string, string>;
   nombreSitio: string;
 }) {
-  const buenos = mesesBuenos(mejorEpoca);
+  // Se construye con URLSearchParams y no pegando cadenas: con un `?sitio=x`
+  // ya en la base, concatenar otro `?` deja la dirección rota.
+  const urlDeMes = (a: number, m: number) => {
+    const p = new URLSearchParams({ ...paramsExtra, anio: String(a), mes: String(m) });
+    return `${baseUrl}?${p.toString()}`;
+  };
+  // Cadena vacía = no hay embalse elegido y por tanto no se sabe si es su
+  // época. Eso es distinto de saber que no lo es. Ver `indiceDePesca`.
+  const buenos = mejorEpoca ? mesesBuenos(mejorEpoca) : null;
 
   const calcular = (medianoche: Date, mesDelDia: number) => {
     const d = diaSolunar(medianoche, punto.latitud, punto.longitud);
-    return { d, i: indiceDePesca(d, { enTemporada: buenos.includes(mesDelDia) }) };
+    return {
+      d,
+      i: indiceDePesca(d, {
+        enTemporada: buenos ? buenos.includes(mesDelDia) : null,
+      }),
+    };
   };
 
   const deHoy = calcular(hoy, new Date(hoy.getTime() + 43200000).getUTCMonth() + 1);
@@ -247,12 +263,19 @@ export function Calendario({
             maximo={MAXIMOS_DESGLOSE.luna}
             nota="Máximo en luna nueva y llena. Es tradición, no está demostrado."
           />
-          <Barra
-            etiqueta="Temporada"
-            valor={deHoy.i.desglose.temporada}
-            maximo={MAXIMOS_DESGLOSE.temporada}
-            nota={`Si ${nombreSitio} está en su mejor época este mes.`}
-          />
+          {buenos ? (
+            <Barra
+              etiqueta="Temporada"
+              valor={deHoy.i.desglose.temporada}
+              maximo={MAXIMOS_DESGLOSE.temporada}
+              nota={`Si ${nombreSitio} está en su mejor época este mes.`}
+            />
+          ) : (
+            <p className="text-xs leading-relaxed text-texto-suave">
+              La época del año también cuenta, pero eso depende del embalse.
+              Elige uno abajo y entra en la nota.
+            </p>
+          )}
         </section>
       </div>
 
@@ -296,13 +319,13 @@ export function Calendario({
           <h2 className="titulo-seccion font-bold">{mesLargo(medianocheLocal(anio, mes, 15))}</h2>
           <div className="flex gap-2">
             <Link
-              href={`${baseUrl}?anio=${mesAnterior.a}&mes=${mesAnterior.m}`}
+              href={urlDeMes(mesAnterior.a, mesAnterior.m)}
               className="inline-flex min-h-touch items-center rounded-xl border-2 border-borde bg-fondo-elevado px-4 font-semibold hover:border-acento"
             >
               ← Anterior
             </Link>
             <Link
-              href={`${baseUrl}?anio=${mesSiguiente.a}&mes=${mesSiguiente.m}`}
+              href={urlDeMes(mesSiguiente.a, mesSiguiente.m)}
               className="inline-flex min-h-touch items-center rounded-xl border-2 border-borde bg-fondo-elevado px-4 font-semibold hover:border-acento"
             >
               Siguiente →

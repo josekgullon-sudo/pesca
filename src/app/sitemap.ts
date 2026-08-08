@@ -38,6 +38,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const fijas: MetadataRoute.Sitemap = [
     { url: urlAbsoluta("/"), changeFrequency: "daily", priority: 1 },
     { url: urlAbsoluta("/especies"), changeFrequency: "monthly", priority: 0.8 },
+    // Cambia de nota cada día, y es de las páginas a las que la gente vuelve.
+    { url: urlAbsoluta("/calendario"), changeFrequency: "daily", priority: 0.9 },
     { url: urlAbsoluta("/ranking"), changeFrequency: "daily", priority: 0.7 },
     { url: urlAbsoluta("/capturas"), changeFrequency: "daily", priority: 0.4 },
     { url: urlAbsoluta("/blog"), changeFrequency: "weekly", priority: 0.8 },

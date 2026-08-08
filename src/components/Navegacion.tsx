@@ -19,7 +19,7 @@ import { usePathname } from "next/navigation";
  */
 
 /** Rutas que tienen su propia pestaña. Lo demás cuelga de una provincia. */
-const RUTAS_PROPIAS = ["/especies", "/capturas", "/ranking", "/blog", "/entrar", "/registro", "/cuenta", "/normas", "/aviso-legal"];
+const RUTAS_PROPIAS = ["/calendario", "/especies", "/capturas", "/ranking", "/blog", "/entrar", "/registro", "/cuenta", "/normas", "/aviso-legal"];
 
 /** El destino del mapa lo decide el servidor, igual que el de los sitios. */
 const MARCA_MAPA = "__mapa__";
@@ -56,6 +56,15 @@ const ENLACES: Enlace[] = [
     activo: (r) => r.endsWith("/mapa"),
   },
   {
+    // Se consulta antes de cada salida, así que va en la barra de móvil. La
+    // que sale para hacerle sitio es Ranking, que se mira de vez en cuando y
+    // no antes de coger el coche.
+    href: "/calendario",
+    etiqueta: "Calendario",
+    icono: IconoLuna,
+    activo: (r) => r.startsWith("/calendario") || r.endsWith("/calendario"),
+  },
+  {
     href: "/especies",
     etiqueta: "Especies",
     icono: IconoPez,
@@ -72,6 +81,7 @@ const ENLACES: Enlace[] = [
     etiqueta: "Ranking",
     icono: IconoRanking,
     activo: (r) => r.startsWith("/ranking"),
+    soloEscritorio: true,
   },
   {
     href: "/blog",
@@ -271,6 +281,23 @@ function IconoPez({ activo }: PropsIcono) {
       <path d="M2.5 12c3-4.5 6.8-6.5 10.5-6.5S19.5 8 21.5 12c-2 4-5.3 6.5-8.5 6.5S5.5 16.5 2.5 12Z" />
       <path d="M21.5 12s.5-2.5.5-4c-1.5.5-3 2-3 2" />
       <circle cx="8" cy="10.5" r=".9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function IconoLuna({ activo }: PropsIcono) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="h-6 w-6"
+      fill={activo ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" />
     </svg>
   );
 }
