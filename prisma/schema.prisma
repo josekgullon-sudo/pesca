@@ -204,9 +204,10 @@ model Especie {
   /// Cómo y dónde buscarla (bloque libre para la ficha de especie).
   comoPescarla String @default("")
 
-  sitios   SitioEspecie[]
-  aparejos AparejoEspecie[]
-  capturas Captura[]
+  sitios    SitioEspecie[]
+  aparejos  AparejoEspecie[]
+  capturas  Captura[]
+  articulos Articulo[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -425,6 +426,15 @@ model Articulo {
   /// enlazarlos entre sí. Opcional: los hay que valen para toda España.
   provinciaId String?
   provincia   Provincia? @relation(fields: [provinciaId], references: [id], onDelete: SetNull)
+
+  /// De qué especie va, si va de una.
+  ///
+  /// Sirve para que la ficha de la especie enlace a sus artículos. Hasta ahora
+  /// los enlaces iban en un solo sentido —el artículo enlazaba a la ficha,
+  /// nunca al revés—, así que la página que recibe las visitas de Google era
+  /// un callejón sin salida y no repartía nada a lo demás.
+  especieId String?
+  especie   Especie? @relation(fields: [especieId], references: [id], onDelete: SetNull)
 
   imagenUrl      String?
   imagenAutor    String?

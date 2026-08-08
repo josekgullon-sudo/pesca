@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArticulosRelacionados } from "@/components/ArticulosRelacionados";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { BarraAbundancia } from "@/components/BarraAbundancia";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
@@ -20,6 +21,7 @@ import {
 } from "@/lib/enums";
 import { metadatosDePagina } from "@/lib/marca";
 import { usuarioOpcional } from "@/lib/auth";
+import { articulosDe } from "@/lib/blog";
 import { prisma } from "@/lib/prisma";
 import { schemaEspecie, schemaMigas } from "@/lib/schema";
 
@@ -97,9 +99,10 @@ export default async function FichaEspecie({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [especie, usuario] = await Promise.all([
+  const [especie, usuario, articulos] = await Promise.all([
     cargarEspecie(slug),
     usuarioOpcional(),
+    articulosDe({ especieSlug: slug }),
   ]);
   if (!especie) notFound();
 
@@ -321,6 +324,7 @@ export default async function FichaEspecie({
               </ul>
             </section>
           )}
+          <ArticulosRelacionados articulos={articulos} />
         </div>
 
         <aside className="mt-8 space-y-6 lg:mt-0 lg:sticky lg:top-6">

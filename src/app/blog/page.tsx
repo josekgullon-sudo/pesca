@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { articulosPublicados } from "@/lib/blog";
+import { articulosPublicados, imagenDe } from "@/lib/blog";
 import { formatearFecha } from "@/lib/formato";
 import { metadatosDePagina } from "@/lib/marca";
 
@@ -38,8 +38,22 @@ export default async function PaginaBlog() {
             <li key={a.slug}>
               <Link
                 href={`/blog/${a.slug}`}
-                className="tarjeta tarjeta-enlace flex h-full flex-col p-6"
+                className="tarjeta tarjeta-enlace flex h-full flex-col overflow-hidden"
               >
+                {(() => {
+                  const img = imagenDe(a);
+                  return img ? (
+                    <div className="aspect-[16/9] overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={img.url}
+                        alt=""
+                        className="foto-zoom h-full w-full object-cover"
+                      />
+                    </div>
+                  ) : null;
+                })()}
+                <div className="flex flex-auto flex-col p-6">
                 <p className="text-sm font-semibold text-acento">
                   {a.provincia ? a.provincia.nombre : "Toda España"}
                   {a.publicadaEl && ` · ${formatearFecha(a.publicadaEl)}`}
@@ -53,6 +67,7 @@ export default async function PaginaBlog() {
                 <span className="mt-4 font-semibold text-acento underline underline-offset-4">
                   Leer
                 </span>
+                </div>
               </Link>
             </li>
           ))}

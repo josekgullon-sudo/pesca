@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArticulosRelacionados } from "@/components/ArticulosRelacionados";
 import { AvisoBorrador } from "@/components/AvisoBorrador";
 import { AvisoEEIProvincia } from "@/components/AvisoEEIProvincia";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
@@ -16,6 +17,7 @@ import {
 } from "@/lib/filtros-sitios";
 import { metadatosDePagina } from "@/lib/marca";
 import { prisma } from "@/lib/prisma";
+import { articulosDe } from "@/lib/blog";
 import { cargarProvincia } from "@/lib/provincias";
 import { schemaMigas } from "@/lib/schema";
 import { distanciaKm, tiempoEnCocheAprox } from "@/lib/ubicacion";
@@ -70,7 +72,7 @@ export default async function PaginaProvincia({
   const filtros = leerFiltros(await searchParams);
   const ubicacion = await ubicacionActual();
 
-  const [sitiosBrutos, especies] = await Promise.all([
+  const [sitiosBrutos, especies, articulos] = await Promise.all([
     prisma.sitio.findMany({
       where: {
         ...construirWhere(filtros, { tiempoAparte: Boolean(ubicacion) }),
@@ -108,6 +110,7 @@ export default async function PaginaProvincia({
       orderBy: { nombreComun: "asc" },
       select: { slug: true, nombreComun: true },
     }),
+    articulosDe({ provinciaSlug: slugProvincia }),
   ]);
 
   // Con ubicación, la lista se ordena por lo que pilla más cerca y cada tarjeta
@@ -236,6 +239,16 @@ export default async function PaginaProvincia({
           <p className="mt-6 max-w-prose text-sm leading-relaxed text-texto-suave">
             {AVISO_ABUNDANCIAS_ESTIMADAS}
           </p>
+
+          {/* Los artículos de la provincia, enlazados desde la propia
+              provincia. Estaban escritos y solo se llegaba a ellos desde el
+              blog: la página que recibe las visitas no los mencionaba. */}
+          <div className="mt-8">
+            <ArticulosRelacionados
+              articulos={articulos}
+              titulo={`Guías de pesca en ${provincia.nombre}`}
+            />
+          </div>
 
           {provincia.areasDelimitadasEEI && (
             <section className="mt-8 rounded-xl border-2 border-ambar-texto/25 bg-ambar-fondo p-4 text-ambar-texto">

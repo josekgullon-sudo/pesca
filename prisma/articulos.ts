@@ -17,6 +17,12 @@ export type ArticuloSemilla = {
   entradilla: string;
   /** Slug de provincia, o null si vale para toda España. */
   provincia: string | null;
+  /**
+   * Slug de especie, si el artículo va de una. Sirve para que la ficha de la
+   * especie enlace de vuelta: hasta que existió esto, los enlaces iban en un
+   * solo sentido y la ficha era un callejón sin salida.
+   */
+  especie?: string;
   /** Días atrás desde hoy, para escalonar las fechas de publicación. */
   diasAtras: number;
   contenido: string;
@@ -89,6 +95,7 @@ Las tres se evitan mirando dos cosas antes de salir: qué especie tienes delante
     entradilla:
       "Depende del agua en la que estés, y la respuesta correcta en un embalse es delito en el de al lado. Cómo funcionan las áreas delimitadas.",
     provincia: "sevilla",
+    especie: "black-bass",
     diasAtras: 15,
     contenido: `Es la pregunta que más se hace y la que peor se responde en los foros, porque la respuesta correcta en un embalse es una infracción en el de al lado.
 
@@ -267,6 +274,7 @@ En la [ficha de cada sitio](/sevilla) tienes marcados los meses buenos, y en los
     entradilla:
       "Maíz, masilla, boilies o lombriz: cuándo funciona cada uno, qué cuesta y con cuál empezar si no has pescado carpa nunca.",
     provincia: null,
+    especie: "carpa-comun",
     diasAtras: 30,
     contenido: `La carpa come casi de todo, y esa es la buena noticia: es la especie con la que más barato se empieza y la que más veces salva un día. La mala es que en un embalse con mucha presión se vuelve desconfiada y ahí sí empieza a importar lo que le pongas.
 
@@ -409,6 +417,7 @@ Cuál es cuál, en la [guía de especies](/especies).`,
     entradilla:
       "Los embalses con mejor población de la provincia, qué señuelo llevar a cada uno y, sobre todo, en cuáles se puede devolver al agua y en cuáles no.",
     provincia: "sevilla",
+    especie: "black-bass",
     diasAtras: 12,
     contenido: `El black bass es la especie que mueve más pesca deportiva en la provincia, y Sevilla tiene sitios buenos de verdad. Antes de los sitios, lo que hay que saber sí o sí.
 
@@ -551,6 +560,7 @@ Ese listado va por provincia y cambia con la orden de vedas. **Míralo en el bol
     entradilla:
       "El cangrejo de las marismas está en media Andalucía, pero su pesca no está abierta y llevárselo vivo es otra infracción distinta. Qué dice la ley y por qué hay tanta información vieja rodando.",
     provincia: null,
+    especie: "cangrejo-rojo-americano",
     diasAtras: 0,
     contenido: `Si has enganchado uno pescando a fondo, o te has encontrado un montón en la orilla de un embalse, esto es lo que hay que saber. Va primero lo importante:
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
-import { articulo, articulosRelacionados } from "@/lib/blog";
+import { articulo, articulosRelacionados, imagenDe } from "@/lib/blog";
 import { formatearFecha } from "@/lib/formato";
 import { Markdown } from "@/lib/markdown";
 import { metadatosDePagina, NOMBRE, urlAbsoluta } from "@/lib/marca";
@@ -25,7 +25,7 @@ export async function generateMetadata({
     descripcion: a.entradilla.slice(0, 155),
     ruta: `/blog/${slug}`,
     tipo: "article",
-    imagen: a.imagenUrl,
+    imagen: imagenDe(a)?.url ?? null,
   });
 }
 
@@ -39,6 +39,7 @@ export default async function FichaArticulo({
   if (!a) notFound();
 
   const otros = await articulosRelacionados(slug);
+  const imagen = imagenDe(a);
 
   return (
     <article className="contenedor py-10 md:py-14">
@@ -56,7 +57,7 @@ export default async function FichaArticulo({
             // Sin autor personal: lo firma la web, que es de donde sale.
             author: { "@type": "Organization", name: NOMBRE },
             publisher: { "@type": "Organization", name: NOMBRE },
-            ...(a.imagenUrl ? { image: urlAbsoluta(a.imagenUrl) } : {}),
+            ...(imagen ? { image: urlAbsoluta(imagen.url) } : {}),
           },
           schemaMigas([
             { nombre: "Inicio", ruta: "/" },
@@ -100,6 +101,39 @@ export default async function FichaArticulo({
           <p className="mt-4 text-xl leading-relaxed text-texto-suave">
             {a.entradilla}
           </p>
+
+          {imagen && (
+            <figure className="mt-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imagen.url}
+                alt=""
+                className="aspect-[16/9] w-full rounded-xl object-cover"
+              />
+              {/* La atribución no es opcional: las fotos de Commons son
+                  Creative Commons y hay que acreditarlas donde se muestran. */}
+              {(imagen.autor || imagen.prestada) && (
+                <figcaption className="mt-2 text-xs text-texto-suave">
+                  {imagen.prestada && `${imagen.prestada}. `}
+                  {imagen.autor && `Foto: ${imagen.autor}`}
+                  {imagen.licencia && ` · ${imagen.licencia}`}
+                  {imagen.fuente && (
+                    <>
+                      {" · "}
+                      <a
+                        href={imagen.fuente}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline underline-offset-2"
+                      >
+                        Wikimedia Commons ↗
+                      </a>
+                    </>
+                  )}
+                </figcaption>
+              )}
+            </figure>
+          )}
         </header>
 
         <Markdown>{a.contenido}</Markdown>

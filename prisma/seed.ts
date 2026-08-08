@@ -1830,6 +1830,12 @@ async function main() {
     ),
   );
   const hoy = new Date();
+  const especiesPorSlug = new Map(
+    (await prisma.especie.findMany({ select: { id: true, slug: true } })).map(
+      (e) => [e.slug, e.id],
+    ),
+  );
+
   const provinciasPublicadasPorSlug = new Set(
     (
       await prisma.provincia.findMany({
@@ -1856,6 +1862,7 @@ async function main() {
       publicada: suProvincia,
       publicadaEl,
       provinciaId: a.provincia ? (provinciasPorSlug.get(a.provincia) ?? null) : null,
+      especieId: a.especie ? (especiesPorSlug.get(a.especie) ?? null) : null,
     };
     await prisma.articulo.upsert({
       where: { slug: a.slug },

@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { guardarArticulo, type EstadoArticulo } from "@/app/admin/acciones";
 import { Markdown } from "@/lib/markdown";
+import { SubirFoto } from "./SubirFoto";
 
 /**
  * Escribir y editar un artículo.
@@ -22,14 +23,18 @@ type Articulo = {
   contenido: string;
   publicada: boolean;
   provinciaId: string | null;
+  especieId: string | null;
+  imagenUrl: string | null;
 };
 
 export function EditorArticulo({
   articulo,
   provincias,
+  especies,
 }: {
   articulo?: Articulo;
   provincias: { id: string; nombre: string }[];
+  especies: { id: string; nombreComun: string }[];
 }) {
   const [estado, accion] = useActionState<EstadoArticulo, FormData>(
     guardarArticulo,
@@ -51,6 +56,18 @@ export function EditorArticulo({
           Volver a la lista
         </Link>
       </div>
+
+      {/* Solo al editar: para subir una foto hace falta que el artículo ya
+          exista, porque la imagen se guarda contra su slug. Y si no se sube
+          ninguna, el artículo hereda la de la especie que tenga marcada. */}
+      {articulo && (
+        <SubirFoto
+          tipo="articulo"
+          slug={articulo.slug}
+          nombre={articulo.titulo}
+          tieneFoto={Boolean(articulo.imagenUrl)}
+        />
+      )}
 
       <form action={accion} className="space-y-5">
         {articulo && <input type="hidden" name="slug" value={articulo.slug} />}
@@ -89,6 +106,24 @@ export function EditorArticulo({
             {provincias.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.nombre}
+              </option>
+            ))}
+          </select>
+        </Campo>
+
+        <Campo
+          etiqueta="Especie"
+          ayuda="Si el artículo va de una especie, márcala: así la ficha de esa especie enlaza aquí. Es de lo poco del posicionamiento que depende solo de nosotros."
+        >
+          <select
+            name="especieId"
+            defaultValue={articulo?.especieId ?? ""}
+            className="min-h-touch w-full rounded-xl border-2 border-borde bg-fondo-elevado px-4"
+          >
+            <option value="">Ninguna en concreto</option>
+            {especies.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.nombreComun}
               </option>
             ))}
           </select>

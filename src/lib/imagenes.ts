@@ -53,7 +53,7 @@ const TIPOS_ACEPTADOS = new Set([
 
 export class ErrorImagen extends Error {}
 
-export type CarpetaImagen = "uploads" | "especies" | "sitios";
+export type CarpetaImagen = "uploads" | "especies" | "sitios" | "articulos";
 
 export const RAIZ_DATOS = path.join(process.cwd(), "datos");
 
@@ -69,7 +69,7 @@ export function rutaEnDisco(partes: string[]): string | null {
   if (partes.length !== 2) return null;
 
   const [carpeta, nombre] = partes;
-  if (!["uploads", "especies", "sitios"].includes(carpeta)) return null;
+  if (!["uploads", "especies", "sitios", "articulos"].includes(carpeta)) return null;
   if (!/^[\w-]+\.(webp|jpg|jpeg|png)$/.test(nombre)) return null;
 
   const destino = path.join(RAIZ_DATOS, carpeta, nombre);

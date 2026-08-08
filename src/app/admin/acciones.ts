@@ -41,12 +41,12 @@ export async function subirFoto(
     return { error: "Solo un administrador puede cambiar las fotos." };
   }
 
-  const tipo = texto(fd, "tipo"); // "especie" | "sitio"
+  const tipo = texto(fd, "tipo"); // "especie" | "sitio" | "articulo"
   const slug = texto(fd, "slug");
   const archivo = fd.get("foto");
 
-  if (tipo !== "especie" && tipo !== "sitio") {
-    return { error: "No sé si eso es una especie o un sitio." };
+  if (tipo !== "especie" && tipo !== "sitio" && tipo !== "articulo") {
+    return { error: "No sé a qué le quieres cambiar la foto." };
   }
   if (!(archivo instanceof File) || archivo.size === 0) {
     return { error: "Elige una imagen." };
@@ -58,16 +58,25 @@ export async function subirFoto(
   const licencia = texto(fd, "licencia");
   const fuente = texto(fd, "fuente");
 
-  const anterior =
+  const modelo =
     tipo === "especie"
-      ? await prisma.especie.findUnique({ where: { slug }, select: { imagenUrl: true } })
-      : await prisma.sitio.findUnique({ where: { slug }, select: { imagenUrl: true } });
+      ? prisma.especie
+      : tipo === "sitio"
+        ? prisma.sitio
+        : prisma.articulo;
+
+  const anterior = await (
+    modelo as { findUnique: (a: unknown) => Promise<{ imagenUrl: string | null } | null> }
+  ).findUnique({ where: { slug }, select: { imagenUrl: true } });
 
   if (!anterior) return { error: "No existe eso que quieres cambiar." };
 
   let url: string;
   try {
-    url = await guardarImagen(archivo, tipo === "especie" ? "especies" : "sitios");
+    url = await guardarImagen(
+      archivo,
+      tipo === "especie" ? "especies" : tipo === "sitio" ? "sitios" : "articulos",
+    );
   } catch (e) {
     return {
       error: e instanceof ErrorImagen ? e.message : "No se ha podido guardar la imagen.",
@@ -82,11 +91,9 @@ export async function subirFoto(
   };
 
   try {
-    if (tipo === "especie") {
-      await prisma.especie.update({ where: { slug }, data: datos });
-    } else {
-      await prisma.sitio.update({ where: { slug }, data: datos });
-    }
+    await (
+      modelo as { update: (a: unknown) => Promise<unknown> }
+    ).update({ where: { slug }, data: datos });
   } catch {
     // Si la base de datos falla, el fichero recién escrito sobra.
     await borrarImagen(url);
@@ -142,6 +149,7 @@ export async function guardarArticulo(
   const entradilla = texto(fd, "entradilla");
   const contenido = texto(fd, "contenido");
   const provinciaId = texto(fd, "provinciaId");
+  const especieId = texto(fd, "especieId");
   const publicada = fd.get("publicada") === "si";
 
   if (titulo.length < 5) return { error: "El título es demasiado corto." };
@@ -156,6 +164,7 @@ export async function guardarArticulo(
     contenido,
     publicada,
     provinciaId: provinciaId || null,
+    especieId: especieId || null,
   };
 
   try {
