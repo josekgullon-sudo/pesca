@@ -373,6 +373,13 @@ export default async function FichaSitio({
         {/* Aquí es donde alguien se pregunta cuánto tarda, así que aquí es
             donde tiene sentido poder decir de dónde sale. Solo se monta una
             vez en la página: el formulario lleva ids y duplicarlo los rompe. */}
+        <Link
+          href={`/${provincia.slug}/${sitio.slug}/calendario`}
+          className="mt-4 inline-flex min-h-touch items-center rounded-xl border-2 border-borde bg-fondo-elevado px-5 font-semibold hover:border-acento"
+        >
+          🌙 Calendario solunar de {sitio.nombre}
+        </Link>
+
         <div className="mt-4">
           <SelectorUbicacion actual={ubicacion} variante="linea" />
           {desdeMiCasaKm !== null && (

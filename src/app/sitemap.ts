@@ -67,12 +67,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.6,
       },
     ]),
-    ...sitios.map((s) => ({
-      url: urlAbsoluta(`/${s.provincia.slug}/${s.slug}`),
-      lastModified: s.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    })),
+    ...sitios.flatMap((s) => [
+      {
+        url: urlAbsoluta(`/${s.provincia.slug}/${s.slug}`),
+        lastModified: s.updatedAt,
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      },
+      // El calendario solunar de cada sitio. Una sola dirección por embalse:
+      // el mes se navega con parámetros y la canónica apunta siempre aquí. Una
+      // URL por embalse y día serían veinte mil páginas casi idénticas, que es
+      // justo lo que Google penaliza como contenido de relleno.
+      {
+        url: urlAbsoluta(`/${s.provincia.slug}/${s.slug}/calendario`),
+        changeFrequency: "daily" as const,
+        priority: 0.6,
+      },
+    ]),
     ...especies.map((e) => ({
       url: urlAbsoluta(`/especies/${e.slug}`),
       lastModified: e.updatedAt,
