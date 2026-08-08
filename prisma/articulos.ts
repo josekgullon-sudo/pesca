@@ -25,9 +25,9 @@ export type ArticuloSemilla = {
 export const ARTICULOS: ArticuloSemilla[] = [
   {
     slug: "licencia-de-pesca-andalucia",
-    titulo: "¿Hace falta licencia para pescar en Andalucía?",
+    titulo: "Licencia de pesca en Andalucía: qué necesitas y qué multa hay",
     entradilla:
-      "Sí, y también seguro de responsabilidad civil. Qué necesitas llevar encima, cómo se saca y qué te puede pasar si te pillan sin ella.",
+      "Sí hace falta, y también seguro de responsabilidad civil. Qué llevar encima, cómo se saca, y cómo se calcula la sanción si te pillan sin ella.",
     provincia: "sevilla",
     diasAtras: 21,
     contenido: `Sí. Para pescar en aguas continentales de Andalucía —embalses, ríos, canales— hace falta la **licencia de pesca continental** en vigor, y hay que llevarla encima. No vale con haberla sacado: si no la puedes enseñar, es como no tenerla.
@@ -52,9 +52,27 @@ No pongo aquí ni el precio ni la duración a propósito: son datos que cambian 
 
 La licencia es autonómica. Hay comunidades con acuerdos de reciprocidad entre ellas, pero **no lo des por hecho**: comprueba antes de coger el coche si la tuya vale en Andalucía, porque la mayoría de las veces no.
 
+## ¿Cuánto es la multa por pescar sin licencia?
+
+No te voy a dar una cifra, y te explico por qué: los importes de las sanciones se actualizan, y un número desactualizado en una web de pesca es peor que ningún número. Lo que sí se puede explicar es **cómo se calcula**, que es lo que de verdad te dice a qué te expones.
+
+Pescar sin licencia es una infracción administrativa, y en la normativa andaluza de flora y fauna las infracciones van **por grados**: leves, graves y muy graves. Cada grado tiene su horquilla de importe, y dentro de la horquilla la cuantía concreta se gradúa según las circunstancias.
+
+Lo que agrava una denuncia, y esto es lo importante:
+
+- **La reincidencia.** No es lo mismo la primera vez que la tercera.
+- **El daño causado.** Llevarse capturas, y cuántas.
+- **La especie.** Que haya de por medio una especie protegida o amenazada cambia el grado de la infracción, no solo el importe.
+- **Dónde estabas.** En espacio natural protegido pesa más.
+- **Si hubo intención o solo descuido.**
+
+Por eso una misma frase —«pescar sin licencia»— puede acabar en una cosa o en otra muy distinta. Y por eso lo que sale al buscar «cuánto es la multa» suele ser una cifra suelta, de una comunidad que no es la tuya y de un año que ya pasó.
+
+**Dónde está el importe vigente**: en la normativa andaluza de flora y fauna silvestres y en la orden de vedas de la temporada, las dos accesibles desde el [Portal de Caza y Pesca de la Junta](https://www.juntadeandalucia.es/organismos/sostenibilidadmedioambienteyeconomiaazul/areas/flora-fauna-silvestres/caza-pesca.html). Si ya tienes una denuncia encima, el importe y el grado vienen escritos en el propio boletín de denuncia.
+
 ## Lo que de verdad se sanciona
 
-Pescar sin licencia es una infracción administrativa con multa. Pero en la práctica lo que más denuncias genera no es eso, sino tres cosas que se hacen sin querer:
+Pescar sin licencia es lo primero que se mira, pero en la práctica lo que más denuncias genera son tres cosas que se hacen sin querer:
 
 1. **Llevarse una especie de devolución obligatoria.** El barbo, la boga y la trucha común van al agua siempre.
 2. **Devolver al agua una especie exótica invasora.** Con el black bass, el lucio, la carpa y la trucha arcoíris pasa justo lo contrario: fuera de las aguas donde están permitidos, la ley obliga a sacrificarlos.
@@ -526,5 +544,76 @@ En la [guía de Cádiz](/cadiz) tienes cada uno con sus especies, su acceso y a 
 **Y las especies invasoras.** Esta es la importante y la que más gente se salta. En Andalucía, el black bass, el lucio, la carpa común y la trucha arcoíris solo se pueden devolver al agua dentro de unas aguas concretas, las llamadas *áreas delimitadas*. Fuera de ellas hay obligación de sacrificarlos.
 
 Ese listado va por provincia y cambia con la orden de vedas. **Míralo en el boletín antes de ir**, no te fíes de lo que valga en la provincia de al lado. Está explicado en [qué hacer con un black bass](/blog/especies-invasoras-que-hacer), y el enlace al portal oficial lo tienes en la propia página de la provincia.`,
+  },
+  {
+    slug: "cangrejo-rojo-americano",
+    titulo: "Cangrejo rojo americano: no se pesca, y vivo no se mueve de sitio",
+    entradilla:
+      "El cangrejo de las marismas está en media Andalucía, pero su pesca no está abierta y llevárselo vivo es otra infracción distinta. Qué dice la ley y por qué hay tanta información vieja rodando.",
+    provincia: null,
+    diasAtras: 0,
+    contenido: `Si has enganchado uno pescando a fondo, o te has encontrado un montón en la orilla de un embalse, esto es lo que hay que saber. Va primero lo importante:
+
+> **Su pesca no está abierta a la pesca deportiva en Andalucía, y trasladarlo vivo está prohibido.** Son dos cosas distintas y las dos se sancionan.
+
+## Qué es exactamente
+
+*Procambarus clarkii*. Le llaman cangrejo rojo americano, cangrejo rojo de las marismas o, mal, cangrejo de río. Rojo oscuro, pinzas granulosas, y aguanta lo que le echen: agua turbia, poco oxígeno, sequía parcial enterrándose en el barro.
+
+Llegó a España en los años setenta y hoy está por toda la cuenca del Guadalquivir y mucho más allá. Es de las especies exóticas invasoras mejor instaladas del país.
+
+**No lo confundas con el cangrejo de río autóctono** (*Austropotamobius pallipes*), que es el que se está extinguiendo y que también tiene su propia protección. Cuando alguien busca «cangrejo rojo de río» casi siempre está buscando este, el americano.
+
+## Por qué es un problema
+
+Dos motivos, y ninguno es el que la gente espera:
+
+1. **Transmite la afanomicosis**, la peste del cangrejo. Él la aguanta; el autóctono se muere. Es la causa principal de que el cangrejo de río español haya desaparecido de casi todos los ríos donde estaba.
+2. **Remueve el fondo y excava las orillas.** Enturbia el agua, se come puestas de anfibios y plantas acuáticas, y cambia el ecosistema entero de una charca.
+
+Por eso está catalogado como especie exótica invasora, y ese catálogo es lo que activa las prohibiciones de las que va este artículo.
+
+## Lo de «vivo» es una infracción aparte
+
+Esta es la parte que más gente se salta, y la que hace que muchas búsquedas acaben aquí.
+
+Con una especie exótica invasora, **la posesión, el transporte y la suelta de ejemplares vivos están prohibidos**. Da igual que sea un cubo con cuatro cangrejos para enseñárselos a los niños, o llevarlos vivos a otra charca. Eso es exactamente el mecanismo por el que la especie se ha extendido por España: a mano, en cubos.
+
+Así que no. Ni vivo en el coche, ni vivo a otra balsa, ni vivo a casa.
+
+## Entonces, ¿por qué veo gente pescándolos?
+
+Porque hay dos cosas que no son pesca deportiva:
+
+- **Los controladores autorizados.** En las Marismas del Guadalquivir hay una explotación regulada con gente que tiene autorización expresa. Eso no lo puede hacer cualquiera con una licencia de pesca.
+- **La información vieja.** Y aquí está el lío de verdad.
+
+Su captura **sí estuvo autorizada** en Andalucía para pesca deportiva en determinadas aguas, y hay guías, foros y vídeos de hace años que lo siguen diciendo. Esa información ya no vale. Si te fías de un foro de 2019 te puedes llevar una sanción, porque el que la firma no la paga.
+
+**Comprueba siempre la orden de vedas vigente** en el [Portal de Caza y Pesca de la Junta de Andalucía](https://www.juntadeandalucia.es/organismos/sostenibilidadmedioambienteyeconomiaazul/areas/flora-fauna-silvestres/caza-pesca.html). Es el único sitio donde está lo que está en vigor hoy.
+
+## ¿Y comerlos?
+
+Se comen, y en Andalucía se comen mucho: el arroz con cangrejos es de aquí. Pero el que llega a la mesa sale de esa explotación regulada, con su control sanitario.
+
+El que pescas tú en un embalse cualquiera no. Y hay un motivo concreto: **el cangrejo rojo acumula metales pesados** del sedimento donde vive. En aguas con historial minero o industrial eso deja de ser un detalle. En la guía marcamos los sitios con aviso sanitario justo por esto.
+
+## Qué hago si engancho uno
+
+Pescando a fondo con maíz o lombriz te van a robar el cebo una y otra vez, sobre todo al atardecer. Es lo normal en casi cualquier embalse andaluz.
+
+- **Devuélvelo al agua ahí mismo**, en el sitio donde lo has sacado. No es una especie que se pueda soltar en otro lado, ni llevarse.
+- Si te está haciendo la jornada imposible, sube el cebo del fondo o cámbiate de puesto. Suelen estar concentrados.
+- Si vas a por carpa o barbo, un anzuelo algo mayor y cebo más duro te los quita de encima bastante.
+
+## En resumen
+
+- **Pescarlo deportivamente**: no está abierto.
+- **Llevártelo vivo**: prohibido, y es una infracción aparte de la anterior.
+- **Devolverlo al agua donde lo pescaste**: sí.
+- **Soltarlo en otra charca**: prohibido, y es exactamente lo que ha extendido la plaga por España.
+- **Fiarte de una guía de hace cinco años**: no.
+
+Tienes la ficha completa, con dónde está y su situación legal, en [cangrejo rojo americano](/especies/cangrejo-rojo-americano). Y si lo que quieres es saber qué hacer con las otras invasoras —black bass, lucio, carpa, trucha arcoíris—, eso va justo al revés y lo tienes en [has pescado un black bass: ¿lo devuelves o no?](/blog/especies-invasoras-que-hacer).`,
   },
 ];

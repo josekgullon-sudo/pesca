@@ -55,17 +55,27 @@ export async function generateMetadata({
       nombreCientifico: true,
       descripcion: true,
       imagenUrl: true,
+      estadoLegal: true,
     },
   });
   if (!especie) return { title: "Especie" };
 
+  // El título prometía «cómo pescarla» en TODAS las fichas, incluidas las de
+  // las especies cuya pesca está prohibida. En el cangrejo rojo eso es decir
+  // en el propio resultado de Google lo contrario de lo que dice la página, y
+  // atrae justo a quien viene buscando cómo cogerlos.
+  const noSePuede = NO_SE_PUEDEN_BUSCAR.has(especie.estadoLegal);
+
   return metadatosDePagina({
     // Quien busca "carpa" quiere saber si se puede pescar y cómo, no leer una
     // enciclopedia: el título lo dice y así compite con las fichas genéricas.
-    titulo: `${especie.nombreComun}: cómo pescarla y qué dice la ley`,
-    descripcion:
-      especie.descripcion.slice(0, 155) ||
-      `${especie.nombreComun} (${especie.nombreCientifico}): dónde está, cómo pescarla y su situación legal.`,
+    titulo: noSePuede
+      ? `${especie.nombreComun}: por qué no se puede pescar y qué hacer si cae`
+      : `${especie.nombreComun}: cómo pescarla y qué dice la ley`,
+    descripcion: noSePuede
+      ? `${especie.nombreComun} (${especie.nombreCientifico}): su pesca no está autorizada. Qué dice la ley, por qué, y qué hacer si engancha una.`
+      : especie.descripcion.slice(0, 155) ||
+        `${especie.nombreComun} (${especie.nombreCientifico}): dónde está, cómo pescarla y su situación legal.`,
     ruta: `/especies/${slug}`,
     tipo: "article",
     imagen: especie.imagenUrl,
