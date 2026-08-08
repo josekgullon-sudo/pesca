@@ -5,6 +5,7 @@ import { Calendario } from "@/components/Calendario";
 import { DatosEstructurados } from "@/components/DatosEstructurados";
 import { diaLocalDe, medianocheLocal, mesLargo } from "@/lib/fechas-solunar";
 import { metadatosDePagina } from "@/lib/marca";
+import { climaDe } from "@/lib/clima";
 import { prisma } from "@/lib/prisma";
 import { cargarProvincia } from "@/lib/provincias";
 import { schemaMigas } from "@/lib/schema";
@@ -71,6 +72,8 @@ export default async function CalendarioSitio({
   const local = diaLocalDe(ahora);
   const hoy = medianocheLocal(local.anio, local.mes, local.dia);
 
+  const clima = await climaDe(sitio.latitud, sitio.longitud);
+
   const q = await searchParams;
   // Se acota a un rango razonable: sin esto, un ?anio=999999 pondría al
   // servidor a calcular posiciones lunares del año del catapum.
@@ -125,6 +128,7 @@ export default async function CalendarioSitio({
         mes={mes}
         hoy={hoy}
         baseUrl={`/${provincia.slug}/${sitio.slug}/calendario`}
+        clima={clima}
         nombreSitio={sitio.nombre}
       />
     </div>

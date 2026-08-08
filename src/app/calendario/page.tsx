@@ -4,6 +4,7 @@ import { Calendario } from "@/components/Calendario";
 import { SelectorUbicacion } from "@/components/SelectorUbicacion";
 import { diaLocalDe, medianocheLocal, mesLargo } from "@/lib/fechas-solunar";
 import { metadatosDePagina } from "@/lib/marca";
+import { climaDe } from "@/lib/clima";
 import { prisma } from "@/lib/prisma";
 import { diaSolunar, indiceDePesca } from "@/lib/solunar";
 import { distanciaKm, formatearKm } from "@/lib/ubicacion";
@@ -79,6 +80,11 @@ export default async function PaginaCalendario({
     : ubicacion
       ? ubicacion.etiqueta
       : (provinciaPorDefecto?.nombre ?? "España");
+
+  // Solo del punto de referencia, no de los 55: una llamada por embalse y por
+  // visita sería abusar de un servicio gratuito, y encima para un dato que en
+  // la rejilla no se enseña.
+  const clima = await climaDe(punto.latitud, punto.longitud);
 
   // La nota de hoy de cada embalse de la guía. Es un cálculo por sitio, no una
   // consulta: son milisegundos y no hace falta guardarlo en ninguna parte.
@@ -177,6 +183,7 @@ export default async function PaginaCalendario({
         hoy={hoy}
         baseUrl="/calendario"
         paramsExtra={q.sitio ? { sitio: q.sitio } : undefined}
+        clima={clima}
         nombreSitio={referencia}
       />
     </div>

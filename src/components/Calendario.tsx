@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { TarjetaClima } from "./TarjetaClima";
+import type { Clima } from "@/lib/clima";
 import {
   DIAS_SEMANA,
   diasDelMes,
@@ -125,6 +127,7 @@ export function Calendario({
   hoy,
   baseUrl,
   paramsExtra,
+  clima,
   nombreSitio,
 }: {
   punto: Punto;
@@ -137,6 +140,8 @@ export function Calendario({
   baseUrl: string;
   /** Parámetros que hay que conservar al cambiar de mes (p. ej. el embalse). */
   paramsExtra?: Record<string, string>;
+  /** El tiempo, si se ha podido traer. Puede ser null y no pasa nada. */
+  clima?: Clima | null;
   nombreSitio: string;
 }) {
   // Se construye con URLSearchParams y no pegando cadenas: con un `?sitio=x`
@@ -207,7 +212,7 @@ export function Calendario({
         </div>
       </section>
 
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div className={`grid gap-5 ${clima ? "lg:grid-cols-2 xl:grid-cols-4" : "lg:grid-cols-3"}`}>
         {/* --- Luna y sol: esto son datos, no estimaciones --- */}
         <section className="tarjeta p-5">
           <h2 className="text-sm font-bold uppercase tracking-wide text-texto-suave">
@@ -245,6 +250,8 @@ export function Calendario({
           <Periodos titulo="Mayores" lista={deHoy.d.mayores} fuerte />
           <Periodos titulo="Menores" lista={deHoy.d.menores} fuerte={false} />
         </section>
+
+        <TarjetaClima clima={clima ?? null} />
 
         {/* --- De dónde sale la nota --- */}
         <section className="tarjeta space-y-4 p-5">
