@@ -1,49 +1,64 @@
 /**
- * Nivel de los embalses, del boletín hidrológico semanal.
+ * Nivel de los embalses.
  *
- *     npm run niveles -- --probar    enseña lo que haría, sin tocar nada
- *     npm run niveles                lo aplica
+ *     npm run niveles -- --descubrir   prueba fuentes y dice cuál sirve
+ *     npm run niveles -- --probar      empareja y enseña la tabla, sin escribir
+ *     npm run niveles                  lo aplica
  *
- * ---------------------------------------------------------------------------
- * LÉEME ANTES DE EJECUTARLO CON DATOS DE VERDAD
- * ---------------------------------------------------------------------------
- *
- * Este script se escribió sin poder probarlo contra el boletín real: desde
- * donde se programó no había salida a internet. Eso significa que el formato
- * del fichero está tomado de su documentación, no comprobado con los ojos.
- *
- * Por eso **empieza siempre por `--probar`**. Ese modo descarga, empareja y
- * enseña una tabla con lo que ha encontrado, sin escribir una línea en la base
- * de datos. Si los porcentajes que salgan ahí no cuadran con la realidad, el
- * emparejamiento o el parseo están mal y hay que arreglarlos antes.
- *
- * Un porcentaje equivocado aquí no es un detalle: alguien puede conducir dos
- * horas hasta un embalse que cree al 80 % y encontrárselo al 20 %, con el agua
- * a trescientos metros de donde aparcó.
+ * También:
+ *     npm run niveles -- --probar --url=https://…      otra dirección
+ *     npm run niveles -- --probar --fichero=datos.csv  un fichero de disco
  *
  * ---------------------------------------------------------------------------
  *
- * Sobre el emparejamiento. El boletín no usa nuestros nombres: «Embalse José
- * Torán» allí es «JOSE TORAN» o «J. TORAN». La primera vez hay que revisar la
- * tabla de `--probar` y, cuando cuadre, se guarda el nombre oficial en
- * `nombreEnBoletin` para no volver a adivinarlo nunca más.
+ * Este script se escribió sin poder salir a internet, así que la dirección de
+ * la fuente iba a ciegas. El primer intento apuntaba a `BD-Embalses.zip` del
+ * Ministerio, que resultó ser un ZIP con una base de datos de Access dentro:
+ * imposible de leer sin herramientas aparte.
+ *
+ * De ahí salieron dos cosas que ahora tiene el script. `--descubrir`, que
+ * prueba varias fuentes y dice de cada una qué es lo que devuelve. Y que la
+ * dirección se pueda pasar por parámetro, para no tener que tocar el código
+ * cada vez que se prueba una.
+ *
+ * Y sigue en pie lo de siempre: **empieza por `--probar`**. Un porcentaje
+ * equivocado manda a alguien a conducir dos horas hasta un embalse que cree
+ * lleno y se lo encuentra al 20 %, con el agua a trescientos metros de donde
+ * aparcó.
  */
 
+import { readFile } from "node:fs/promises";
 import { prisma } from "../src/lib/prisma";
 import { interpretarFecha, normalizar } from "../src/lib/niveles";
+import { reconocer } from "../src/lib/formato-descarga";
 
 /**
- * De dónde salen los datos.
+ * Fuentes candidatas, de más a menos preferible.
  *
- * El Ministerio publica el boletín hidrológico semanal, y con él un fichero de
- * datos por embalse. Es la fuente oficial y la que citan los demás.
+ * Ninguna está confirmada: son las que hay que probar con `--descubrir` desde
+ * una máquina con internet. La que salga como CSV o JSON es la buena, y se
+ * pasa luego con `--url=`.
  */
-const FUENTE = {
-  nombre: "Boletín Hidrológico Semanal (MITECO)",
-  // El fichero de datos abiertos del boletín. Si cambia de sitio, es lo único
-  // que hay que tocar aquí.
-  url: "https://www.miteco.gob.es/content/dam/miteco/es/agua/temas/evaluacion-de-los-recursos-hidricos/boletin-hidrologico/Historico-de-embalses/BD-Embalses.zip",
-};
+const CANDIDATAS = [
+  {
+    nombre: "datos.gob.es — estado de los embalses",
+    url: "https://datos.gob.es/es/catalogo/e00125301-estado-de-los-embalses-y-pantanos.csv",
+  },
+  {
+    nombre: "MITECO — boletín hidrológico, embalses en CSV",
+    url: "https://www.miteco.gob.es/content/dam/miteco/es/agua/temas/evaluacion-de-los-recursos-hidricos/boletin-hidrologico/embalses.csv",
+  },
+  {
+    nombre: "CH Guadalquivir — SAIH, embalses",
+    url: "https://www.chguadalquivir.es/saih/datos/embalses.csv",
+  },
+  {
+    nombre: "MITECO — el ZIP que ya sabemos que trae Access",
+    url: "https://www.miteco.gob.es/content/dam/miteco/es/agua/temas/evaluacion-de-los-recursos-hidricos/boletin-hidrologico/Historico-de-embalses/BD-Embalses.zip",
+  },
+];
+
+const FUENTE_NOMBRE = "Boletín Hidrológico Semanal (MITECO)";
 
 type FilaBoletin = {
   nombre: string;
@@ -52,33 +67,76 @@ type FilaBoletin = {
   fecha: Date;
 };
 
-/**
- * Descarga y parsea el boletín.
- *
- * Aislado en su propia función a propósito: es la parte que no se ha podido
- * comprobar, así que es la que habrá que cambiar cuando se vea el fichero de
- * verdad. Todo lo demás —emparejar, enseñar, guardar— es independiente.
- */
-async function descargarBoletin(): Promise<FilaBoletin[]> {
-  const respuesta = await fetch(FUENTE.url, {
+async function bajar(url: string): Promise<Uint8Array> {
+  const respuesta = await fetch(url, {
     signal: AbortSignal.timeout(60000),
     headers: { "User-Agent": "MapaDePesca/1.0 (https://mapadepesca.es)" },
   });
-  if (!respuesta.ok) {
+  if (!respuesta.ok) throw new Error(`contestó ${respuesta.status}`);
+  return new Uint8Array(await respuesta.arrayBuffer());
+}
+
+/**
+ * Prueba las candidatas y cuenta qué devuelve cada una.
+ *
+ * Se ejecuta desde el servidor, que sí tiene internet, y su salida es
+ * suficiente para saber cuál sirve sin tener que abrir ninguna a mano.
+ */
+async function descubrir() {
+  console.log("Probando fuentes. No se escribe nada.\n");
+
+  for (const c of CANDIDATAS) {
+    process.stdout.write(`${c.nombre}\n  ${c.url}\n  `);
+    try {
+      const datos = await bajar(c.url);
+      const d = reconocer(datos);
+      console.log(`${(datos.length / 1024).toFixed(0)} KB · ${d.formato.toUpperCase()}`);
+      console.log(`  ${d.explicacion}`);
+      for (const p of d.pistas) console.log(`  · ${p}`);
+    } catch (e) {
+      console.log(`no se ha podido: ${(e as Error).message}`);
+    }
+    console.log();
+  }
+
+  console.log(
+    "Pásame esta salida entera. Con ella sé qué fuente sirve y termino el\n" +
+      "parseo con el formato real delante.",
+  );
+}
+
+/** Lee CSV o JSON. Si es otra cosa, lo dice con claridad y no adivina. */
+function interpretar(datos: Uint8Array): FilaBoletin[] {
+  const d = reconocer(datos);
+
+  if (d.formato !== "csv" && d.formato !== "json") {
+    const detalle = d.pistas.length ? `\n  ${d.pistas.join("\n  ")}` : "";
     throw new Error(
-      `El boletín contestó ${respuesta.status}. Puede que hayan movido el ` +
-        `fichero: comprueba la dirección en FUENTE.url.`,
+      `lo que hay en esa dirección es ${d.formato.toUpperCase()}, no datos ` +
+        `que pueda leer.\n  ${d.explicacion}${detalle}\n\n` +
+        `  Prueba con: npm run niveles -- --descubrir`,
     );
   }
 
-  const texto = await respuesta.text();
-  const lineas = texto.split(/\r?\n/).filter((l) => l.trim());
-  if (lineas.length < 2) throw new Error("El fichero vino vacío o ilegible.");
+  const texto = new TextDecoder("utf-8").decode(datos);
 
-  // Se localizan las columnas por su cabecera y no por su posición: si el
-  // ministerio mete una columna nueva en medio, esto sigue funcionando en vez
-  // de empezar a leer capacidades en la casilla de las cotas.
-  const separador = lineas[0].includes(";") ? ";" : ",";
+  if (d.formato === "json") {
+    const crudo: unknown = JSON.parse(texto);
+    const lista = Array.isArray(crudo)
+      ? crudo
+      : ((crudo as Record<string, unknown>).embalses ?? []);
+    return (lista as Record<string, unknown>[])
+      .map((o) => ({
+        nombre: String(o.nombre ?? o.embalse ?? ""),
+        capacidadHm3: Number(o.capacidad ?? o.capacidadHm3 ?? 0),
+        volumenHm3: Number(o.volumen ?? o.agua ?? o.embalsada ?? 0),
+        fecha: interpretarFecha(String(o.fecha ?? "")),
+      }))
+      .filter((f) => f.nombre && f.capacidadHm3 > 0);
+  }
+
+  const lineas = texto.split(/\r?\n/).filter((l) => l.trim());
+  const separador = (lineas[0].match(/;/g) ?? []).length >= 2 ? ";" : ",";
   const cabecera = lineas[0].split(separador).map((c) => normalizar(c));
 
   const iDe = (...candidatos: string[]) => {
@@ -89,86 +147,97 @@ async function descargarBoletin(): Promise<FilaBoletin[]> {
     return -1;
   };
 
-  const iNombre = iDe("embalse nombre", "nombre");
+  const iNombre = iDe("embalse nombre", "nombre embalse", "nombre");
   const iCap = iDe("capacidad total", "capacidad");
-  const iVol = iDe("agua total", "volumen", "embalsada");
+  const iVol = iDe("agua total", "volumen", "embalsada", "actual");
   const iFecha = iDe("fecha");
 
   if (iNombre < 0 || iCap < 0 || iVol < 0) {
     throw new Error(
-      `No reconozco las columnas del fichero. Cabecera encontrada:\n  ` +
-        lineas[0].slice(0, 300),
+      `es un CSV pero no reconozco sus columnas.\n  Cabecera: ${lineas[0].slice(0, 300)}`,
     );
   }
+
+  const num = (v: string | undefined) =>
+    Number((v ?? "").trim().replace(/\./g, "").replace(",", "."));
 
   const filas: FilaBoletin[] = [];
   for (const linea of lineas.slice(1)) {
     const c = linea.split(separador);
     const nombre = (c[iNombre] ?? "").trim();
-    // Los decimales pueden venir con coma.
-    const num = (v: string | undefined) =>
-      Number((v ?? "").trim().replace(/\./g, "").replace(",", "."));
-
     const capacidadHm3 = num(c[iCap]);
     const volumenHm3 = num(c[iVol]);
-    if (!nombre || !Number.isFinite(capacidadHm3) || !Number.isFinite(volumenHm3)) {
-      continue;
-    }
-    if (capacidadHm3 <= 0) continue;
-
-    const bruto = iFecha >= 0 ? (c[iFecha] ?? "").trim() : "";
-    const fecha = bruto ? interpretarFecha(bruto) : new Date();
-
-    filas.push({ nombre, capacidadHm3, volumenHm3, fecha });
+    if (!nombre || !(capacidadHm3 > 0) || !Number.isFinite(volumenHm3)) continue;
+    filas.push({
+      nombre,
+      capacidadHm3,
+      volumenHm3,
+      fecha: iFecha >= 0 ? interpretarFecha((c[iFecha] ?? "").trim()) : new Date(),
+    });
   }
-
   return filas;
 }
 
 async function main() {
-  const soloProbar = process.argv.includes("--probar");
+  const args = process.argv.slice(2);
 
-  console.log(
-    soloProbar
-      ? "Modo prueba: no se va a escribir nada.\n"
-      : "Aplicando los niveles. (Con --probar se ve antes lo que haría.)\n",
-  );
+  if (args.includes("--descubrir")) {
+    await descubrir();
+    return;
+  }
 
-  const sitios = await prisma.sitio.findMany({
-    where: { tipo: "embalse" },
-    select: { id: true, nombre: true, nombreEnBoletin: true, capacidadHm3: true },
-    orderBy: { nombre: "asc" },
-  });
+  const soloProbar = args.includes("--probar");
+  const url = args.find((a) => a.startsWith("--url="))?.slice(6);
+  const fichero = args.find((a) => a.startsWith("--fichero="))?.slice(10);
 
-  let boletin: FilaBoletin[];
-  try {
-    boletin = await descargarBoletin();
-  } catch (e) {
-    console.error("No se ha podido leer el boletín:\n ", (e as Error).message);
+  if (!url && !fichero) {
     console.error(
-      "\nEsto es lo que hay que arreglar antes de nada. El script no ha " +
-        "tocado la base de datos.",
+      "No hay ninguna fuente confirmada todavía, así que hay que decirle cuál.\n\n" +
+        "  1) npm run niveles -- --descubrir      para ver cuál sirve\n" +
+        "  2) npm run niveles -- --probar --url=LA_QUE_SIRVA\n",
     );
     process.exitCode = 1;
     return;
   }
 
-  console.log(`El boletín trae ${boletin.length} embalses.\n`);
+  console.log(
+    soloProbar
+      ? "Modo prueba: no se va a escribir nada.\n"
+      : "Aplicando los niveles.\n",
+  );
 
-  const porNombre = new Map(boletin.map((f) => [normalizar(f.nombre), f]));
+  let filas: FilaBoletin[];
+  try {
+    const datos = fichero ? new Uint8Array(await readFile(fichero)) : await bajar(url!);
+    filas = interpretar(datos);
+  } catch (e) {
+    console.error(`No se ha podido leer la fuente: ${(e as Error).message}`);
+    console.error("\nLa base de datos no se ha tocado.");
+    process.exitCode = 1;
+    return;
+  }
 
-  const emparejados: { sitio: (typeof sitios)[number]; fila: FilaBoletin; pct: number }[] = [];
+  console.log(`La fuente trae ${filas.length} embalses.\n`);
+
+  const sitios = await prisma.sitio.findMany({
+    where: { tipo: "embalse" },
+    select: { id: true, nombre: true, nombreEnBoletin: true },
+    orderBy: { nombre: "asc" },
+  });
+
+  const porNombre = new Map(filas.map((f) => [normalizar(f.nombre), f]));
+  const emparejados: { id: string; nombre: string; fila: FilaBoletin; pct: number }[] = [];
   const sinEmparejar: string[] = [];
 
   for (const s of sitios) {
-    const clave = normalizar(s.nombreEnBoletin ?? s.nombre);
-    const fila = porNombre.get(clave);
+    const fila = porNombre.get(normalizar(s.nombreEnBoletin ?? s.nombre));
     if (!fila) {
       sinEmparejar.push(s.nombre);
       continue;
     }
     emparejados.push({
-      sitio: s,
+      id: s.id,
+      nombre: s.nombre,
       fila,
       pct: (fila.volumenHm3 / fila.capacidadHm3) * 100,
     });
@@ -177,7 +246,7 @@ async function main() {
   console.log("EMPAREJADOS");
   for (const e of emparejados) {
     console.log(
-      `  ${e.sitio.nombre.padEnd(42)} ${e.fila.nombre.padEnd(28)} ` +
+      `  ${e.nombre.padEnd(40)} ${e.fila.nombre.padEnd(26)} ` +
         `${e.pct.toFixed(1).padStart(6)}%  ` +
         `${Math.round(e.fila.volumenHm3)}/${Math.round(e.fila.capacidadHm3)} hm³  ` +
         `${e.fila.fecha.toISOString().slice(0, 10)}`,
@@ -187,30 +256,21 @@ async function main() {
   if (sinEmparejar.length) {
     console.log("\nSIN EMPAREJAR (se quedan sin nivel, que es lo correcto)");
     for (const n of sinEmparejar) console.log(`  ${n}`);
-    console.log(
-      "\n  Para arreglarlos, busca su nombre exacto en el boletín y guárdalo " +
-        "en el campo `nombreEnBoletin` del sitio.",
-    );
   }
 
   if (soloProbar) {
-    console.log(
-      "\nNo se ha escrito nada. Comprueba que esos porcentajes tienen sentido " +
-        "y vuelve a lanzarlo sin --probar.",
-    );
+    console.log("\nNo se ha escrito nada. Si esos porcentajes cuadran, quita --probar.");
     return;
   }
 
   for (const e of emparejados) {
     await prisma.sitio.update({
-      where: { id: e.sitio.id },
+      where: { id: e.id },
       data: {
         nivelHm3: e.fila.volumenHm3,
         nivelPorcentaje: e.pct,
         nivelFecha: e.fila.fecha,
-        nivelFuente: FUENTE.nombre,
-        // La capacidad oficial manda sobre la que tuviéramos: viene de la
-        // misma fuente que el volumen, así que el porcentaje es coherente.
+        nivelFuente: FUENTE_NOMBRE,
         capacidadHm3: e.fila.capacidadHm3,
         nombreEnBoletin: e.fila.nombre,
       },
