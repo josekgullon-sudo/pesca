@@ -146,6 +146,24 @@ model Sitio {
   /// Ficha en embalses.net u otra fuente para consultar el nivel del agua.
   urlNivelAgua String?
 
+  /// --- Nivel del agua, del boletín hidrológico ---
+  ///
+  /// Cuánta agua lleva ahora mismo el embalse. Cambia por completo dónde se
+  /// pesca: a media capacidad quedan orillas enteras al descubierto y los
+  /// puestos de siempre se van a diez metros del agua.
+  ///
+  /// El dato oficial es SEMANAL, no en tiempo real. Por eso viaja siempre con
+  /// su fecha: un porcentaje sin fecha, en agosto y bajando, miente.
+  nivelHm3        Float?
+  nivelPorcentaje Float?
+  nivelFecha      DateTime?
+  /// De dónde salió, para poder citarlo en la ficha.
+  nivelFuente String?
+  /// Nombre del embalse en el boletín, que no coincide con el nuestro.
+  /// «Embalse José Torán» allí es «JOSE TORAN». Se guarda una vez comprobado
+  /// para no depender de adivinarlo en cada actualización.
+  nombreEnBoletin String?
+
   /// Foto de cabecera. La baja `npm run fotos` de Wikimedia Commons, donde
   /// casi todos los embalses y ríos españoles tienen fotos libres.
   imagenUrl String?

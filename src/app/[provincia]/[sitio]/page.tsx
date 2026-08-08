@@ -5,6 +5,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { AvisoBorrador } from "@/components/AvisoBorrador";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { ResumenSolunar } from "@/components/ResumenSolunar";
+import { NivelDelAgua } from "@/components/NivelDelAgua";
 import { BarraAbundancia } from "@/components/BarraAbundancia";
 import { CapturasDelSitio } from "@/components/CapturasDelSitio";
 import { BandaSitio } from "@/components/BandaSitio";
@@ -370,6 +371,17 @@ export default async function FichaSitio({
         <h2 className="mb-2 text-xl font-bold">Qué es</h2>
         <p className="max-w-prose leading-relaxed">{sitio.descripcion}</p>
       </section>
+
+      <NivelDelAgua
+        nivel={{
+          nivelPorcentaje: sitio.nivelPorcentaje,
+          nivelHm3: sitio.nivelHm3,
+          capacidadHm3: sitio.capacidadHm3,
+          nivelFecha: sitio.nivelFecha,
+          nivelFuente: sitio.nivelFuente,
+        }}
+        nombre={sitio.nombre}
+      />
 
       <ResumenSolunar
         latitud={sitio.latitud}

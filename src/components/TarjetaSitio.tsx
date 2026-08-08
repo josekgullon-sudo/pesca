@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BandaSitio } from "./BandaSitio";
+import { NivelCompacto } from "./NivelDelAgua";
 import {
   formatearKm,
   formatearTiempo,
@@ -26,6 +27,11 @@ export type SitioTarjeta = {
   avisosSanitarios: string;
   esAreaDelimitadaEEI: boolean;
   eeiComprobado: boolean;
+  nivelPorcentaje?: number | null;
+  nivelHm3?: number | null;
+  capacidadHm3?: number | null;
+  nivelFecha?: Date | null;
+  nivelFuente?: string | null;
   imagenUrl: string | null;
   especies: {
     abundancia: number;
@@ -119,6 +125,16 @@ export function TarjetaSitio({
         </div>
 
         <div className="flex flex-auto flex-col p-4">
+          <NivelCompacto
+            nivel={{
+              nivelPorcentaje: sitio.nivelPorcentaje ?? null,
+              nivelHm3: sitio.nivelHm3 ?? null,
+              capacidadHm3: sitio.capacidadHm3 ?? null,
+              nivelFecha: sitio.nivelFecha ?? null,
+              nivelFuente: sitio.nivelFuente ?? null,
+            }}
+          />
+
           {principales.length > 0 && (
             <p className="text-[0.95rem] leading-snug">
               <span className="text-texto-suave">Lo que más cae: </span>
