@@ -236,9 +236,14 @@ export default async function PaginaProvincia({
             </ul>
           )}
 
-          <p className="mt-6 max-w-prose text-sm leading-relaxed text-texto-suave">
-            {AVISO_ABUNDANCIAS_ESTIMADAS}
-          </p>
+          <details className="mt-6">
+            <summary className="cursor-pointer text-sm font-semibold text-texto-suave">
+              De dónde salen las abundancias
+            </summary>
+            <p className="mt-1 max-w-prose text-sm leading-relaxed text-texto-suave">
+              {AVISO_ABUNDANCIAS_ESTIMADAS}
+            </p>
+          </details>
 
           {/* Los artículos de la provincia, enlazados desde la propia
               provincia. Estaban escritos y solo se llegaba a ellos desde el

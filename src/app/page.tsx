@@ -48,7 +48,6 @@ export default async function Home() {
     provincias,
     sitios,
     ultimas,
-    misCapturas,
     totalCapturas,
     especiesDistintas,
     mayor,
@@ -86,9 +85,6 @@ export default async function Home() {
           fotos: { orderBy: { esPrincipal: "desc" }, take: 1 },
         },
       }),
-      usuario
-        ? prisma.captura.count({ where: { usuarioId: usuario.id } })
-        : Promise.resolve(0),
       prisma.captura.count(),
       prisma.captura
         .findMany({ distinct: ["especieId"], select: { especieId: true } })
@@ -226,30 +222,9 @@ export default async function Home() {
       </div>
 
       <div className="contenedor space-y-16 py-12 md:py-16">
-        {/* --- Qué es esto, para quien cae aquí desde Google y no sabe qué
-            está mirando. --- */}
-        <section className="grid gap-8 sm:grid-cols-3 sm:gap-10">
-          <Argumento numero="1" titulo="Dónde ir">
-            Embalses y tramos de río con lo que se pesca en cada uno, cómo es el
-            acceso y cuánto se tarda en coche.
-          </Argumento>
-          <Argumento numero="2" titulo="Qué dice la ley">
-            Cada especie con su semáforo: cuál te puedes llevar, cuál hay que
-            devolver y cuál no se puede devolver al agua.
-          </Argumento>
-          <Argumento numero="3" titulo="Qué se está pescando">
-            Las capturas de la gente, con foto y peso, y el ranking por especie
-            y por sitio.
-          </Argumento>
-        </section>
-
         {/* --- Provincias --- */}
         <section id="provincias" className="scroll-mt-20">
-          <h2 className="titulo-seccion font-bold">Elige provincia</h2>
-          <p className="mt-2 mb-5 max-w-prose text-lg text-texto-suave">
-            Cada provincia tiene su normativa y sus áreas delimitadas para
-            especies invasoras, así que van por separado.
-          </p>
+          <h2 className="titulo-seccion mb-5 font-bold">Elige provincia</h2>
 
           {/* La rejilla se ajusta a cuántas hay. Con una sola provincia, tres
               columnas dejaban la única tarjeta encogida en una esquina y la
@@ -295,11 +270,6 @@ export default async function Home() {
             ))}
           </ul>
 
-          <p className="mt-5 max-w-prose leading-relaxed text-texto-suave">
-            Vamos añadiendo provincias según conseguimos comprobar su normativa
-            en el boletín oficial correspondiente. Publicar una a medias sería
-            peor que no publicarla.
-          </p>
         </section>
 
         {/* --- El mapa, en la portada. Buscar dónde pescar es una pregunta
@@ -311,9 +281,7 @@ export default async function Home() {
               <div>
                 <h2 className="titulo-seccion font-bold">Dónde están</h2>
                 <p className="mt-1 text-lg text-texto-suave">
-                  {puntos.length === 1
-                    ? "El sitio de la guía en el mapa."
-                    : `Los ${puntos.length} sitios de la guía en el mapa.`}{" "}
+                  {puntos.length === 1 ? "1 sitio" : `${puntos.length} sitios`}.
                   Pulsa un punto para abrir su ficha.
                 </p>
               </div>
@@ -327,14 +295,19 @@ export default async function Home() {
               )}
             </div>
 
-            <div className="h-[24rem] overflow-hidden rounded-2xl border border-borde md:h-[32rem]">
+            <div className="h-[18rem] overflow-hidden rounded-2xl border border-borde sm:h-[24rem] md:h-[32rem]">
               <MapaSitios sitios={puntos} />
             </div>
 
-            <p className="mt-3 max-w-prose text-sm leading-relaxed text-texto-suave">
-              {AVISO_COORDENADAS_APROXIMADAS} El mapa necesita conexión: las
-              teselas vienen de OpenStreetMap.
-            </p>
+            <details className="mt-3">
+              <summary className="cursor-pointer text-sm font-semibold text-texto-suave">
+                Sobre el mapa
+              </summary>
+              <p className="mt-1 max-w-prose text-sm leading-relaxed text-texto-suave">
+                {AVISO_COORDENADAS_APROXIMADAS} Necesita conexión: las teselas
+                vienen de OpenStreetMap.
+              </p>
+            </details>
           </section>
         )}
 
@@ -414,12 +387,22 @@ export default async function Home() {
         {ultimas.length > 0 && (
           <section>
             <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
-              <h2 className="titulo-seccion font-bold">Lo último que ha caído</h2>
+              <div>
+                <h2 className="titulo-seccion font-bold">Lo último que ha caído</h2>
+                {totalCapturas > 0 && (
+                  <p className="mt-1 text-texto-suave">
+                    {totalCapturas} capturas de {especiesDistintas} especies
+                    {mayor?.pesoGramos
+                      ? `. La más gorda, ${formatearPeso(mayor.pesoGramos)} de ${mayor.especie.nombreComun}.`
+                      : "."}
+                  </p>
+                )}
+              </div>
               <Link
                 href="/capturas"
                 className="font-semibold text-acento underline underline-offset-4"
               >
-                Ver todas
+                Ver el ranking
               </Link>
             </div>
             <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
@@ -458,33 +441,6 @@ export default async function Home() {
             </ul>
           </section>
         )}
-
-        {/* --- Marcador --- */}
-        <section>
-          <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="titulo-seccion font-bold">Cómo vamos</h2>
-            <Link
-              href="/ranking"
-              className="font-semibold text-acento underline underline-offset-4"
-            >
-              Ver el ranking
-            </Link>
-          </div>
-          <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {usuario && <Marcador titulo="Tuyas" valor={misCapturas} />}
-            <Marcador titulo="Capturas" valor={totalCapturas} />
-            <Marcador titulo="Especies distintas" valor={especiesDistintas} />
-            <Marcador
-              titulo="La más gorda"
-              valor={mayor ? (formatearPeso(mayor.pesoGramos) ?? "—") : "—"}
-              pie={
-                mayor
-                  ? `${mayor.especie.nombreComun}, ${mayor.usuario.nombre}`
-                  : undefined
-              }
-            />
-          </dl>
-        </section>
 
         {/* --- Blog: las preguntas que no responde una ficha de embalse. --- */}
         {articulos.length > 0 && (
@@ -542,46 +498,6 @@ export default async function Home() {
           </Link>
         </section>
       </div>
-    </div>
-  );
-}
-
-function Argumento({
-  numero,
-  titulo,
-  children,
-}: {
-  numero: string;
-  titulo: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="border-t-2 border-acento pt-5">
-      <p className="text-sm font-bold tabular-nums text-acento">{numero}</p>
-      <h2 className="mt-1 text-xl font-bold">{titulo}</h2>
-      <p className="mt-2 leading-relaxed text-texto-suave">{children}</p>
-    </div>
-  );
-}
-
-function Marcador({
-  titulo,
-  valor,
-  pie,
-}: {
-  titulo: string;
-  valor: number | string;
-  pie?: string;
-}) {
-  return (
-    <div className="tarjeta p-4">
-      <dt className="text-xs font-bold uppercase tracking-wide text-texto-suave">
-        {titulo}
-      </dt>
-      <dd className="mt-1 text-3xl font-bold tabular-nums text-acento">
-        {valor}
-      </dd>
-      {pie && <p className="mt-0.5 text-xs text-texto-suave">{pie}</p>}
     </div>
   );
 }

@@ -390,16 +390,19 @@ export default async function FichaSitio({
         <div className="mt-4">
           <SelectorUbicacion actual={ubicacion} variante="linea" />
           {desdeMiCasaKm !== null && (
-            <p className="mt-2 max-w-prose text-sm leading-relaxed text-texto-suave">
-              Los {formatearTiempo(tiempoEnCocheAprox(desdeMiCasaKm))} son una
-              estimación a partir de la línea recta, no una ruta: por carretera
-              de montaña o con el embalse al final de un carril, cuenta más.
+            <p className="mt-2 text-sm text-texto-suave">
+              Tiempo estimado, no una ruta: por carretera cuenta más.
             </p>
           )}
         </div>
-        <p className="mt-3 text-sm leading-relaxed text-texto-suave">
-          {AVISO_COORDENADAS_APROXIMADAS}
-        </p>
+        <details className="mt-3">
+          <summary className="cursor-pointer text-sm font-semibold text-texto-suave">
+            Sobre las coordenadas
+          </summary>
+          <p className="mt-1 max-w-prose text-sm leading-relaxed text-texto-suave">
+            {AVISO_COORDENADAS_APROXIMADAS}
+          </p>
+        </details>
         <a
           href={`https://www.google.com/maps/search/?api=1&query=${sitio.latitud},${sitio.longitud}`}
           target="_blank"
@@ -417,9 +420,14 @@ export default async function FichaSitio({
 
       <section>
         <h2 className="mb-1 text-xl font-bold">Qué hay</h2>
-        <p className="mb-4 text-sm leading-relaxed text-texto-suave">
-          {AVISO_ABUNDANCIAS_ESTIMADAS}
-        </p>
+        <details className="mb-4">
+          <summary className="cursor-pointer text-sm font-semibold text-texto-suave">
+            De dónde salen estas abundancias
+          </summary>
+          <p className="mt-1 max-w-prose text-sm leading-relaxed text-texto-suave">
+            {AVISO_ABUNDANCIAS_ESTIMADAS}
+          </p>
+        </details>
 
         {pescables.length > 0 && (
           <>
