@@ -273,7 +273,10 @@ function bisectar(
     if (f(lo) * f(medio) <= 0) hi = medio;
     else lo = medio;
   }
-  return new Date(inicio.getTime() + Math.round((lo + hi) / 2) * 60000);
+  // Sin redondear al minuto: la bisección ya da precisión de segundos y
+  // tirarla aquí hacía que días consecutivos cerca del solsticio salieran
+  // empatados. El redondeo va donde toca, al pintar la hora.
+  return new Date(inicio.getTime() + ((lo + hi) / 2) * 60000);
 }
 
 // --- Fase lunar -----------------------------------------------------------
@@ -478,12 +481,14 @@ export function indiceDePesca(
   const ciclo = (Math.cos(4 * Math.PI * dia.fase.fraccion) + 1) / 2;
   const luna = Math.round(MAX.luna * ciclo);
 
+  // Tres estados, y los tres claros: sí, no, y no se sabe. El «no» vale cero
+  // y no un 40 % de regalo, que era un número mágico y además dejaba las dos
+  // pantallas descuadradas: un sitio fuera de temporada puntuaba MÁS que el
+  // calendario general del mismo día, porque el general no tiene ese suelo.
+  // Con esto, en temporada > sin saberlo > fuera de temporada, que es el
+  // orden que cualquiera espera.
   const sinSitio = opciones.enTemporada === null || opciones.enTemporada === undefined;
-  const temporada = sinSitio
-    ? 0
-    : opciones.enTemporada
-      ? MAX.temporada
-      : Math.round(MAX.temporada * 0.4);
+  const temporada = sinSitio ? 0 : opciones.enTemporada ? MAX.temporada : 0;
 
   // Sin temporada, luz y luna reparten los 100 puntos entre las dos.
   const total = sinSitio

@@ -13,17 +13,27 @@ export const metadata: Metadata = metadatosDePagina({
 });
 
 /**
- * OJO, ESTO HAY QUE COMPLETARLO ANTES DE PUBLICAR.
+ * Quién responde de la web.
  *
- * Una web pública que recoge emails, fotos y ubicaciones de personas está
- * sujeta al RGPD y a la LSSI. Este texto describe con honestidad lo que la
- * aplicación hace de verdad, pero los datos del responsable hay que rellenarlos
- * y conviene que alguien que sepa lo revise.
+ * Sale de variables de entorno y no del código por dos motivos. Uno, que son
+ * datos personales y no tienen por qué estar en un repositorio. Y dos, que así
+ * se rellenan editando el `.env` del servidor y levantando de nuevo, sin tocar
+ * una línea ni esperar a un despliegue.
+ *
+ * La LSSI (art. 10) obliga a identificar al prestador del servicio, y el RGPD
+ * a decir quién es el responsable del tratamiento y cómo ejercer los derechos.
+ * Mientras falten, la página lo dice en vez de enseñar un «[COMPLETAR]», que
+ * es lo que había y que daba peor impresión que no tener la página.
+ *
+ *     RESPONSABLE_NOMBRE="Nombre y apellidos o razón social"
+ *     RESPONSABLE_CONTACTO="correo@dominio.es"
  */
 const RESPONSABLE = {
-  nombre: "[COMPLETAR: nombre del responsable]",
-  contacto: "[COMPLETAR: email de contacto]",
+  nombre: process.env.RESPONSABLE_NOMBRE?.trim() || null,
+  contacto: process.env.RESPONSABLE_CONTACTO?.trim() || null,
 };
+
+const FALTAN_DATOS = !RESPONSABLE.nombre || !RESPONSABLE.contacto;
 
 export default function PaginaAvisoLegal() {
   // El texto cambia según haya anuncios o no: decir que no hay cookies de
@@ -37,19 +47,23 @@ export default function PaginaAvisoLegal() {
         Aviso legal y privacidad
       </h1>
 
+      {FALTAN_DATOS && (
       <div className="rounded-xl border-2 border-ambar-texto/30 bg-ambar-fondo p-4 text-ambar-texto">
         <p className="font-bold">Pendiente de completar</p>
         <p className="mt-1 leading-relaxed">
-          Faltan los datos del responsable. Están marcados abajo y hay que
-          rellenarlos antes de abrir la web al público.
+          Faltan los datos de quien responde de esta web. Se rellenan en el
+          fichero <code>.env</code> del servidor, con{" "}
+          <code>RESPONSABLE_NOMBRE</code> y <code>RESPONSABLE_CONTACTO</code>.
         </p>
       </div>
+      )}
 
       <section>
         <h2 className="mb-2 text-xl font-bold">Quién responde de esta web</h2>
         <p className="leading-relaxed">
-          {RESPONSABLE.nombre}. Contacto: {RESPONSABLE.contacto}. Es un proyecto
-          personal, sin ánimo de lucro y sin publicidad.
+          {RESPONSABLE.nombre ?? "pendiente de identificar"}. Contacto:{" "}
+          {RESPONSABLE.contacto ?? "pendiente"}. Es un proyecto
+          personal.
         </p>
       </section>
 
@@ -123,7 +137,10 @@ export default function PaginaAvisoLegal() {
             Mi cuenta
           </Link>
           : se elimina la cuenta, todas tus capturas y todas tus fotos, sin
-          copias. Para cualquier otra cosa, escribe a {RESPONSABLE.contacto}.
+          copias.
+          {RESPONSABLE.contacto
+            ? ` Para cualquier otra cosa, escribe a ${RESPONSABLE.contacto}.`
+            : " Para cualquier otra cosa, usa el formulario de contacto de la web."}
         </p>
       </section>
 

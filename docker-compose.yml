@@ -22,6 +22,11 @@ services:
       # Vacío = sin anuncios y sin banner de cookies. Al rellenarlo aparecen
       # los dos, y el script de Google solo se envía si el visitante acepta.
       ADSENSE_ID: "${ADSENSE_ID:-}"
+      # Quien responde de la web, para el aviso legal. La LSSI obliga a
+      # identificarlo y el RGPD a decir a quién se le reclaman los datos.
+      # Van aquí y no en el código porque son datos personales.
+      RESPONSABLE_NOMBRE: "${RESPONSABLE_NOMBRE:-}"
+      RESPONSABLE_CONTACTO: "${RESPONSABLE_CONTACTO:-}"
       SEED_PASSWORD: "${SEED_PASSWORD:-cambiala-ya}"
       # Pon "no" cuando no quieras que el seed se ejecute en cada arranque.
       SEMBRAR_AL_ARRANCAR: "${SEMBRAR_AL_ARRANCAR:-si}"

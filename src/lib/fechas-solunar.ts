@@ -74,14 +74,21 @@ export function diaLocalDe(instante: Date): { anio: number; mes: number; dia: nu
   return { anio: Number(v.year), mes: Number(v.month), dia: Number(v.dia ?? v.day) };
 }
 
-/** «07:31», en hora local del sitio. */
+/**
+ * «07:31», en hora local del sitio.
+ *
+ * Redondea al minuto más cercano, como cualquier almanaque. `Intl` trunca, y
+ * truncar un orto calculado a las 07:31:50 lo deja en 07:31 cuando lo que se
+ * ve es 07:32.
+ */
 export function hora(d: Date | null): string {
   if (!d) return "—";
+  const alMinuto = new Date(Math.round(d.getTime() / 60000) * 60000);
   return new Intl.DateTimeFormat("es-ES", {
     timeZone: ZONA,
     hour: "2-digit",
     minute: "2-digit",
-  }).format(d);
+  }).format(alMinuto);
 }
 
 /** «sábado, 8 de agosto». */

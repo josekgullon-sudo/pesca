@@ -18,7 +18,8 @@
     "fotos": "tsx scripts/fotos.mjs",
     "predev": "prisma migrate deploy",
     "actualizar": "npm run db:deploy && npm run db:seed",
-    "contrasena": "tsx scripts/contrasena.mjs"
+    "contrasena": "tsx scripts/contrasena.mjs",
+    "test": "node --import tsx --test \"src/**/*.test.ts\""
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.9.1",
