@@ -51,6 +51,7 @@ export default async function PaginaCalendario({
         latitud: true,
         longitud: true,
         mejorEpoca: true,
+        nivelPorcentaje: true,
         provincia: { select: { slug: true, nombre: true } },
       },
     }),
@@ -101,7 +102,10 @@ export default async function PaginaCalendario({
       }
       return {
         ...s,
-        nota: indiceDePesca(d, { enTemporada: meses.includes(mesDeHoy) }).total,
+        nota: indiceDePesca(d, {
+          enTemporada: meses.includes(mesDeHoy),
+          nivelPorcentaje: s.nivelPorcentaje,
+        }).total,
         distanciaKm: ubicacion ? distanciaKm(ubicacion, s) : null,
       };
     })
@@ -156,6 +160,15 @@ export default async function PaginaCalendario({
                       {s.municipio}
                       {s.distanciaKm !== null && ` · a ${formatearKm(s.distanciaKm)}`}
                     </span>
+                    {/* Por qué esta nota y no otra. Sin esto, un embalse del
+                        que no hay dato de nivel cae al final de la lista y
+                        parece que sea malo, cuando lo que pasa es que no se
+                        sabe. */}
+                    <span className="block text-xs text-texto-suave">
+                      {s.nivelPorcentaje === null
+                        ? "sin dato de nivel"
+                        : `al ${Math.round(s.nivelPorcentaje)} % de capacidad`}
+                    </span>
                   </span>
                   <span
                     className={`shrink-0 text-2xl font-bold tabular-nums ${
@@ -178,6 +191,7 @@ export default async function PaginaCalendario({
       <Calendario
         punto={punto}
         mejorEpoca={elegido?.mejorEpoca ?? ""}
+        nivelPorcentaje={elegido?.nivelPorcentaje ?? null}
         anio={anio}
         mes={mes}
         hoy={hoy}

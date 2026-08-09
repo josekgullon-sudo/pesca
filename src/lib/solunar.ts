@@ -433,6 +433,7 @@ export type Desglose = {
   luz: number;
   luna: number;
   temporada: number;
+  nivel: number;
 };
 
 export type Indice = {
@@ -443,7 +444,38 @@ export type Indice = {
   descripcion: string;
 };
 
-const MAX = { luz: 35, luna: 40, temporada: 25 } as const;
+/**
+ * Cuánto pesa cada cosa.
+ *
+ * Sol y luna son iguales para todos los embalses el mismo día: dos sitios de
+ * Andalucía se llevan minutos de amanecer y la misma fase de luna. Así que
+ * todo lo que pese ahí es peso que NO distingue un embalse de otro.
+ *
+ * Con luz 35 y luna 40, el listado de «los embalses hoy» salía con la misma
+ * nota en casi todas las fichas —20, y 45 los que estaban en temporada—, que
+ * es un ranking que no ordena nada. La mitad de los puntos son ahora del
+ * sitio: en qué época está y cuánta agua lleva.
+ */
+const MAX = { luz: 30, luna: 30, temporada: 20, nivel: 20 } as const;
+
+/**
+ * Qué nota se le pone al nivel del embalse.
+ *
+ * Solo se moja donde hay algo que decir de verdad. Un embalse muy vaciado en
+ * verano deja las orillas de siempre a cien metros del agua, y lo que queda es
+ * poco fondo, caliente y con menos oxígeno: eso lo firma cualquiera que haya
+ * ido. Entre el 60 % y el 100 %, en cambio, no hay una diferencia que se pueda
+ * defender, así que ahí no se inventa ninguna y puntúan igual.
+ *
+ * Lo que esto NO dice es que un embalse lleno pesque más que otro medio lleno.
+ * Dice que uno bajo mínimos pesca peor que él mismo cuando está lleno.
+ */
+export function notaDelNivel(porcentaje: number): number {
+  const p = Math.max(0, Math.min(100, porcentaje));
+  if (p >= 60) return MAX.nivel;
+  if (p >= 30) return Math.round(MAX.nivel * (0.5 + (p - 30) / 60));
+  return Math.round(MAX.nivel * (p / 60));
+}
 
 /** Cuántos minutos se solapan dos intervalos. */
 function solape(a: Periodo, b: Periodo): number {
@@ -460,7 +492,17 @@ export function indiceDePesca(
    * Entonces esa pata sale del reparto y las otras dos se reescalan a 100, en
    * vez de restar puntos por un dato que nadie ha comprobado.
    */
-  opciones: { enTemporada?: boolean | null } = {},
+  opciones: {
+    enTemporada?: boolean | null;
+    /**
+     * Porcentaje de capacidad del embalse. En `null` o sin poner significa que
+     * no se sabe —hay embalses pequeños que el boletín del Ministerio no
+     * recoge— y entonces esta pata sale del reparto, igual que la temporada.
+     * Restarle puntos a un embalse por un dato que nadie tiene sería castigarlo
+     * por ser pequeño.
+     */
+    nivelPorcentaje?: number | null;
+  } = {},
 ): Indice {
   // --- Luz: solape de los periodos con las dos horas de penumbra ---
   const franjas: Periodo[] = [];
@@ -487,16 +529,36 @@ export function indiceDePesca(
   // calendario general del mismo día, porque el general no tiene ese suelo.
   // Con esto, en temporada > sin saberlo > fuera de temporada, que es el
   // orden que cualquiera espera.
-  const sinSitio = opciones.enTemporada === null || opciones.enTemporada === undefined;
-  const temporada = sinSitio ? 0 : opciones.enTemporada ? MAX.temporada : 0;
+  const sabeTemporada =
+    opciones.enTemporada !== null && opciones.enTemporada !== undefined;
+  const temporada = opciones.enTemporada ? MAX.temporada : 0;
 
-  // Sin temporada, luz y luna reparten los 100 puntos entre las dos.
-  const total = sinSitio
-    ? Math.round(((luz + luna) / (MAX.luz + MAX.luna)) * 100)
-    : luz + luna + temporada;
+  const sabeNivel =
+    opciones.nivelPorcentaje !== null && opciones.nivelPorcentaje !== undefined;
+  const nivel = sabeNivel ? notaDelNivel(opciones.nivelPorcentaje!) : 0;
+
+  // Lo que no se sabe no puntúa cero: sale del reparto y el resto se reescala
+  // a 100. Si no, el calendario general —donde no hay embalse elegido— y un
+  // embalse pequeño del que no hay dato de nivel saldrían castigados por no
+  // tener un dato que nadie ha comprobado, en vez de simplemente no tenerlo.
+  const partes = [
+    { punto: luz, tope: MAX.luz },
+    { punto: luna, tope: MAX.luna },
+    ...(sabeTemporada ? [{ punto: temporada, tope: MAX.temporada }] : []),
+    ...(sabeNivel ? [{ punto: nivel, tope: MAX.nivel }] : []),
+  ];
+  const puntos = partes.reduce((a, p) => a + p.punto, 0);
+  const topes = partes.reduce((a, p) => a + p.tope, 0);
+
+  const total = Math.round((puntos / topes) * 100);
   const { titular, descripcion } = etiquetaDe(total);
 
-  return { total, desglose: { luz, luna, temporada }, titular, descripcion };
+  return {
+    total,
+    desglose: { luz, luna, temporada, nivel },
+    titular,
+    descripcion,
+  };
 }
 
 function etiquetaDe(total: number): { titular: string; descripcion: string } {

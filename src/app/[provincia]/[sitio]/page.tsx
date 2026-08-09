@@ -387,6 +387,7 @@ export default async function FichaSitio({
         latitud={sitio.latitud}
         longitud={sitio.longitud}
         mejorEpoca={sitio.mejorEpoca}
+        nivelPorcentaje={sitio.nivelPorcentaje}
         hoy={hoy}
         enlaceCalendario={`/${provincia.slug}/${sitio.slug}/calendario`}
         titulo={`Cuándo ir a ${sitio.nombre}`}

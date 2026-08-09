@@ -128,6 +128,7 @@ export function Calendario({
   baseUrl,
   paramsExtra,
   clima,
+  nivelPorcentaje = null,
   nombreSitio,
 }: {
   punto: Punto;
@@ -142,6 +143,8 @@ export function Calendario({
   paramsExtra?: Record<string, string>;
   /** El tiempo, si se ha podido traer. Puede ser null y no pasa nada. */
   clima?: Clima | null;
+  /** Cuánta agua lleva. En `null`, esa pata sale del reparto de la nota. */
+  nivelPorcentaje?: number | null;
   nombreSitio: string;
 }) {
   // Se construye con URLSearchParams y no pegando cadenas: con un `?sitio=x`
@@ -160,6 +163,7 @@ export function Calendario({
       d,
       i: indiceDePesca(d, {
         enTemporada: buenos ? buenos.includes(mesDelDia) : null,
+        nivelPorcentaje,
       }),
     };
   };
@@ -282,6 +286,14 @@ export function Calendario({
               La época del año también cuenta, pero eso depende del embalse.
               Elige uno abajo y entra en la nota.
             </p>
+          )}
+          {nivelPorcentaje !== null && nivelPorcentaje !== undefined && (
+            <Barra
+              etiqueta="Nivel del agua"
+              valor={deHoy.i.desglose.nivel}
+              maximo={MAXIMOS_DESGLOSE.nivel}
+              nota={`${nombreSitio} está al ${Math.round(nivelPorcentaje)} %. Solo baja nota si está muy vaciado: entre el 60 % y el 100 % no cambia.`}
+            />
           )}
         </section>
       </div>

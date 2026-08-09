@@ -188,6 +188,50 @@ describe("índice de pesca", () => {
     );
   });
 
+  it("sin saber el nivel, esa pata tampoco resta", () => {
+    const sinSaber = indiceDePesca(d, { enTemporada: true, nivelPorcentaje: null });
+    const vacio = indiceDePesca(d, { enTemporada: true, nivelPorcentaje: 5 });
+    assert.ok(
+      sinSaber.total > vacio.total,
+      "un embalse del que no hay dato puntuaba como uno bajo mínimos",
+    );
+  });
+
+  it("un embalse lleno no puntúa menos que el mismo medio vacío", () => {
+    const nota = (p: number) =>
+      indiceDePesca(d, { enTemporada: true, nivelPorcentaje: p }).total;
+    assert.ok(nota(90) >= nota(50), "lleno puntuaba menos que a media asta");
+    assert.ok(nota(50) >= nota(10), "medio puntuaba menos que bajo mínimos");
+    assert.ok(nota(90) > nota(10), "el nivel no estaba cambiando nada");
+  });
+
+  it("entre el 60 % y el 100 % no se inventa ninguna diferencia", () => {
+    // No hay forma de defender que un embalse al 95 % pesque mejor que uno al
+    // 70 %, así que la nota no lo dice.
+    const nota = (p: number) =>
+      indiceDePesca(d, { enTemporada: true, nivelPorcentaje: p }).total;
+    assert.equal(nota(60), nota(100));
+    assert.equal(nota(75), nota(100));
+  });
+
+  it("el nivel desempata: dos embalses del mismo día no salen iguales", () => {
+    // La razón de que el nivel entre en la nota. El listado de «los embalses
+    // hoy» salía con la misma cifra en casi todas las fichas, porque el sol y
+    // la luna son los mismos para todos y solo desempataba la temporada.
+    const lleno = indiceDePesca(d, { enTemporada: true, nivelPorcentaje: 85 }).total;
+    const bajo = indiceDePesca(d, { enTemporada: true, nivelPorcentaje: 7.5 }).total;
+    assert.notEqual(lleno, bajo);
+  });
+
+  it("la nota sigue entre 0 y 100 con todas las patas", () => {
+    for (const p of [0, 7.5, 30, 59.9, 60, 100]) {
+      for (const t of [true, false, null]) {
+        const i = indiceDePesca(d, { enTemporada: t, nivelPorcentaje: p });
+        assert.ok(i.total >= 0 && i.total <= 100, `nivel ${p}, temporada ${t}: ${i.total}`);
+      }
+    }
+  });
+
   it("la luna puntúa más en luna nueva y llena que en los cuartos", () => {
     const nota = (mes: number, dia: number) =>
       indiceDePesca(
