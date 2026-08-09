@@ -19,7 +19,7 @@
     "predev": "prisma migrate deploy",
     "actualizar": "npm run db:deploy && npm run db:seed",
     "contrasena": "tsx scripts/contrasena.mjs",
-    "test": "node --import tsx --test \"src/**/*.test.ts\"",
+    "test": "node --import tsx --test \"src/**/*.test.ts\" \"scripts/**/*.test.mjs\"",
     "niveles": "tsx scripts/niveles.ts",
     "admin": "tsx scripts/admin.mjs",
     "version": "tsx scripts/version.mjs"

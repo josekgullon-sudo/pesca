@@ -1,8 +1,15 @@
 /**
  * Descarga fotos de Wikimedia Commons para las especies y para los sitios.
  *
- *     npm run fotos            solo lo que aún no tiene foto
- *     npm run fotos -- --todas vuelve a bajarlo todo
+ *     npm run fotos                    solo lo que aún no tiene foto
+ *     npm run fotos -- --todas         vuelve a bajarlo todo
+ *     npm run fotos -- --solo=especies deja los embalses en paz
+ *     npm run fotos -- --solo=sitios   solo los embalses
+ *
+ * Lo de `--solo` está porque las fotos de los embalses se pueden estar
+ * poniendo a mano, que casi siempre queda mejor: una foto tuya del sitio dice
+ * más que la de Commons, que muchas veces es de la presa vista desde la
+ * carretera. Las de las especies, en cambio, no hay por qué hacerlas uno.
  *
  * Por qué un script y no imágenes metidas en el repositorio: las fotos de
  * Commons tienen autor y licencia, casi siempre Creative Commons con obligación
@@ -251,24 +258,59 @@ async function procesar(etiqueta, terminos, carpeta, slug, ancho, guardar) {
   }
 }
 
+/**
+ * Qué hay que bajar, según los argumentos.
+ *
+ * Va aparte y se exporta para poder probarlo: equivocarse aquí y bajar de
+ * Commons encima de unas fotos puestas a mano es de las cosas que no se
+ * deshacen, porque al cambiar la imagen se borra del disco la anterior.
+ */
+export function queHacer(argv) {
+  const puesto = argv.find((a) => a.startsWith("--solo="));
+  // Se mira si viene la opción, no si su valor es «verdadero»: un «--solo=»
+  // vacío daba una cadena vacía, se colaba por el if y acababa bajándolo todo,
+  // que es justo lo contrario de lo que se estaba pidiendo.
+  const solo = puesto?.slice("--solo=".length);
+  if (puesto !== undefined && solo !== "especies" && solo !== "sitios") {
+    throw new Error(`--solo solo acepta "especies" o "sitios", no "${solo}".`);
+  }
+  return {
+    todas: argv.includes("--todas"),
+    especies: solo !== "sitios",
+    sitios: solo !== "especies",
+  };
+}
+
 async function main() {
-  const todas = process.argv.includes("--todas");
-  const filtro = todas ? {} : { imagenUrl: null };
+  const plan = queHacer(process.argv.slice(2));
+  const filtro = plan.todas ? {} : { imagenUrl: null };
 
-  const especies = await prisma.especie.findMany({
-    where: filtro,
-    orderBy: { nombreComun: "asc" },
-    select: { id: true, slug: true, nombreComun: true, nombreCientifico: true },
-  });
+  if (plan.todas && plan.especies && plan.sitios) {
+    console.log(
+      "Con --todas se rehacen TODAS las fotos, también las que estén puestas a\n" +
+        "mano, y la anterior se borra del disco. Si las de los embalses las has\n" +
+        "puesto tú, usa --solo=especies.\n",
+    );
+  }
 
-  const sitios = await prisma.sitio.findMany({
-    where: filtro,
-    orderBy: { nombre: "asc" },
-    select: { id: true, slug: true, nombre: true, municipio: true },
-  });
+  const especies = plan.especies
+    ? await prisma.especie.findMany({
+        where: filtro,
+        orderBy: { nombreComun: "asc" },
+        select: { id: true, slug: true, nombreComun: true, nombreCientifico: true },
+      })
+    : [];
+
+  const sitios = plan.sitios
+    ? await prisma.sitio.findMany({
+        where: filtro,
+        orderBy: { nombre: "asc" },
+        select: { id: true, slug: true, nombre: true, municipio: true },
+      })
+    : [];
 
   if (especies.length === 0 && sitios.length === 0) {
-    console.log("Todo tiene ya su foto. Usa --todas para rehacerlas.");
+    console.log("Nada que bajar con eso. Usa --todas para rehacer lo que ya tiene foto.");
     return;
   }
 
