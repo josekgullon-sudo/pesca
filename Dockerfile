@@ -40,6 +40,15 @@ RUN npx prisma generate && npm run build
 
 FROM node:22-slim AS runner
 WORKDIR /app
+
+# Qué commit es esta imagen.
+#
+# Sin esto no hay forma de saber desde dentro del contenedor qué versión se
+# está ejecutando, y eso ha costado ya tres diagnósticos equivocados: se
+# lanzaba un comando antes de que el despliegue hubiera entrado y el resultado
+# parecía un fallo del código cuando era el código de antes.
+ARG VERSION_APP="desconocida"
+ENV VERSION_APP=$VERSION_APP
 RUN apt-get update \
   && apt-get install -y --no-install-recommends openssl ca-certificates \
   && rm -rf /var/lib/apt/lists/*

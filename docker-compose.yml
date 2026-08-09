@@ -8,7 +8,11 @@
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        # La pone `desplegar.sh` con el commit que acaba de traer.
+        VERSION_APP: "${VERSION_APP:-desconocida}"
     restart: unless-stopped
     environment:
       # La base de datos y las fotos viven en el volumen, no en la imagen.

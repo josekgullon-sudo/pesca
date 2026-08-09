@@ -21,7 +21,8 @@
     "contrasena": "tsx scripts/contrasena.mjs",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "niveles": "tsx scripts/niveles.ts",
-    "admin": "tsx scripts/admin.mjs"
+    "admin": "tsx scripts/admin.mjs",
+    "version": "tsx scripts/version.mjs"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.9.1",

@@ -202,7 +202,9 @@ async function main() {
   const args = process.argv.slice(2);
   // Se imprime antes que nada. Si no sale ni esta línea, el problema está en
   // los imports o el proceso ni llegó a ejecutarse.
-  console.log(`niveles.ts arrancando · Node ${process.version}`);
+  console.log(
+    `niveles.ts · versión ${process.env.VERSION_APP ?? "desconocida"} · Node ${process.version}`,
+  );
 
   if (args.includes("--descubrir")) {
     await descubrir();

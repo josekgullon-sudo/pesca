@@ -74,6 +74,11 @@ else
 fi
 
 paso "Reconstruyendo y levantando"
+# Se exporta para que el Dockerfile la reciba como argumento de construcción y
+# quede grabada en la imagen. Así, dentro del contenedor, siempre se puede
+# preguntar qué versión es esta.
+export VERSION_APP="$(git rev-parse --short HEAD)"
+
 docker compose up -d --build </dev/null
 
 paso "Comprobando que responde"
