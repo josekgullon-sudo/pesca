@@ -31,6 +31,7 @@ import { readFile } from "node:fs/promises";
 import { prisma } from "../src/lib/prisma";
 import { interpretarFecha, normalizar } from "../src/lib/niveles";
 import { reconocer } from "../src/lib/formato-descarga";
+import { leerBoletin } from "../src/lib/boletin-embalses";
 
 /**
  * Fuentes candidatas, de más a menos preferible.
@@ -39,6 +40,9 @@ import { reconocer } from "../src/lib/formato-descarga";
  * una máquina con internet. La que salga como CSV o JSON es la buena, y se
  * pasa luego con `--url=`.
  */
+const OFICIAL =
+  "https://www.miteco.gob.es/content/dam/miteco/es/agua/temas/evaluacion-de-los-recursos-hidricos/boletin-hidrologico/Historico-de-embalses/BD-Embalses.zip";
+
 const CANDIDATAS = [
   {
     nombre: "datos.gob.es — estado de los embalses",
@@ -108,6 +112,22 @@ async function descubrir() {
 /** Lee CSV o JSON. Si es otra cosa, lo dice con claridad y no adivina. */
 function interpretar(datos: Uint8Array): FilaBoletin[] {
   const d = reconocer(datos);
+
+  if (d.formato === "zip") {
+    const { filas, radiografia, problema } = leerBoletin(datos);
+    if (problema) {
+      console.error(`\n${problema}\n`);
+      for (const t of radiografia.tablas) {
+        console.error(`  Tabla «${t.nombre}» (${t.filas} filas)`);
+        console.error(`    ${t.columnas.join(", ")}`);
+      }
+      throw new Error("no he sabido encontrar los datos dentro de la base.");
+    }
+    console.log(
+      `Leído de la tabla «${radiografia.tablaElegida}» de la base de Access.`,
+    );
+    return filas;
+  }
 
   if (d.formato !== "csv" && d.formato !== "json") {
     const detalle = d.pistas.length ? `\n  ${d.pistas.join("\n  ")}` : "";
@@ -190,16 +210,6 @@ async function main() {
   const url = args.find((a) => a.startsWith("--url="))?.slice(6);
   const fichero = args.find((a) => a.startsWith("--fichero="))?.slice(10);
 
-  if (!url && !fichero) {
-    console.error(
-      "No hay ninguna fuente confirmada todavía, así que hay que decirle cuál.\n\n" +
-        "  1) npm run niveles -- --descubrir      para ver cuál sirve\n" +
-        "  2) npm run niveles -- --probar --url=LA_QUE_SIRVA\n",
-    );
-    process.exitCode = 1;
-    return;
-  }
-
   console.log(
     soloProbar
       ? "Modo prueba: no se va a escribir nada.\n"
@@ -208,7 +218,9 @@ async function main() {
 
   let filas: FilaBoletin[];
   try {
-    const datos = fichero ? new Uint8Array(await readFile(fichero)) : await bajar(url!);
+    const datos = fichero
+      ? new Uint8Array(await readFile(fichero))
+      : await bajar(url ?? OFICIAL);
     filas = interpretar(datos);
   } catch (e) {
     console.error(`No se ha podido leer la fuente: ${(e as Error).message}`);
