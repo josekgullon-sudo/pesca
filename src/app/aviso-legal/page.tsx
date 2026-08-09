@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { FECHA_DATOS_LEGALES } from "@/lib/avisos";
+import { HAY_ANALITICA } from "@/lib/analitica";
 import { hayQuePreguntar } from "@/lib/consentimiento";
 import { metadatosDePagina } from "@/lib/marca";
 
@@ -36,10 +37,14 @@ const RESPONSABLE = {
 const FALTAN_DATOS = !RESPONSABLE.nombre || !RESPONSABLE.contacto;
 
 export default function PaginaAvisoLegal() {
-  // El texto cambia según haya anuncios o no: decir que no hay cookies de
-  // seguimiento cuando sí las hay es exactamente la clase de afirmación que
-  // convierte un aviso legal en un problema.
+  // El texto cambia según haya anuncios o no y según haya contador de visitas
+  // o no: decir que no hay analítica ni cookies de seguimiento cuando sí las
+  // hay es exactamente la clase de afirmación que convierte un aviso legal en
+  // un problema. Por eso las dos cosas se leen del entorno y no se escriben a
+  // mano aquí: encender el contador y olvidarse de actualizar esta página
+  // sería lo fácil, y esto no deja.
   const conAnuncios = hayQuePreguntar();
+  const conAnalitica = HAY_ANALITICA;
 
   return (
     <div className="contenedor max-w-prose space-y-6 py-10 md:py-14">
@@ -80,6 +85,16 @@ export default function PaginaAvisoLegal() {
                 si las rechazas la web funciona igual. Puedes cambiar de
                 opinión desde el enlace del pie de página.
               </>
+            ) : conAnalitica ? (
+              <>
+                <strong>Si solo consultas la web</strong>, ningún dato que te
+                identifique. Se cuentan las visitas con un contador propio,
+                alojado en este mismo servidor: <strong>no pone ninguna cookie
+                </strong> y no te sigue de una web a otra. Para no contarte dos
+                veces calcula un identificador a partir de tu IP y tu navegador
+                que se recicla cada día; la IP no se guarda. Por eso esta web
+                no te pide permiso para cookies: no hay ninguna que pedir.
+              </>
             ) : (
               <>
                 <strong>Si solo consultas la web</strong>, ninguno. No hay
@@ -119,9 +134,11 @@ export default function PaginaAvisoLegal() {
         <h2 className="mb-2 text-xl font-bold">Dónde están</h2>
         <p className="leading-relaxed">
           En un servidor propio. No se ceden a terceros y no se venden.
+          {conAnalitica &&
+            " El contador de visitas también es propio y corre en ese mismo servidor: las estadísticas no las ve nadie más."}
           {conAnuncios
             ? " El único servicio externo es Google AdSense, y solo si aceptas sus cookies."
-            : " No hay servicios externos de analítica ni de publicidad."}
+            : " No hay ningún servicio externo de analítica ni de publicidad."}
         </p>
       </section>
 

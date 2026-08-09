@@ -31,6 +31,10 @@ services:
       # Van aquí y no en el código porque son datos personales.
       RESPONSABLE_NOMBRE: "${RESPONSABLE_NOMBRE:-}"
       RESPONSABLE_CONTACTO: "${RESPONSABLE_CONTACTO:-}"
+      # Analítica propia, sin cookies. Ver los servicios «umami» de abajo.
+      # Vacíos = no se envía ningún script al navegador.
+      UMAMI_URL: "${UMAMI_URL:-}"
+      UMAMI_WEBSITE_ID: "${UMAMI_WEBSITE_ID:-}"
       SEED_PASSWORD: "${SEED_PASSWORD:-cambiala-ya}"
       # Pon "no" cuando no quieras que el seed se ejecute en cada arranque.
       SEMBRAR_AL_ARRANCAR: "${SEMBRAR_AL_ARRANCAR:-si}"
@@ -38,6 +42,60 @@ services:
       - datos:/app/datos
     expose:
       - "3000"
+
+  # --- Analítica ------------------------------------------------------------
+  #
+  # Umami en el propio servidor, en un subdominio. Se eligió esto y no Google
+  # Analytics por dos razones que se refuerzan: no pone cookies, así que no
+  # obliga a enseñar el banner de consentimiento —esta web hoy no enseña
+  # ninguno—, y al no haber banner se mide al 100 % de las visitas en vez de
+  # solo a quien acepta, que suele ser la mitad. Y los datos no salen de aquí.
+  #
+  # Se sirve desde el propio dominio, así que para el navegador es una petición
+  # de primera parte: ni la bloquean los bloqueadores ni se le cuenta a nadie
+  # más quién entra.
+  #
+  # Va en un perfil y SIN variables obligatorias, las dos cosas a propósito.
+  # Con `${UMAMI_DB_PASSWORD:?...}` esto quedaba precioso y rompía el despliegue
+  # entero: Compose interpola el fichero completo antes de mirar los perfiles,
+  # así que un servidor sin esa variable en su .env no podía levantar ni la app.
+  # Comprobado, no supuesto.
+  #
+  # Para encenderlo:  docker compose --profile analitica up -d
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    profiles: ["analitica"]
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "postgresql://umami:${UMAMI_DB_PASSWORD:-}@umami-db:5432/umami"
+      DATABASE_TYPE: "postgresql"
+      APP_SECRET: "${UMAMI_APP_SECRET:-}"
+      # Sin esto Umami manda un ping con la versión a sus servidores.
+      DISABLE_TELEMETRY: "1"
+    depends_on:
+      umami-db:
+        condition: service_healthy
+    expose:
+      - "3000"
+
+  umami-db:
+    image: postgres:16-alpine
+    profiles: ["analitica"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "umami"
+      POSTGRES_USER: "umami"
+      # Vacía, Postgres se niega a arrancar y lo dice. Es el aviso que toca:
+      # falla el contenedor de la analítica y solo ese.
+      POSTGRES_PASSWORD: "${UMAMI_DB_PASSWORD:-}"
+    volumes:
+      - umami_datos:/var/lib/postgresql/data
+    healthcheck:
+      # Umami se cae al arrancar si Postgres todavía no acepta conexiones.
+      test: ["CMD-SHELL", "pg_isready -U umami"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   caddy:
     image: caddy:2-alpine
@@ -47,15 +105,24 @@ services:
       - "443:443"
     environment:
       DOMINIO: "${DOMINIO:?falta DOMINIO en el fichero .env}"
+      # El subdominio de la analítica. Por defecto apunta a un «.localhost»
+      # para el que Caddy usa su CA interna, así que mientras no se configure
+      # no se le pide ningún certificado a Let's Encrypt por un subdominio que
+      # a lo mejor ni existe en el DNS. Ver el Caddyfile.
+      DOMINIO_ANALITICA: "${DOMINIO_ANALITICA:-analitica.localhost}"
     volumes:
       - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    # Sin `depends_on: umami`: la analítica es opcional y Caddy tiene que
+    # levantar igual sin ella. Si no está, el subdominio da 502 y ya.
     depends_on:
       - app
 
 volumes:
   # Lo único irreemplazable: base de datos y fotos. Es lo que hay que copiar.
   datos:
+  # Las visitas. Se pierden si se borra, pero no se pierde nada de la guía.
+  umami_datos:
   caddy_data:
   caddy_config:

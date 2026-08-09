@@ -12,6 +12,28 @@ www.{$DOMINIO} {
 	redir https://{$DOMINIO}{uri} permanent
 }
 
+# La analítica, en su propio subdominio y con su propio certificado.
+#
+# Necesita un registro A en el DNS apuntando a este servidor, igual que el
+# www. Sin él, Caddy se queda reintentando el certificado y la web principal
+# sigue funcionando: no se lleva nada por delante.
+#
+# El panel queda expuesto a internet, así que lo único que lo protege es la
+# contraseña de Umami. Cámbiala nada más entrar: viene con admin/umami.
+{$DOMINIO_ANALITICA} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		-Server
+		# Que no acabe en Google el panel de estadísticas.
+		X-Robots-Tag "noindex, nofollow"
+	}
+
+	reverse_proxy umami:3000
+}
+
 {$DOMINIO} {
 	encode zstd gzip
 

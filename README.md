@@ -136,6 +136,44 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | `npm run db:studio`  | Prisma Studio para curiosear la base de datos  |
 | `npm run contrasena` | Cambia la contraseña de una cuenta              |
 
+## Analítica
+
+Umami en el propio servidor, en `analitica.TUDOMINIO`. Se eligió esto y no
+Google Analytics por tres motivos encadenados:
+
+1. **No pone cookies.** Por eso la web sigue sin enseñar banner: hoy no tiene
+   ninguna cookie que pedir salvo la de sesión, que es imprescindible.
+2. **Y sin banner se mide al 100 % de las visitas**, no solo a quien pulsa
+   «aceptar», que suele ser la mitad. Una analítica que no ve a la mitad de la
+   gente no sirve para decidir nada.
+3. **Los datos no salen del servidor.**
+
+Para montarlo:
+
+1. Añade un registro **A** en el DNS de `analitica.TUDOMINIO` apuntando al
+   VPS. Sin él, Caddy se queda reintentando el certificado; la web principal
+   sigue funcionando igual.
+2. Pon `UMAMI_DB_PASSWORD` y `UMAMI_APP_SECRET` en el `.env` del servidor, y
+   `DOMINIO_ANALITICA=analitica.TUDOMINIO`.
+3. `docker compose --profile analitica up -d`. Entra en `https://analitica.TUDOMINIO` con
+   **admin / umami** y **cambia la contraseña antes de nada**: el panel está
+   expuesto a internet y eso es lo único que lo protege.
+4. Da de alta la web en Settings → Websites, copia su *Website ID*, ponlo en
+   `UMAMI_URL` y `UMAMI_WEBSITE_ID` del `.env` y `docker compose up -d app`.
+
+Mientras `UMAMI_URL` y `UMAMI_WEBSITE_ID` estén vacías no se envía ningún
+script al navegador, y `/aviso-legal` dice que no hay analítica. En cuanto se
+rellenan, esa página cambia sola y explica qué se mide: es la razón de que el
+texto se decida con una variable de entorno y no escribiéndolo a mano.
+
+Umami va en un **perfil** de Compose, así que sin `--profile analitica` no se
+levanta y la web funciona exactamente igual. Y ninguna de sus variables es
+obligatoria: con `${UMAMI_DB_PASSWORD:?...}` quedaba más elegante y rompía el
+despliegue entero, porque Compose interpola el fichero completo antes de mirar
+los perfiles y un servidor sin esa variable no podía levantar ni la app.
+`docker/desplegar.sh` añade el perfil solo si hay contraseña en el `.env`, así
+que en los despliegues automáticos no hay que acordarse de nada.
+
 En el servidor, `bash docker/desplegar.sh` actualiza y levanta comprobando que
 la web responde. Con los secretos configurados, GitHub Actions lo ejecuta solo
 en cada subida a la rama: ver `DESPLIEGUE.md`.

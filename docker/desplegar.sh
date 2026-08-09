@@ -79,7 +79,23 @@ paso "Reconstruyendo y levantando"
 # preguntar qué versión es esta.
 export VERSION_APP="$(git rev-parse --short HEAD)"
 
-docker compose up -d --build </dev/null
+# La analítica es opcional y vive en un perfil, así que sin esto se quedaría
+# parada en el primer despliegue después de encenderla. Se activa sola si en el
+# .env hay contraseña para su base de datos, que es lo que hace falta para que
+# arranque; así no hay que acordarse de escribir el perfil cada vez.
+# El patrón exige un carácter que no sea comilla ni espacio: `.+` daba por
+# buena la línea `UMAMI_DB_PASSWORD=""` que trae el .env.example, y entonces
+# se levantaba el perfil con la contraseña vacía y Postgres se negaba a
+# arrancar en bucle.
+PERFILES=()
+if grep -qE '^UMAMI_DB_PASSWORD=["'"'"']?[^"'"'"'[:space:]]' .env 2>/dev/null; then
+  PERFILES=(--profile analitica)
+  echo "Analítica configurada: se levanta también."
+fi
+
+# `${PERFILES[@]+...}` y no `${PERFILES[@]}` a secas: con `set -u`, un array
+# vacío cuenta como variable sin definir en las versiones viejas de bash.
+docker compose ${PERFILES[@]+"${PERFILES[@]}"} up -d --build </dev/null
 
 paso "Comprobando que responde"
 # Se pregunta desde dentro del contenedor porque el puerto 3000 no está

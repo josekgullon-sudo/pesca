@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Analitica } from "@/components/Analitica";
 import { Anuncios } from "@/components/Anuncios";
 import { AvisoLegal } from "@/components/AvisoLegal";
 import { Cabecera } from "@/components/Cabecera";
@@ -63,6 +64,7 @@ export default async function RootLayout({
     <html lang="es">
       <body className="antialiased">
         <DatosEstructurados schema={schemaWebSite()} />
+        <Analitica />
         <Anuncios />
 
         {/* El armazón ocupa la pantalla entera y es cada bloque el que centra
