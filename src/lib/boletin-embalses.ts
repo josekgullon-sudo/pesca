@@ -18,14 +18,10 @@
 
 import { unzipSync } from "fflate";
 import MDBReader from "mdb-reader";
-import { interpretarFecha } from "./niveles";
+import { interpretarFecha, type FilaBoletin } from "./niveles";
 
-export type FilaEmbalse = {
-  nombre: string;
-  capacidadHm3: number;
-  volumenHm3: number;
-  fecha: Date;
-};
+/** Es la misma fila que emparejamos después; el tipo vive en `niveles.ts`. */
+export type FilaEmbalse = FilaBoletin;
 
 /** Lo que se ha encontrado dentro, para poder diagnosticar sin adivinar. */
 export type Radiografia = {

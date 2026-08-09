@@ -1704,6 +1704,26 @@ async function main() {
   );
 
   // --- Sitios --------------------------------------------------------------
+  //
+  // La capacidad tiene dos orígenes y hay que decidir cuál manda. Aquí está
+  // escrita a mano; el boletín hidrológico trae la oficial y `npm run niveles`
+  // la guarda junto al volumen de esa semana. Como este seed se ejecuta en
+  // cada arranque, si volviera a pisarla la ficha diría «40 de 113 hm³» al
+  // lado de un «40 %» que se calculó sobre 101: dos números que no cuadran
+  // entre sí, en el mismo renglón.
+  //
+  // Manda el boletín. El valor de aquí es la estimación de partida, y sirve
+  // mientras ese embalse no haya emparejado —que es justo lo que dice tener
+  // `nombreEnBoletin`—.
+  const conBoletin = new Set(
+    (
+      await prisma.sitio.findMany({
+        where: { NOT: { nombreEnBoletin: null } },
+        select: { slug: true },
+      })
+    ).map((s) => s.slug),
+  );
+
   for (const s of SITIOS) {
     const { mejorEpoca, provincia, ...resto } = s;
     const provinciaId = provincias.get(provincia);
@@ -1714,10 +1734,14 @@ async function main() {
       provinciaId,
       mejorEpoca: JSON.stringify(mejorEpoca),
     };
+
+    const sinCapacidad = { ...data };
+    delete (sinCapacidad as { capacidadHm3?: unknown }).capacidadHm3;
+
     await prisma.sitio.upsert({
       where: { slug: s.slug },
       create: data,
-      update: data,
+      update: conBoletin.has(s.slug) ? sinCapacidad : data,
     });
   }
   console.log(`  ${SITIOS.length} sitios`);

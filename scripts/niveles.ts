@@ -29,7 +29,12 @@
 
 import { readFile } from "node:fs/promises";
 import { prisma } from "../src/lib/prisma";
-import { interpretarFecha, normalizar } from "../src/lib/niveles";
+import {
+  crearBuscador,
+  interpretarFecha,
+  normalizar,
+  type FilaBoletin,
+} from "../src/lib/niveles";
 import { reconocer } from "../src/lib/formato-descarga";
 import { leerBoletin } from "../src/lib/boletin-embalses";
 
@@ -63,13 +68,6 @@ const CANDIDATAS = [
 ];
 
 const FUENTE_NOMBRE = "Boletín Hidrológico Semanal (MITECO)";
-
-type FilaBoletin = {
-  nombre: string;
-  capacidadHm3: number;
-  volumenHm3: number;
-  fecha: Date;
-};
 
 async function bajar(url: string): Promise<Uint8Array> {
   const respuesta = await fetch(url, {
@@ -245,14 +243,15 @@ async function main() {
     orderBy: { nombre: "asc" },
   });
 
-  const porNombre = new Map(filas.map((f) => [normalizar(f.nombre), f]));
+  const { buscar, parecidosA } = crearBuscador(filas);
+
   const emparejados: { id: string; nombre: string; fila: FilaBoletin; pct: number }[] = [];
-  const sinEmparejar: string[] = [];
+  const sinEmparejar: { nombre: string; parecidos: string[] }[] = [];
 
   for (const s of sitios) {
-    const fila = porNombre.get(normalizar(s.nombreEnBoletin ?? s.nombre));
+    const fila = buscar(s.nombreEnBoletin ?? s.nombre);
     if (!fila) {
-      sinEmparejar.push(s.nombre);
+      sinEmparejar.push({ nombre: s.nombre, parecidos: parecidosA(s.nombre) });
       continue;
     }
     emparejados.push({
@@ -275,7 +274,18 @@ async function main() {
 
   if (sinEmparejar.length) {
     console.log("\nSIN EMPAREJAR (se quedan sin nivel, que es lo correcto)");
-    for (const n of sinEmparejar) console.log(`  ${n}`);
+    for (const n of sinEmparejar) {
+      console.log(`  ${n.nombre}`);
+      if (n.parecidos.length) {
+        console.log(`      parecidos en el boletín: ${n.parecidos.join(", ")}`);
+      } else {
+        console.log(`      no hay nada parecido: probablemente no viene`);
+      }
+    }
+    console.log(
+      "\n  Para arreglarlos, pon el nombre exacto del boletín en el campo\n" +
+        "  `nombreEnBoletin` del sitio. Con «A + B» se suman varios.",
+    );
   }
 
   if (soloProbar) {

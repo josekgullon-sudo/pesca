@@ -55,6 +55,14 @@ export type SitioAndalucia = {
   avisosSanitarios: string;
   mejorEpoca: number[];
   urlNivelAgua: string | null;
+  /**
+   * Cómo se llama en el boletín hidrológico, si no se llama igual que aquí.
+   *
+   * Solo hace falta cuando el emparejamiento automático no acierta: nombres
+   * que allí llevan un romano detrás, o complejos de presas comunicadas que
+   * hay que sumar escribiendo «A + B». Lo normal es dejarlo sin poner.
+   */
+  nombreEnBoletin?: string;
 };
 
 const PRIMAVERA_Y_OTONO = [3, 4, 5, 6, 9, 10, 11];
@@ -862,6 +870,10 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
       "de referencia de la provincia, y también el más visitado: en " +
       "temporada alta hay mucha gente que no viene a pescar.",
     capacidadHm3: null,
+    // Dos presas distintas en el boletín, y la ficha habla de las dos: aquí se
+    // suman. Enseñar solo el nivel de una sería contar otra cosa de la que se
+    // está mirando.
+    nombreEnBoletin: "Guadalhorce + Guadalteba",
     accesoDescripcion:
       "Desde Ardales y desde la carretera de El Chorro, con aparcamientos y " +
       "áreas recreativas. Los accesos se saturan los fines de semana.",

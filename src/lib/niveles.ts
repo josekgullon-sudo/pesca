@@ -22,9 +22,81 @@ export function normalizar(nombre: string): string {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
-    .replace(/\b(embalse|pantano|de|del|la|el|los|las)\b/g, " ")
+    .replace(/\b(embalses?|pantanos?|de|del|la|el|los|las)\b/g, " ")
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
+}
+
+/** Una fila del boletín, con lo único que hace falta para emparejar. */
+export type FilaBoletin = {
+  nombre: string;
+  capacidadHm3: number;
+  volumenHm3: number;
+  fecha: Date;
+};
+
+/**
+ * Prepara la búsqueda de un embalse nuestro dentro del boletín.
+ *
+ * Vive aquí, y no dentro del script, porque de las 52 fichas de embalse la
+ * primera pasada emparejó 48. Las cuatro que no son justo los casos raros, y
+ * los casos raros son los que hay que poder probar:
+ *
+ * - **Por prefijo.** El boletín numera las presas sucesivas —«Guadalcacín II»—
+ *   y nosotros usamos el nombre de toda la vida. Solo se acepta si hay una
+ *   única candidata: con dos no se puede decidir sin inventar, y prefiero
+ *   dejar la ficha sin porcentaje.
+ * - **Sumando varios**, escribiendo «A + B» en `nombreEnBoletin`. Hace falta
+ *   para los complejos comunicados, como el de El Chorro: la ficha habla de
+ *   Guadalhorce y Guadalteba juntos, y enseñar el nivel de uno solo sería
+ *   contar otra cosa distinta de la que se está mirando.
+ *
+ * Devolver `null` es una respuesta válida y buena. Un embalse sin nivel se
+ * queda sin la barra; uno con el nivel de otro manda a alguien a conducir dos
+ * horas hasta un pantano que cree lleno.
+ */
+export function crearBuscador(filas: FilaBoletin[]) {
+  const porNombre = new Map(filas.map((f) => [normalizar(f.nombre), f]));
+
+  const buscar = (clave: string): FilaBoletin | null => {
+    if (clave.includes("+")) {
+      const trozos = clave.split("+").map((t) => buscar(t.trim()));
+      if (trozos.some((t) => !t)) return null;
+      const partes = trozos as FilaBoletin[];
+      return {
+        nombre: partes.map((p) => p.nombre).join(" + "),
+        capacidadHm3: partes.reduce((a, p) => a + p.capacidadHm3, 0),
+        volumenHm3: partes.reduce((a, p) => a + p.volumenHm3, 0),
+        fecha: partes.reduce((a, p) => (p.fecha > a ? p.fecha : a), partes[0].fecha),
+      };
+    }
+
+    const n = normalizar(clave);
+    if (!n) return null;
+
+    const exacta = porNombre.get(n);
+    if (exacta) return exacta;
+
+    const porPrefijo = [...porNombre.entries()].filter(([k]) => k.startsWith(`${n} `));
+    return porPrefijo.length === 1 ? porPrefijo[0][1] : null;
+  };
+
+  /**
+   * Qué hay en el boletín que se le parezca, para poder rellenar
+   * `nombreEnBoletin` sin abrir el fichero a mano.
+   */
+  const parecidosA = (nombre: string): string[] => {
+    const palabras = normalizar(nombre)
+      .split(" ")
+      .filter((p) => p.length > 3);
+    if (palabras.length === 0) return [];
+    return [...porNombre.entries()]
+      .filter(([k]) => palabras.some((p) => k.includes(p)))
+      .slice(0, 5)
+      .map(([, f]) => f.nombre);
+  };
+
+  return { buscar, parecidosA };
 }
 
 /** «09/08/2026» o «2026-08-09». Nunca devuelve una fecha inválida. */
