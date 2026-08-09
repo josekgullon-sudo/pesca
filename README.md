@@ -153,8 +153,11 @@ Para montarlo:
 1. Añade un registro **A** en el DNS de `analitica.TUDOMINIO` apuntando al
    VPS. Sin él, Caddy se queda reintentando el certificado; la web principal
    sigue funcionando igual.
-2. Pon `UMAMI_DB_PASSWORD` y `UMAMI_APP_SECRET` en el `.env` del servidor, y
-   `DOMINIO_ANALITICA=analitica.TUDOMINIO`.
+2. Pon `UMAMI_DB_PASSWORD` y `UMAMI_APP_SECRET` en el `.env` del servidor
+   —dos valores distintos, `openssl rand -hex 32` cada uno— y
+   `DOMINIO_ANALITICA=analitica.TUDOMINIO`. En hexadecimal porque la
+   contraseña viaja dentro de una dirección `postgresql://umami:LACLAVE@…` y
+   una barra la partiría por la mitad.
 3. `docker compose --profile analitica up -d`. Entra en `https://analitica.TUDOMINIO` con
    **admin / umami** y **cambia la contraseña antes de nada**: el panel está
    expuesto a internet y eso es lo único que lo protege.
