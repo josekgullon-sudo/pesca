@@ -556,9 +556,17 @@ Ese listado va por provincia y cambia con la orden de vedas. **Míralo en el bol
   },
   {
     slug: "cangrejo-rojo-americano",
-    titulo: "Cangrejo rojo americano: no se pesca, y vivo no se mueve de sitio",
+    // El título no empieza por el nombre de la especie, y es a propósito. Con
+    // «Cangrejo rojo americano: …» chocaba de frente con /especies/
+    // cangrejo-rojo-americano, que se llama casi igual y va de lo mismo: dos
+    // páginas nuestras peleándose por la consulta con más demanda de la web,
+    // y ninguna de las dos pasando de la posición 55. La ficha se queda con el
+    // nombre de la especie; este artículo, con la pregunta que se hace la
+    // gente y con lo que solo cuenta él: que llevárselo vivo se sanciona
+    // aparte, y que la mitad de lo que se lee por ahí está desfasado.
+    titulo: "¿Se pueden coger cangrejos rojos? Lo que cambió y qué se sanciona",
     entradilla:
-      "El cangrejo de las marismas está en media Andalucía, pero su pesca no está abierta y llevárselo vivo es otra infracción distinta. Qué dice la ley y por qué hay tanta información vieja rodando.",
+      "Su pesca no está abierta en Andalucía, y llevárselo vivo es otra infracción distinta. Las dos cosas se sancionan por separado, y buena parte de lo que circula por internet viene de cuando las normas eran otras.",
     provincia: null,
     especie: "cangrejo-rojo-americano",
     diasAtras: 0,
