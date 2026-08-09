@@ -5,10 +5,16 @@ const nextConfig: NextConfig = {
    * Las URLs de sitios colgaban de /sitios antes de que la web fuera por
    * provincias. Se redirigen de forma permanente para no perder nada de lo que
    * ya estuviera enlazado o indexado.
+   *
+   * Y por esto el listado común vive en /donde-pescar y no en /sitios, que era
+   * el nombre evidente: /sitios lleva tiempo devolviendo un 308, y un 308 se
+   * queda cacheado en el navegador para siempre. Quien pasara por la web
+   * antigua tendría guardado «/sitios va a la portada» y no llegaría nunca a
+   * la página nueva, sin que hubiera forma de avisarle.
    */
   async redirects() {
     return [
-      { source: "/sitios", destination: "/", permanent: true },
+      { source: "/sitios", destination: "/donde-pescar", permanent: true },
       { source: "/sitios/mapa", destination: "/sevilla/mapa", permanent: true },
       { source: "/sitios/:slug", destination: "/sevilla/:slug", permanent: true },
     ];

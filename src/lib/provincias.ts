@@ -57,7 +57,14 @@ export async function rutaDeSitios(): Promise<string> {
       select: { slug: true },
       take: 2,
     });
-    return publicadas.length === 1 ? `/${publicadas[0].slug}` : "/";
+    // Con una sola provincia su página ya es el listado de sitios, y llevar
+    // ahí es mejor: una URL menos y la que Google tiene indexada.
+    //
+    // Con varias va al listado común. Antes devolvía «/» y el resultado era
+    // que pulsar «Sitios» te dejaba en la portada, que es justo de donde
+    // venías. Duró lo que tardó en publicarse la segunda provincia.
+    if (publicadas.length === 1) return `/${publicadas[0].slug}`;
+    return publicadas.length === 0 ? "/" : "/donde-pescar";
   } catch {
     return "/";
   }

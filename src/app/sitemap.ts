@@ -37,6 +37,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const fijas: MetadataRoute.Sitemap = [
     { url: urlAbsoluta("/"), changeFrequency: "daily", priority: 1 },
+    // El listado de todo y su mapa. Con una sola provincia publicada son casi
+    // un duplicado de la página de esa provincia, y por eso van con menos
+    // prioridad que ella: la que interesa que salga en «dónde pescar en
+    // Sevilla» es la de Sevilla, no esta.
+    { url: urlAbsoluta("/donde-pescar"), changeFrequency: "weekly", priority: 0.7 },
+    { url: urlAbsoluta("/mapa"), changeFrequency: "weekly", priority: 0.5 },
     { url: urlAbsoluta("/especies"), changeFrequency: "monthly", priority: 0.8 },
     // Cambia de nota cada día, y es de las páginas a las que la gente vuelve.
     { url: urlAbsoluta("/calendario"), changeFrequency: "daily", priority: 0.9 },

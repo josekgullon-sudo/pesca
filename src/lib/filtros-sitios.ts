@@ -21,6 +21,11 @@ export type FiltrosSitios = {
   dificultad?: DificultadAcceso;
   /** Slug de una especie que tenga que estar presente en el sitio. */
   especie?: string;
+  /**
+   * Slug de provincia. Solo lo usa el listado común de `/sitios`: dentro de
+   * una provincia la ruta ya la fija, y ahí este filtro no se pinta.
+   */
+  provincia?: string;
 };
 
 export type ParamsBusqueda = Record<string, string | string[] | undefined>;
@@ -36,6 +41,7 @@ export function leerFiltros(params: ParamsBusqueda): FiltrosSitios {
   const tiempo = Number(primero(params.tiempo));
   const dificultad = primero(params.dificultad);
   const especie = primero(params.especie);
+  const provincia = primero(params.provincia);
 
   return {
     tipo: TIPOS_SITIO.includes(tipo as TipoSitio)
@@ -46,6 +52,7 @@ export function leerFiltros(params: ParamsBusqueda): FiltrosSitios {
       ? (dificultad as DificultadAcceso)
       : undefined,
     especie: especie || undefined,
+    provincia: provincia || undefined,
   };
 }
 
@@ -60,8 +67,18 @@ export function leerFiltros(params: ParamsBusqueda): FiltrosSitios {
  */
 export function construirWhere(
   f: FiltrosSitios,
-  opciones: { tiempoAparte?: boolean } = {},
+  opciones: { tiempoAparte?: boolean; soloPublicadas?: boolean } = {},
 ): Prisma.SitioWhereInput {
+  // Las dos condiciones sobre la provincia se combinan aquí y no en cada
+  // página. Cuando estaban sueltas, el listado común hacía
+  // `{ ...construirWhere(f), provincia: { publicada: true } }` y esa segunda
+  // clave `provincia` machacaba entera la del filtro: elegir «Cádiz» seguía
+  // enseñando los 23 sitios de las dos provincias, sin ningún error.
+  const provincia = {
+    ...(f.provincia ? { slug: f.provincia } : {}),
+    ...(opciones.soloPublicadas ? { publicada: true } : {}),
+  };
+
   return {
     ...(f.tipo ? { tipo: f.tipo } : {}),
     ...(f.dificultad ? { dificultadAcceso: f.dificultad } : {}),
@@ -71,11 +88,14 @@ export function construirWhere(
     ...(f.especie
       ? { especies: { some: { especie: { slug: f.especie } } } }
       : {}),
+    ...(Object.keys(provincia).length > 0 ? { provincia } : {}),
   };
 }
 
 export function hayFiltros(f: FiltrosSitios): boolean {
-  return Boolean(f.tipo || f.tiempo || f.dificultad || f.especie);
+  return Boolean(
+    f.tipo || f.tiempo || f.dificultad || f.especie || f.provincia,
+  );
 }
 
 /** Serializa los filtros actuales sobre otra ruta, sin cambiar ninguno. */

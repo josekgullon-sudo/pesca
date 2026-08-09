@@ -55,9 +55,16 @@ const NO_SE_PUEDEN_BUSCAR = new Set(["prohibida", "invasora_no_pescable"]);
 export function TarjetaSitio({
   sitio,
   provincia,
+  nombreProvincia,
 }: {
   sitio: SitioTarjeta;
   provincia: string;
+  /**
+   * Solo en el listado común de `/sitios`, donde se mezclan provincias. Sin
+   * esto «Embalse de Bornos» y «Embalse de Cala» salen seguidos sin decir que
+   * están en provincias distintas, a dos horas el uno del otro.
+   */
+  nombreProvincia?: string;
 }) {
   const principales = sitio.especies
     .filter((e) => !NO_SE_PUEDEN_BUSCAR.has(e.especie.estadoLegal))
@@ -95,6 +102,7 @@ export function TarjetaSitio({
               <p className="mt-0.5 truncate text-sm text-white/80">
                 {ETIQUETA_TIPO_SITIO[sitio.tipo as TipoSitio]} ·{" "}
                 {sitio.municipio}
+                {nombreProvincia && ` · ${nombreProvincia}`}
               </p>
             </div>
             {/* Si el visitante ha dicho de dónde sale, manda su tiempo. El de

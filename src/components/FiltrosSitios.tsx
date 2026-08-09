@@ -18,20 +18,51 @@ import {
  * y lo que quieres ver al entrar son los sitios, no los filtros. Se abren solos
  * si ya hay alguno puesto, para que nunca filtres sin darte cuenta.
  */
+function Chip({
+  href,
+  activo,
+  children,
+}: {
+  href: string;
+  activo: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={activo ? "true" : undefined}
+      className={`inline-flex min-h-[2.75rem] items-center rounded-xl border-2 px-4 font-semibold ${
+        activo
+          ? "border-acento bg-acento text-acento-texto"
+          : "border-borde bg-fondo-elevado text-texto"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
+
 export function FiltrosSitios({
   base,
   filtros,
   especies,
+  provincias,
 }: {
   base: string;
   filtros: Filtros;
   especies: { slug: string; nombreComun: string }[];
+  /**
+   * Solo lo pasa el listado común de `/sitios`. Dentro de una provincia la
+   * ruta ya la fija, y ofrecer ahí un filtro de provincia sería absurdo.
+   */
+  provincias?: { slug: string; nombre: string }[];
 }) {
   const activos = [
     filtros.tipo,
     filtros.tiempo,
     filtros.dificultad,
     filtros.especie,
+    provincias ? filtros.provincia : undefined,
   ].filter((v) => v !== undefined).length;
 
   return (
@@ -60,60 +91,64 @@ export function FiltrosSitios({
             {grupo.titulo}
           </legend>
           <div className="flex flex-wrap gap-2">
-            {grupo.opciones.map((o) => {
-              const activo = opcionActiva(filtros, o);
-              return (
-                <Link
-                  key={`${o.clave}-${o.valor ?? "todos"}`}
-                  href={urlConFiltro(base, filtros, o.clave, o.valor)}
-                  aria-current={activo ? "true" : undefined}
-                  className={`inline-flex min-h-[2.75rem] items-center rounded-xl border-2 px-4 font-semibold ${
-                    activo
-                      ? "border-acento bg-acento text-acento-texto"
-                      : "border-borde bg-fondo-elevado text-texto"
-                  }`}
-                >
-                  {o.etiqueta}
-                </Link>
-              );
-            })}
+            {grupo.opciones.map((o) => (
+              <Chip
+                key={`${o.clave}-${o.valor ?? "todos"}`}
+                href={urlConFiltro(base, filtros, o.clave, o.valor)}
+                activo={opcionActiva(filtros, o)}
+              >
+                {o.etiqueta}
+              </Chip>
+            ))}
           </div>
         </fieldset>
       ))}
+
+      {provincias && provincias.length > 1 && (
+        <fieldset>
+          <legend className="mb-2 text-sm font-bold text-texto-suave uppercase tracking-wide">
+            Provincia
+          </legend>
+          <div className="flex flex-wrap gap-2">
+            <Chip
+              href={urlConFiltro(base, filtros, "provincia", undefined)}
+              activo={!filtros.provincia}
+            >
+              Todas
+            </Chip>
+            {provincias.map((p) => (
+              <Chip
+                key={p.slug}
+                href={urlConFiltro(base, filtros, "provincia", p.slug)}
+                activo={filtros.provincia === p.slug}
+              >
+                {p.nombre}
+              </Chip>
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       <fieldset>
         <legend className="mb-2 text-sm font-bold text-texto-suave uppercase tracking-wide">
           Que haya
         </legend>
         <div className="flex flex-wrap gap-2">
-          <Link
+          <Chip
             href={urlConFiltro(base, filtros, "especie", undefined)}
-            aria-current={!filtros.especie ? "true" : undefined}
-            className={`inline-flex min-h-[2.75rem] items-center rounded-xl border-2 px-4 font-semibold ${
-              !filtros.especie
-                ? "border-acento bg-acento text-acento-texto"
-                : "border-borde bg-fondo-elevado text-texto"
-            }`}
+            activo={!filtros.especie}
           >
             Lo que sea
-          </Link>
-          {especies.map((e) => {
-            const activo = filtros.especie === e.slug;
-            return (
-              <Link
-                key={e.slug}
-                href={urlConFiltro(base, filtros, "especie", e.slug)}
-                aria-current={activo ? "true" : undefined}
-                className={`inline-flex min-h-[2.75rem] items-center rounded-xl border-2 px-4 font-semibold ${
-                  activo
-                    ? "border-acento bg-acento text-acento-texto"
-                    : "border-borde bg-fondo-elevado text-texto"
-                }`}
-              >
-                {e.nombreComun}
-              </Link>
-            );
-          })}
+          </Chip>
+          {especies.map((e) => (
+            <Chip
+              key={e.slug}
+              href={urlConFiltro(base, filtros, "especie", e.slug)}
+              activo={filtros.especie === e.slug}
+            >
+              {e.nombreComun}
+            </Chip>
+          ))}
         </div>
       </fieldset>
 

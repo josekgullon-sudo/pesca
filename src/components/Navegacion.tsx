@@ -43,11 +43,17 @@ const ENLACES: Enlace[] = [
   },
   {
     // El destino lo decide el servidor: con una sola provincia publicada va
-    // directo a ella, y con varias a la portada, que es donde está el listado.
+    // directo a ella, porque su página ya es el listado; con varias, al
+    // listado común de /donde-pescar.
     href: "__sitios__",
     etiqueta: "Sitios",
     icono: IconoLista,
-    activo: (r) => RUTAS_PROPIAS.every((x) => !r.startsWith(x)) && r !== "/",
+    // Cualquier ruta de provincia, y /sitios. Los mapas se excluyen para que
+    // no se enciendan las dos pestañas a la vez.
+    activo: (r) =>
+      r !== "/" &&
+      !r.endsWith("/mapa") &&
+      RUTAS_PROPIAS.every((x) => !r.startsWith(x)),
   },
   {
     href: MARCA_MAPA,
@@ -98,11 +104,12 @@ const ENLACES: Enlace[] = [
 
 function destinoDe(href: string, rutaSitios: string) {
   if (href === "__sitios__") return rutaSitios;
-  // Con una sola provincia publicada, rutaSitios es "/sevilla" y el mapa está
-  // en "/sevilla/mapa". Con varias es "/", y entonces el mapa se elige desde
-  // la portada, que es donde está el listado de provincias.
+  // Con una sola provincia publicada, rutaSitios es "/sevilla" y su mapa está
+  // en "/sevilla/mapa". Con varias es "/donde-pescar" y el mapa de todas, en "/mapa".
+  // Y sin ninguna publicada es "/", donde no hay mapa que enseñar.
   if (href === MARCA_MAPA) {
-    return rutaSitios === "/" ? "/#provincias" : `${rutaSitios}/mapa`;
+    if (rutaSitios === "/") return "/#provincias";
+    return rutaSitios === "/donde-pescar" ? "/mapa" : `${rutaSitios}/mapa`;
   }
   return href;
 }
