@@ -128,7 +128,13 @@ export function leerBoletin(zip: Uint8Array): {
   radiografia.tablaElegida = elegida.nombre;
 
   const tabla = lector.getTable(elegida.nombre);
-  const datos = tabla.getData() as Record<string, unknown>[];
+
+  // Solo las cuatro columnas que hacen falta, no la tabla entera. La base
+  // histórica trae una fila por embalse y semana desde hace años, y cargarla
+  // completa en un VPS pequeño es la clase de cosa que se lleva por delante
+  // el proceso sin dar tiempo ni a que se queje.
+  const columnas = Object.values(elegida.cols);
+  const datos = tabla.getData({ columns: columnas }) as Record<string, unknown>[];
   radiografia.ejemplo = datos[0];
 
   // Una fila por embalse y semana: nos quedamos con la más reciente de cada uno.

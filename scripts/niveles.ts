@@ -200,6 +200,9 @@ function interpretar(datos: Uint8Array): FilaBoletin[] {
 
 async function main() {
   const args = process.argv.slice(2);
+  // Se imprime antes que nada. Si no sale ni esta línea, el problema está en
+  // los imports o el proceso ni llegó a ejecutarse.
+  console.log(`niveles.ts arrancando · Node ${process.version}`);
 
   if (args.includes("--descubrir")) {
     await descubrir();
@@ -218,9 +221,12 @@ async function main() {
 
   let filas: FilaBoletin[];
   try {
+    const origen = fichero ?? url ?? OFICIAL;
+    console.log(`Descargando ${origen}`);
     const datos = fichero
       ? new Uint8Array(await readFile(fichero))
       : await bajar(url ?? OFICIAL);
+    console.log(`Descargados ${(datos.length / 1048576).toFixed(1)} MB. Abriendo...`);
     filas = interpretar(datos);
   } catch (e) {
     console.error(`No se ha podido leer la fuente: ${(e as Error).message}`);
@@ -292,4 +298,30 @@ async function main() {
   console.log(`\nActualizados ${emparejados.length} embalses.`);
 }
 
-main().finally(() => prisma.$disconnect());
+/**
+ * El `.catch` no estaba, y por eso un fallo aquí dentro dejaba el script
+ * terminando sin imprimir absolutamente nada: la peor forma de fallar que
+ * hay, porque no se distingue de haber ido bien.
+ *
+ * El aviso de memoria es por lo que hace este script en concreto: descarga
+ * diez megas comprimidos, los descomprime y carga una base de Access entera
+ * con años de histórico. En un VPS pequeño eso se puede llevar por delante el
+ * proceso, y a un proceso matado por falta de memoria no le da tiempo a
+ * quejarse: se va con SIGKILL y sin una línea.
+ */
+main()
+  .catch((e) => {
+    console.error("\nHa fallado:", e instanceof Error ? e.message : e);
+    if (e instanceof Error && e.stack) console.error(e.stack);
+    process.exitCode = 1;
+  })
+  .finally(() => prisma.$disconnect());
+
+process.on("exit", (codigo) => {
+  if (codigo === 0) return;
+  console.error(
+    `\nSalida ${codigo}. Si además no ha salido ningún mensaje de error, lo ` +
+      `más probable es que\nse haya quedado sin memoria al abrir la base. ` +
+      `Compruébalo con:\n  dmesg | tail -20 | grep -i -E "killed|oom"`,
+  );
+});
