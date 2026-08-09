@@ -50,7 +50,32 @@ export type SitioCadiz = {
 const PRIMAVERA_Y_OTONO = [3, 4, 5, 6, 9, 10, 11];
 
 /** Vacío a propósito: el estado EEI de estos sitios no lo ha comprobado nadie. */
-const SIN_COMPROBAR = "";
+/**
+ * Áreas delimitadas para especies exóticas invasoras en Cádiz.
+ *
+ * Aquí la delimitación NO es la misma para las cuatro especies, y por eso hay
+ * dos textos y no uno. El black bass está autorizado en los diez embalses de
+ * la lista —los nueve de esta guía entre ellos—; el lucio, solo en
+ * Zahara-El Gastor. Marcar los embalses con un simple «sí, es área
+ * delimitada» habría dicho que en Bornos un lucio se puede devolver al agua,
+ * y no se puede: hay que sacarlo y sacrificarlo.
+ *
+ * Fuente: Resolución de 19 de diciembre de 2019 sobre delimitación de las
+ * áreas ocupadas por estas especies, y Orden de 13 de enero de 2023, que
+ * regula la pesca continental recreativa y deportiva en Andalucía.
+ */
+const EEI_BASS_SIN_LUCIO =
+  "Está dentro del área delimitada para black bass: aquí se puede pescar y " +
+  "devolver al agua. El lucio no —en Cádiz su única área delimitada es " +
+  "Zahara-El Gastor—, así que si cae uno hay que sacarlo del agua y " +
+  "sacrificarlo. La trucha arcoíris, igual: solo se devuelve en cotos " +
+  "autorizados de trucha arcoíris, y este no lo es.";
+
+const EEI_BASS_Y_LUCIO =
+  "Está dentro del área delimitada para black bass y para lucio: es el único " +
+  "embalse de Cádiz donde el lucio se puede pescar y devolver al agua. La " +
+  "trucha arcoíris no: solo se devuelve en cotos autorizados de trucha " +
+  "arcoíris, y este no lo es.";
 
 const SOL_Y_AGUA =
   "Orillas abiertas y con poca sombra: gorra, crema y agua de sobra de mayo a " +
@@ -96,9 +121,9 @@ export const SITIOS_CADIZ: SitioCadiz[] = [
     dificultadAcceso: "facil",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: EEI_BASS_SIN_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} ${RIEGO} Con el nivel bajo queda fango blando al descubierto: no te fíes de la costra seca de la orilla, que debajo sigue blanda.`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -125,9 +150,9 @@ export const SITIOS_CADIZ: SitioCadiz[] = [
     dificultadAcceso: "facil",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: EEI_BASS_SIN_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} Hay actividad náutica y de remo: no lances hacia la zona de embarcaciones.`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -155,9 +180,9 @@ export const SITIOS_CADIZ: SitioCadiz[] = [
     dificultadAcceso: "media",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: EEI_BASS_SIN_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} ${RIEGO} ${LEVANTE}`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -185,9 +210,9 @@ export const SITIOS_CADIZ: SitioCadiz[] = [
     dificultadAcceso: "media",
     tieneSombra: true,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: EEI_BASS_Y_LUCIO,
     avisosSanitarios:
       "Entorno del parque natural Sierra de Grazalema: además de la normativa " +
       "de pesca hay reglas propias de acceso, baño y navegación, y zonas de " +
@@ -218,9 +243,9 @@ export const SITIOS_CADIZ: SitioCadiz[] = [
     dificultadAcceso: "dificil",
     tieneSombra: true,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: EEI_BASS_SIN_LUCIO,
     avisosSanitarios:
       "Embalse de abastecimiento: puede haber limitaciones de acceso, baño y " +
       `navegación. ${ORILLA_CON_PENDIENTE}`,
@@ -250,9 +275,9 @@ export const SITIOS_CADIZ: SitioCadiz[] = [
     dificultadAcceso: "media",
     tieneSombra: true,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: EEI_BASS_SIN_LUCIO,
     avisosSanitarios:
       "Parque natural de Los Alcornocales: normativa propia de acceso, " +
       "acampada y circulación, aparte de la de pesca. En verano el riesgo de " +
@@ -281,9 +306,9 @@ export const SITIOS_CADIZ: SitioCadiz[] = [
     dificultadAcceso: "media",
     tieneSombra: true,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: EEI_BASS_SIN_LUCIO,
     avisosSanitarios:
       "Entorno de parque natural, con normativa propia de acceso y de fuego. " +
       SOL_Y_AGUA,
@@ -312,9 +337,9 @@ export const SITIOS_CADIZ: SitioCadiz[] = [
     dificultadAcceso: "media",
     tieneSombra: false,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: EEI_BASS_SIN_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} ${LEVANTE}`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -340,9 +365,9 @@ export const SITIOS_CADIZ: SitioCadiz[] = [
     dificultadAcceso: "media",
     tieneSombra: true,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: EEI_BASS_SIN_LUCIO,
     avisosSanitarios:
       "Entorno de parque natural. Monte cerrado: manga larga contra las " +
       "zarzas y cuidado con el fuego en verano. " +
@@ -503,3 +528,27 @@ export const NOTAS_LEGALES_CADIZ =
   "de los parques naturales de Los Alcornocales y Sierra de Grazalema, que " +
   "tienen normativa propia de acceso, circulación y acampada además de la de " +
   "pesca.";
+
+/**
+ * El listado de áreas delimitadas de Cádiz.
+ *
+ * Mientras esto estuvo vacío, la provincia salía publicada con un aviso en
+ * rojo arriba del todo diciendo que faltaba. Ya no hace falta.
+ *
+ * Va por especie a propósito: en Cádiz no coinciden. El black bass tiene diez
+ * embalses y el lucio uno solo, y resumirlo en «estas son las aguas
+ * delimitadas» sería dar por buena la devolución de un lucio en nueve sitios
+ * donde hay obligación de sacrificarlo.
+ */
+export const AREAS_DELIMITADAS_EEI_CADIZ =
+  "Black bass: embalses de Zahara-El Gastor, Almodóvar, Arcos, Barbate, " +
+  "Bornos, Celemín, Charco Redondo, Guadalcacín, Guadarranque y Los Hurones. " +
+  "Lucio: solo el embalse de Zahara-El Gastor. Carpa común: las masas, cursos " +
+  "y cuerpos de agua continentales de Andalucía donde esté presente, siempre " +
+  "que no sean aguas trucheras ni refugios de pesca y no haya otra limitación " +
+  "específica. Trucha arcoíris: solo los cotos de pesca de trucha arcoíris " +
+  "autorizados. Fuera de esas zonas, los ejemplares capturados no se pueden " +
+  "devolver al agua: hay que extraerlos y sacrificarlos en el momento. " +
+  "Según la Resolución de 19 de diciembre de 2019 y la Orden de 13 de enero " +
+  "de 2023. La normativa de espacios protegidos y refugios de pesca puede " +
+  "añadir condiciones.";
