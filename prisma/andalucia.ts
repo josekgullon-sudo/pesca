@@ -870,10 +870,11 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
       "de referencia de la provincia, y también el más visitado: en " +
       "temporada alta hay mucha gente que no viene a pescar.",
     capacidadHm3: null,
-    // Dos presas distintas en el boletín, y la ficha habla de las dos: aquí se
-    // suman. Enseñar solo el nivel de una sería contar otra cosa de la que se
-    // está mirando.
-    nombreEnBoletin: "Guadalhorce + Guadalteba",
+    // El boletín ya da Guadalhorce y Guadalteba en una sola entrada, y deja
+    // Conde de Guadalhorce aparte. La ficha habla de los tres, que están
+    // comunicados entre sí, así que se suman: enseñar solo una parte sería
+    // contar otra cosa distinta de la que se está mirando.
+    nombreEnBoletin: "Guadalhorce-Guadalteba + Conde Guadalhorce",
     accesoDescripcion:
       "Desde Ardales y desde la carretera de El Chorro, con aparcamientos y " +
       "áreas recreativas. Los accesos se saturan los fines de semana.",

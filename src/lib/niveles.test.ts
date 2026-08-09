@@ -22,14 +22,21 @@ const fila = (nombre: string, capacidadHm3: number, volumenHm3: number) => ({
   fecha: new Date("2026-08-04T00:00:00Z"),
 });
 
-/** Nombres tal cual los escribe el boletín: en mayúsculas y sin tildes. */
+/**
+ * Nombres tal cual los escribe el boletín, copiados de una ejecución real.
+ *
+ * Merece la pena mirarlos con calma, porque cada uno rompe el emparejamiento
+ * de una forma distinta: un romano detrás, el municipio entre paréntesis, dos
+ * presas metidas en una sola entrada y una tercera del mismo complejo suelta.
+ */
 const BOLETIN = [
-  fila("JOSE TORAN", 101, 40),
-  fila("TORRE DEL AGUILA", 73, 21),
-  fila("GUADALCACIN II", 800, 300),
-  fila("GUADALHORCE", 126, 30),
-  fila("GUADALTEBA", 153, 60),
-  fila("BORNOS", 200, 128),
+  fila("José Torán", 101, 73),
+  fila("Torre del Águila", 48, 14),
+  fila("Guadalcacín II", 800, 701),
+  fila("Guadalhorce-Guadalteba", 279, 90),
+  fila("Conde Guadalhorce", 70, 40),
+  fila("Agrio (Aznalcollar)", 20, 17),
+  fila("Bornos", 200, 146),
 ];
 
 describe("normalizar nombres de embalse", () => {
@@ -49,50 +56,55 @@ describe("buscar un embalse en el boletín", () => {
   const { buscar } = crearBuscador(BOLETIN);
 
   it("empareja aunque los nombres se escriban distinto", () => {
-    assert.equal(buscar("Embalse de José Torán")?.nombre, "JOSE TORAN");
-    assert.equal(buscar("Embalse de la Torre del Águila")?.nombre, "TORRE DEL AGUILA");
+    assert.equal(buscar("Embalse de José Torán")?.nombre, "José Torán");
+    assert.equal(buscar("Embalse de la Torre del Águila")?.nombre, "Torre del Águila");
   });
 
-  it("«Guadalcacín» encuentra a «GUADALCACIN II»", () => {
+  it("«Guadalcacín» encuentra a «Guadalcacín II»", () => {
     // El boletín numera las presas sucesivas; la ficha usa el nombre de siempre.
-    assert.equal(buscar("Embalse de Guadalcacín")?.nombre, "GUADALCACIN II");
+    assert.equal(buscar("Embalse de Guadalcacín")?.nombre, "Guadalcacín II");
+  });
+
+  it("no le estorba el municipio entre paréntesis", () => {
+    assert.equal(buscar("Embalse del Agrio")?.nombre, "Agrio (Aznalcollar)");
   });
 
   it("suma los embalses comunicados de El Chorro", () => {
-    const r = buscar("Guadalhorce + Guadalteba");
+    // Los tres del complejo están comunicados y la ficha habla de los tres,
+    // pero el boletín mete dos en una entrada y deja el otro suelto.
+    const r = buscar("Guadalhorce-Guadalteba + Conde Guadalhorce");
     assert.ok(r, "no encontró el complejo");
-    assert.equal(r.capacidadHm3, 126 + 153);
-    assert.equal(r.volumenHm3, 30 + 60);
-    assert.equal(r.nombre, "GUADALHORCE + GUADALTEBA");
+    assert.equal(r.capacidadHm3, 279 + 70);
+    assert.equal(r.volumenHm3, 90 + 40);
+    assert.equal(r.nombre, "Guadalhorce-Guadalteba + Conde Guadalhorce");
   });
 
   it("si falta una de las partes, no devuelve la suma a medias", () => {
     // Media suma daría un porcentaje creíble y equivocado, que es lo peor.
-    assert.equal(buscar("Guadalhorce + Conde de Guadalhorce"), null);
+    assert.equal(buscar("Guadalhorce-Guadalteba + Conde de Villalobos"), null);
   });
 
   it("dice que no cuando el embalse no viene en el boletín", () => {
     // Los pequeños no salen: Cazalla de la Sierra apenas tiene lámina.
     assert.equal(buscar("Embalse de Cazalla de la Sierra"), null);
-    assert.equal(buscar("Embalse del Agrio"), null);
   });
 
   it("no elige por prefijo cuando hay más de una candidata", () => {
     // Ninguna es exacta y las dos empiezan igual: elegir una sería a cara o
     // cruz. Se queda sin nivel hasta que alguien ponga el `nombreEnBoletin`.
     const { buscar: b } = crearBuscador([
-      fila("GUADALHORCE I", 126, 30),
-      fila("GUADALHORCE II", 20, 5),
+      fila("Guadalhorce I", 126, 30),
+      fila("Guadalhorce II", 20, 5),
     ]);
     assert.equal(b("Embalse del Guadalhorce"), null);
   });
 
   it("el nombre exacto gana al prefijo", () => {
     const { buscar: b } = crearBuscador([
-      fila("BORNOS", 200, 128),
-      fila("BORNOS SUPERIOR", 9, 2),
+      fila("Bornos", 200, 146),
+      fila("Bornos Superior", 9, 2),
     ]);
-    assert.equal(b("Embalse de Bornos")?.nombre, "BORNOS");
+    assert.equal(b("Embalse de Bornos")?.nombre, "Bornos");
   });
 
   it("un nombre que se queda en nada al normalizar no empareja con el primero", () => {
@@ -105,14 +117,16 @@ describe("sugerir parecidos cuando no empareja", () => {
   const { parecidosA } = crearBuscador(BOLETIN);
 
   it("propone lo que comparte alguna palabra", () => {
+    // Esta lista es la que resolvió El Chorro: sin ella no había forma de
+    // saber que el boletín junta dos de los tres embalses en una entrada.
     assert.deepEqual(parecidosA("Embalses del Guadalhorce y Guadalteba"), [
-      "GUADALHORCE",
-      "GUADALTEBA",
+      "Guadalhorce-Guadalteba",
+      "Conde Guadalhorce",
     ]);
   });
 
   it("no propone nada cuando de verdad no hay nada parecido", () => {
-    assert.deepEqual(parecidosA("Embalse del Agrio"), []);
+    assert.deepEqual(parecidosA("Embalse de Cazalla de la Sierra"), []);
   });
 });
 
