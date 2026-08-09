@@ -43,6 +43,36 @@ function normalizarColumna(c: string): string {
     .replace(/[^a-z0-9]+/g, "_");
 }
 
+/**
+ * Qué columna es cada cosa.
+ *
+ * Se saca aparte para poder probarlo con los nombres reales, porque aquí ya
+ * me equivoqué una vez y de forma silenciosa: en esta base la capacidad es
+ * `AGUA_TOTAL` y el volumen de hoy es `AGUA_ACTUAL`, y yo buscaba `AGUA_TOTAL`
+ * como si fuera el volumen. Con esa confusión todos los embalses habrían
+ * salido al 100 %, que es un fallo que encima parece plausible.
+ */
+export type Columnas = {
+  nombre: string;
+  capacidad: string;
+  volumen: string;
+  fecha: string | null;
+  ambito: string | null;
+};
+
+export function elegirColumnas(columnas: string[]): Columnas | null {
+  const nombre = buscarColumna(columnas, "embalse_nombre", "nombre_embalse", "embalse");
+  // El orden importa: «agua_total» es la capacidad, no el volumen actual.
+  const capacidad = buscarColumna(columnas, "agua_total", "capacidad_total", "capacidad");
+  const volumen = buscarColumna(columnas, "agua_actual", "volumen_actual", "volumen", "embalsada");
+  const fecha = buscarColumna(columnas, "fecha");
+  const ambito = buscarColumna(columnas, "ambito");
+
+  if (!nombre || !capacidad || !volumen) return null;
+  if (capacidad === volumen) return null; // no pueden ser la misma columna
+  return { nombre, capacidad, volumen, fecha, ambito };
+}
+
 /** Busca una columna por lo que significa, no por cómo se llama exactamente. */
 function buscarColumna(columnas: string[], ...pistas: string[]): string | null {
   const normalizadas = columnas.map((c) => ({ real: c, n: normalizarColumna(c) }));
@@ -101,17 +131,14 @@ export function leerBoletin(zip: Uint8Array): {
   // La tabla buena es la que tiene a la vez nombre de embalse, capacidad y
   // volumen. Buscarla así, y no por su nombre, es lo que hace que esto siga
   // funcionando si el Ministerio le cambia el nombre a la tabla.
-  let elegida: { nombre: string; cols: Record<string, string> } | null = null;
+  let elegida: { nombre: string; cols: Columnas } | null = null;
 
   for (const t of radiografia.tablas) {
-    const nombre = buscarColumna(t.columnas, "embalse_nombre", "nombre_embalse", "embalse", "nombre");
-    const capacidad = buscarColumna(t.columnas, "capacidad_total", "capacidad");
-    const volumen = buscarColumna(t.columnas, "agua_total", "volumen", "embalsada", "agua");
-    const fecha = buscarColumna(t.columnas, "fecha");
-
-    if (nombre && capacidad && volumen) {
-      elegida = { nombre: t.nombre, cols: { nombre, capacidad, volumen, ...(fecha ? { fecha } : {}) } };
-      break;
+    const cols = elegirColumnas(t.columnas);
+    // Se queda con la que más filas tenga: la base trae también tablas
+    // auxiliares que pueden cuadrar de columnas y no traer los datos.
+    if (cols && (!elegida || t.filas > (radiografia.tablas.find((x) => x.nombre === elegida!.nombre)?.filas ?? 0))) {
+      elegida = { nombre: t.nombre, cols };
     }
   }
 
@@ -133,7 +160,12 @@ export function leerBoletin(zip: Uint8Array): {
   // histórica trae una fila por embalse y semana desde hace años, y cargarla
   // completa en un VPS pequeño es la clase de cosa que se lleva por delante
   // el proceso sin dar tiempo ni a que se queje.
-  const columnas = Object.values(elegida.cols);
+  const columnas = [
+    elegida.cols.nombre,
+    elegida.cols.capacidad,
+    elegida.cols.volumen,
+    ...(elegida.cols.fecha ? [elegida.cols.fecha] : []),
+  ];
   const datos = tabla.getData({ columns: columnas }) as Record<string, unknown>[];
   radiografia.ejemplo = datos[0];
 
@@ -150,7 +182,14 @@ export function leerBoletin(zip: Uint8Array): {
     if (!fecha) continue;
 
     const previa = ultima.get(nombre);
-    if (!previa || fecha > previa.fecha) {
+    // Más reciente gana. Y si empatan en fecha —un mismo embalse puede venir
+    // repetido por el indicador de aprovechamiento eléctrico—, gana el de
+    // mayor capacidad, que es el registro del embalse completo.
+    if (
+      !previa ||
+      fecha > previa.fecha ||
+      (fecha.getTime() === previa.fecha.getTime() && capacidadHm3 > previa.capacidadHm3)
+    ) {
       ultima.set(nombre, { nombre, capacidadHm3, volumenHm3, fecha });
     }
   }
