@@ -2,9 +2,12 @@
  * Las provincias andaluzas que todavía son un armazón.
  *
  * Cádiz salió de aquí: está trabajada al nivel de Sevilla y vive en
- * `cadiz.ts`. Estas seis siguen con la plantilla común.
+ * `cadiz.ts`. **Córdoba también ha salido, aunque siga en este fichero**: ya
+ * tiene su listado de áreas delimitadas comprobado, ficha de especies propia
+ * embalse por embalse y se publica al sembrar. Lo que dice este comentario
+ * vale para las otras CINCO.
  *
- * **Ninguna de estas provincias se publica al sembrar.** Esto es un armazón,
+ * **Ninguna de esas cinco se publica al sembrar.** Esto es un armazón,
  * no una guía terminada, y hay que saber qué fiabilidad tiene cada cosa antes
  * de tocarla:
  *
@@ -84,6 +87,97 @@ const NIVEL_VARIABLE =
   "Es un embalse de regulación: el nivel sube y baja mucho a lo largo del " +
   "año y los puestos cambian por completo. Comprueba el nivel antes de " +
   "hacer kilómetros.";
+
+// ---------------------------------------------------------------------------
+// Áreas delimitadas para especies exóticas invasoras · Córdoba
+// ---------------------------------------------------------------------------
+//
+// En Córdoba la delimitación no coincide entre especies, y encima tres de los
+// embalses llevan condición propia. Un solo «sí, es área delimitada» por sitio
+// no sirve: diría que en Sierra Boyera un lucio se puede devolver al agua, y
+// lo que hay es obligación de sacarlo y sacrificarlo.
+//
+// Black bass: Yeguas, Martín Gonzalo, Guadalmellato, Sierra Boyera, Puente
+// Nuevo, La Breña II, Vadomojón, Arenoso, San Rafael de Navallana y Bembézar
+// (los dos últimos fuera de su Refugio de Pesca) e Iznájar (con las medidas
+// excepcionales que correspondan).
+// Lucio: Puente Nuevo, La Breña II, Guadalmellato y San Rafael de Navallana.
+// Trucha arcoíris: ninguna masa de agua de Córdoba. Solo cotos autorizados.
+//
+// Fuente: Resolución de 19 de diciembre de 2019 y Orden de 13 de enero de 2023.
+
+/** La trucha arcoíris no tiene área en Córdoba, así que esto vale para los siete. */
+const CO_TRUCHA =
+  " La trucha arcoíris no tiene ninguna área en Córdoba: solo se devuelve en " +
+  "cotos autorizados de trucha, y este no lo es.";
+
+/** Los tres donde también está delimitado el lucio. */
+const CO_BASS_Y_LUCIO =
+  "Está dentro del área delimitada para black bass y para lucio: los dos se " +
+  "pueden pescar y devolver al agua." + CO_TRUCHA;
+
+/** Delimitado solo para black bass. Un lucio aquí hay que sacrificarlo. */
+const CO_SOLO_BASS =
+  "Está dentro del área delimitada para black bass: se puede pescar y " +
+  "devolver al agua. El lucio no —en Córdoba solo está delimitado en Puente " +
+  "Nuevo, La Breña II, Guadalmellato y San Rafael de Navallana—, así que si " +
+  "cae uno hay que sacarlo del agua y sacrificarlo." + CO_TRUCHA;
+
+/** Bembézar: el área del bass excluye la zona declarada Refugio de Pesca. */
+const CO_BEMBEZAR =
+  "Está dentro del área delimitada para black bass, PERO fuera de la zona " +
+  "declarada Refugio de Pesca del embalse: dentro del refugio no vale. El " +
+  "lucio no está delimitado aquí, así que si cae uno hay que sacarlo del agua " +
+  "y sacrificarlo. En el refugio hay además limitaciones propias que afectan " +
+  "también a la carpa: mira dónde estás antes de tirar." + CO_TRUCHA;
+
+/** Iznájar: delimitado, pero la propia resolución lo deja condicionado. */
+const CO_IZNAJAR =
+  "Está dentro del área delimitada para black bass, sujeto a los " +
+  "condicionantes y medidas excepcionales que correspondan, así que conviene " +
+  "mirar la orden vigente antes de ir. El lucio no está delimitado aquí: si " +
+  "cae uno hay que sacarlo del agua y sacrificarlo." + CO_TRUCHA;
+
+/**
+ * La Colada, que no sale en ninguna de las listas.
+ *
+ * Es el sitio donde más importa no callarse. En los otros seis la duda juega a
+ * favor del pez; aquí la respuesta es la contraria y hay que decirla entera.
+ */
+const CO_FUERA_DE_AREA =
+  "NO está dentro de ninguna de las áreas delimitadas de Córdoba. Si capturas " +
+  "black bass, lucio o trucha arcoíris aquí, hay obligación de sacarlos del " +
+  "agua y sacrificarlos: no se pueden devolver.";
+
+/**
+ * Lo que hay que saber antes de mojar el sedal en Córdoba. Va aparte de la
+ * descripción porque no es geografía.
+ */
+export const NOTAS_LEGALES_CORDOBA =
+  "Córdoba se rige por la orden de vedas de pesca continental de Andalucía. " +
+  "Es obligatorio llevar licencia de pesca continental andaluza en vigor. " +
+  "Varios embalses del norte están dentro de espacios protegidos de Sierra " +
+  "Morena —Hornachuelos, Cardeña y Montoro— con normativa propia de acceso, " +
+  "circulación y acampada además de la de pesca. Y hay refugios de pesca " +
+  "declarados en Cordobilla, Malpasillo, Bembézar y una zona de San Rafael de " +
+  "Navallana: dentro de un refugio no se pesca, y sus límites no coinciden " +
+  "con los del embalse.";
+
+export const AREAS_DELIMITADAS_EEI_CORDOBA =
+  "Black bass: embalses de Yeguas, Martín Gonzalo, Guadalmellato, Sierra " +
+  "Boyera, Puente Nuevo, La Breña II, Vadomojón, Arenoso, San Rafael de " +
+  "Navallana y Bembézar —estos dos, fuera de su zona declarada Refugio de " +
+  "Pesca— e Iznájar, con los condicionantes y medidas excepcionales que " +
+  "correspondan. Lucio: solo Puente Nuevo, La Breña II, Guadalmellato y San " +
+  "Rafael de Navallana, este último fuera del refugio. Carpa común: las masas " +
+  "y cursos de agua continentales donde esté presente, siempre que no sean " +
+  "aguas trucheras ni refugios de pesca; en Córdoba hay refugio en Cordobilla, " +
+  "Malpasillo, Bembézar y una zona de San Rafael de Navallana. Trucha " +
+  "arcoíris: ninguna masa de agua de la provincia, solo los cotos de trucha " +
+  "arcoíris autorizados. Fuera de esas zonas, los ejemplares capturados no se " +
+  "pueden devolver al agua: hay que extraerlos y sacrificarlos en el momento. " +
+  "Según la Resolución de 19 de diciembre de 2019 y la Orden de 13 de enero " +
+  "de 2023.";
 
 export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
   // -------------------------------------------------------------------------
@@ -281,9 +375,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "facil",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: CO_IZNAJAR,
     avisosSanitarios:
       `${SOL_Y_AGUA} ${NIVEL_VARIABLE} Con viento se levanta oleaje de ` +
       "verdad: si sales en barca, mira el parte.",
@@ -310,9 +404,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "facil",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: CO_BASS_Y_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} ${NIVEL_VARIABLE}`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -337,9 +431,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "media",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: CO_BASS_Y_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} ${NIVEL_VARIABLE}`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -363,9 +457,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "facil",
     tieneSombra: false,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: CO_SOLO_BASS,
     avisosSanitarios:
       `${SOL_Y_AGUA} ${NIVEL_VARIABLE} Con el nivel muy bajo el fondo que ` +
       "queda al descubierto es barro blando: no te fíes de la costra seca.",
@@ -392,9 +486,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "media",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: CO_BASS_Y_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} ${ORILLA_CON_PENDIENTE}`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -419,9 +513,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "dificil",
     tieneSombra: true,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: CO_BEMBEZAR,
     avisosSanitarios:
       "Entorno de parque natural, con normativa propia de acceso. " +
       ORILLA_CON_PENDIENTE,
@@ -450,8 +544,8 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     tieneSombra: true,
     navegable: false,
     esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    eeiComprobado: true,
+    notasLegales: CO_FUERA_DE_AREA,
     avisosSanitarios:
       "Ha habido episodios de mala calidad del agua en este embalse. " +
       "Comprueba si hay avisos vigentes antes de ir, y en cualquier caso no " +
@@ -1060,11 +1154,81 @@ const SIERRA = new Set([
   "la-concepcion",
 ]);
 
+/**
+ * Córdoba, ya con ficha propia embalse por embalse.
+ *
+ * Sale de la plantilla porque la provincia se publica, y publicar siete
+ * páginas repitiendo las mismas seis frases no es una guía: es la misma
+ * página siete veces. Lo que cambia de verdad entre ellos —la profundidad,
+ * el tipo de orilla, el agua que llevan y el tamaño— es lo que decide con
+ * qué se va uno de casa.
+ *
+ * El lucio va donde la resolución de 2019 lo delimita. No es una suposición:
+ * esa resolución delimita justamente «las áreas ocupadas por» estas especies,
+ * así que si el lucio está delimitado en un embalse es porque está allí.
+ */
+const ESPECIES_CORDOBA: Record<string, FilaSitioEspecie[]> = {
+  iznajar: [
+    ["carpa-comun", 5, "alta", "fondo", "El pez de Iznájar. Con tanta orilla, cebar y esperar compensa más que moverse."],
+    ["black-bass", 4, "alta", "spinning", "Los brazos largos y las paredes de roca son el sitio. Con barca se cubre lo que desde orilla no se llega ni a ver."],
+    ["barbo", 4, "alta", "feeder", "El Genil trae barbo en cantidad, sobre todo en las colas. Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable. En las orillas de poca profundidad no te deja pescar a fondo."],
+    ["alburno", 4, "alta", "", "Bandos enormes en una lámina así de grande. Donde saltan, hay bass debajo."],
+    ["carpin", 2, "baja", "fondo", "Cae con anzuelo pequeño mientras buscas carpa."],
+  ],
+  "la-brena-ii": [
+    ["black-bass", 4, "alta", "spinning", "El embalse de bass de la provincia. Agua clara y honda: cuenta con bajar la presentación y afinar el hilo."],
+    ["lucio", 3, "media", "spinning", "Aquí sí está delimitado, así que se puede devolver. Busca los bordes de las colas y la vegetación sumergida."],
+    ["carpa-comun", 4, "alta", "fondo", "Muy presente, pero con estas paredes tan verticales hay que buscar las pocas orillas tendidas."],
+    ["barbo", 3, "media", "feeder", "Más en las colas que en la presa. Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 3, "media", "", "No pescable."],
+    ["alburno", 3, "media", "", "Cerca de superficie, y detrás el bass."],
+  ],
+  "puente-nuevo": [
+    ["black-bass", 4, "alta", "spinning", "Madera sumergida y piedra por todas partes: es lo que hay que buscar."],
+    ["lucio", 3, "media", "spinning", "Delimitado aquí, se puede devolver. En las zonas de menos fondo y con vegetación."],
+    ["carpa-comun", 4, "alta", "fondo", "Bien repartida por todo el embalse."],
+    ["barbo", 3, "media", "feeder", "El Guadiato baja con barbo. Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable. Te vacía el anzuelo si pescas a fondo."],
+    ["alburno", 3, "media", "", "Bandos en superficie."],
+  ],
+  guadalmellato: [
+    ["black-bass", 4, "alta", "spinning", "El más cómodo de la provincia si sales de Córdoba capital, y con bass de sobra."],
+    ["lucio", 3, "media", "spinning", "Delimitado aquí, se puede devolver. En las colas y donde hay vegetación."],
+    ["carpa-comun", 4, "alta", "fondo", "La captura segura cuando el bass no quiere."],
+    ["barbo", 3, "media", "feeder", "Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable."],
+    ["alburno", 3, "media", "", "Bandos cerca de superficie."],
+  ],
+  "sierra-boyera": [
+    ["carpa-comun", 4, "alta", "fondo", "Lo que más cae, y con diferencia."],
+    ["black-bass", 3, "media", "spinning", "Hay, pero es un embalse pequeño y poco profundo: en cuanto baja el nivel se complica mucho."],
+    ["barbo", 3, "media", "feeder", "Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable. En fondo de fango, constante."],
+    ["carpin", 3, "media", "fondo", "Frecuente en aguas someras y templadas como estas."],
+  ],
+  bembezar: [
+    ["barbo", 4, "alta", "feeder", "Domina el embalse. Agua limpia de Sierra Morena y barbo por todas partes. Devolución obligatoria."],
+    ["boga-de-rio", 3, "media", "", "Propia de estas aguas limpias. Devolución obligatoria."],
+    ["carpa-comun", 3, "media", "fondo", "En las colas y donde el fondo se suaviza."],
+    ["black-bass", 2, "baja", "spinning", "Menos que en los embalses del Guadiato, y el agua clara obliga a afinar."],
+    ["cangrejo-rojo-americano", 3, "media", "", "No pescable."],
+  ],
+  "la-colada": [
+    ["barbo", 4, "alta", "feeder", "Lo más abundante. Devolución obligatoria."],
+    ["carpa-comun", 3, "media", "fondo", "Bien repartida por las orillas tendidas de la dehesa."],
+    ["boga-de-rio", 3, "media", "", "Devolución obligatoria."],
+    ["black-bass", 2, "baja", "spinning", "Lo hay, pero aquí NO está en área delimitada: si cae, hay que sacrificarlo. Léete la ficha antes de ir a por él."],
+    ["cangrejo-rojo-americano", 3, "media", "", "No pescable."],
+  ],
+};
+
 export const ESPECIES_POR_SITIO_ANDALUCIA: Record<string, FilaSitioEspecie[]> =
   Object.fromEntries(
     SITIOS_ANDALUCIA.map((s) => [
       s.slug,
-      SIERRA.has(s.slug) ? COMUN_EMBALSE_SIERRA : COMUN_EMBALSE_INTERIOR,
+      ESPECIES_CORDOBA[s.slug] ??
+        (SIERRA.has(s.slug) ? COMUN_EMBALSE_SIERRA : COMUN_EMBALSE_INTERIOR),
     ]),
   );
 

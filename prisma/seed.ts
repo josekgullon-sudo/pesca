@@ -28,8 +28,10 @@ import {
 import { prisma } from "../src/lib/prisma";
 import { ARTICULOS } from "./articulos";
 import {
+  AREAS_DELIMITADAS_EEI_CORDOBA,
   DESCRIPCIONES_ANDALUCIA,
   ESPECIES_POR_SITIO_ANDALUCIA,
+  NOTAS_LEGALES_CORDOBA,
   SITIOS_ANDALUCIA,
 } from "./andalucia";
 import {
@@ -117,7 +119,10 @@ const PROVINCIAS: ProvinciaSeed[] = [
   // tiene diez embalses y el lucio uno— y por eso el texto va por especie.
   { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: true, descripcion: DESCRIPCION_CADIZ, areasDelimitadasEEI: AREAS_DELIMITADAS_EEI_CADIZ, notasLegales: NOTAS_LEGALES_CADIZ, urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA },
   { slug: "malaga", nombre: "Málaga", comunidad: "Andalucía", latitud: 36.8, longitud: -4.6, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.malaga },
-  { slug: "cordoba", nombre: "Córdoba", comunidad: "Andalucía", latitud: 38.0, longitud: -4.8, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.cordoba },
+  // Córdoba, publicada con su listado de áreas delimitadas ya comprobado.
+  // Ojo con La Colada: no aparece en ninguna de las listas de la resolución,
+  // así que allí la respuesta es la contraria y su ficha lo dice.
+  { slug: "cordoba", nombre: "Córdoba", comunidad: "Andalucía", latitud: 38.0, longitud: -4.8, publicada: true, descripcion: DESCRIPCIONES_ANDALUCIA.cordoba, areasDelimitadasEEI: AREAS_DELIMITADAS_EEI_CORDOBA, notasLegales: NOTAS_LEGALES_CORDOBA, urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA },
   { slug: "jaen", nombre: "Jaén", comunidad: "Andalucía", latitud: 38.0, longitud: -3.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.jaen },
   { slug: "granada", nombre: "Granada", comunidad: "Andalucía", latitud: 37.3, longitud: -3.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.granada },
   { slug: "almeria", nombre: "Almería", comunidad: "Andalucía", latitud: 37.2, longitud: -2.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.almeria },
