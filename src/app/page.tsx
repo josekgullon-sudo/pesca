@@ -55,10 +55,20 @@ export default async function Home() {
   ] = await Promise.all([
       rutaDeSitios(),
       provinciasPublicadas(),
+      // Todos los publicados, sin cortar. Aquí había un `take: 20` de cuando
+      // solo estaba Sevilla, y con tres provincias se llevaba por delante los
+      // siete embalses de Córdoba y tres de Cádiz: al ordenar por el tiempo
+      // desde Dos Hermanas, lo que cae fuera del corte es siempre lo de más
+      // lejos, o sea la provincia que se acaba de publicar.
+      //
+      // Rompía dos cosas a la vez. El mapa de la portada no pintaba Córdoba
+      // entera, y los tres sitios destacados se elegían entre esos 20 aunque
+      // el visitante hubiera dicho de dónde sale: a alguien de Córdoba no le
+      // podía salir un embalse de Córdoba. El mismo fallo que el filtro de «a
+      // cuánto en coche», que también medía desde Dos Hermanas.
       prisma.sitio.findMany({
         where: { provincia: { publicada: true } },
         orderBy: { tiempoCocheMin: "asc" },
-        take: 20,
         select: {
           slug: true,
           nombre: true,
@@ -123,8 +133,8 @@ export default async function Home() {
       : candidatos.map((s) => ({ ...s, distanciaUsuarioKm: undefined }))
   ).slice(0, 3);
 
-  // Los puntos del mapa de la portada. Se pintan todos los sitios cargados, no
-  // solo los destacados: el mapa vale precisamente para ver el conjunto.
+  // Los puntos del mapa de la portada. Se pintan todos, no solo los
+  // destacados: el mapa vale precisamente para ver el conjunto.
   const puntos = sitios.map((s) => ({
     slug: s.slug,
     nombre: s.nombre,
