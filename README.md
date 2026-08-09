@@ -70,15 +70,25 @@ Ojo: sin HTTPS el navegador no dará acceso a la cámara ni al GPS, que hacen
 falta a partir del bloque 5. Para eso ya toca desplegar en el VPS con
 certificado, o usar un túnel tipo `ngrok`.
 
-Usuarios que crea el seed:
+Usuarios que crea el seed: `jose@pesca.local` y `pareja@pesca.local`, los dos
+con la contraseña de `SEED_PASSWORD`. Si esa variable no está puesta, se les
+pone una aleatoria y el seed la escribe por pantalla al crearlas —es la única
+vez que se enseña—.
 
-| Email                | Contraseña                          |
-| -------------------- | ----------------------------------- |
-| `jose@pesca.local`   | la de `SEED_PASSWORD` (`pesca2026`) |
-| `pareja@pesca.local` | la misma                            |
+Van como usuarios normales. El rol de administrador se da aparte:
 
-El seed **no pisa** usuarios que ya existan, así que se puede cambiar la
-contraseña sin miedo a que la próxima ejecución la revierta.
+```bash
+npm run admin -- tu@correo.com
+```
+
+Antes venían de serie como administradores y con la contraseña escrita en
+este mismo fichero, que en un repositorio que se puede leer es lo mismo que
+dejar la puerta abierta. Si alguna cuenta todavía tiene aquella contraseña, el
+seed se la cambia por una aleatoria en el siguiente arranque y lo avisa.
+
+El seed **no pisa** usuarios que ya existan —ni la contraseña ni el rol—, así
+que los dos se pueden cambiar sin miedo a que la próxima ejecución los
+revierta.
 
 ## Acceso
 

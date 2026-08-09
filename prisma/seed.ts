@@ -19,7 +19,7 @@
  */
 
 import { randomBytes } from "node:crypto";
-import { hash } from "bcryptjs";
+import { compare, hash } from "bcryptjs";
 import {
   AVISO_FUERA_DE_AREA_DELIMITADA,
   TEXTO_AREAS_DELIMITADAS_EEI,
@@ -33,6 +33,7 @@ import {
   SITIOS_ANDALUCIA,
 } from "./andalucia";
 import {
+  AREAS_DELIMITADAS_EEI_CADIZ,
   CADIZ_AGUA_CLARA,
   CADIZ_AGUA_TURBIA,
   CADIZ_SPINNING,
@@ -111,11 +112,10 @@ const PROVINCIAS: ProvinciaSeed[] = [
   // delimitadas para especies exóticas invasoras de cada provincia, que sale
   // del boletín y no se deduce. Ver el comentario de cabecera de andalucia.ts.
   { slug: "huelva", nombre: "Huelva", comunidad: "Andalucía", latitud: 37.6, longitud: -6.9, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.huelva },
-  // Publicada sin su listado de áreas delimitadas, a propósito y con el aviso
-  // en rojo que sale arriba de /cadiz mientras `areasDelimitadasEEI` esté
-  // vacío. Los nueve sitios siguen con `eeiComprobado: false`: la web dice que
-  // no lo sabe, que es distinto de decir que no están en el área.
-  { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: true, descripcion: DESCRIPCION_CADIZ, notasLegales: NOTAS_LEGALES_CADIZ, urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA },
+  // Cádiz ya con su listado de áreas delimitadas, así que sin el aviso en
+  // rojo. Ojo: allí la delimitación cambia según la especie —el black bass
+  // tiene diez embalses y el lucio uno— y por eso el texto va por especie.
+  { slug: "cadiz", nombre: "Cádiz", comunidad: "Andalucía", latitud: 36.5, longitud: -5.8, publicada: true, descripcion: DESCRIPCION_CADIZ, areasDelimitadasEEI: AREAS_DELIMITADAS_EEI_CADIZ, notasLegales: NOTAS_LEGALES_CADIZ, urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA },
   { slug: "malaga", nombre: "Málaga", comunidad: "Andalucía", latitud: 36.8, longitud: -4.6, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.malaga },
   { slug: "cordoba", nombre: "Córdoba", comunidad: "Andalucía", latitud: 38.0, longitud: -4.8, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.cordoba },
   { slug: "jaen", nombre: "Jaén", comunidad: "Andalucía", latitud: 38.0, longitud: -3.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.jaen },
@@ -1532,18 +1532,31 @@ const APAREJO_SITIO: FilaAparejoSitio[] = [
 // Usuarios
 // ---------------------------------------------------------------------------
 
-// Las dos cuentas iniciales son administradoras: con el registro abierto hace
-// falta que alguien pueda retirar lo que no debería estar.
+// Las dos cuentas iniciales, para tener con qué entrar en una instalación
+// nueva. Se crean como usuarios normales, no como administradores: el rol se
+// da a mano con `npm run admin` y a una cuenta de verdad.
 const USUARIOS = [
-  { nombre: "José", email: "jose@pesca.local", rol: "admin" },
-  { nombre: "Pareja", email: "pareja@pesca.local", rol: "admin" },
+  { nombre: "José", email: "jose@pesca.local", rol: "usuario" },
+  { nombre: "Pareja", email: "pareja@pesca.local", rol: "usuario" },
 ];
 
 /**
- * Contraseña inicial de los dos usuarios. Se puede cambiar con la variable de
- * entorno SEED_PASSWORD. Cámbiala antes de desplegar en el VPS.
+ * La contraseña que llevaban escrita estas dos cuentas.
+ *
+ * Estaba aquí y en el README, en un repositorio que se puede leer, y encima el
+ * seed les devolvía el rol de administrador en cada arranque. Es decir: quien
+ * pasara por el repositorio podía entrar en producción con permiso para
+ * escribir en el blog, publicar provincias y borrar capturas ajenas, y
+ * quitarles el rol a mano no habría servido de nada porque el siguiente
+ * reinicio se lo devolvía.
+ *
+ * Se queda escrita a propósito, pero solo para reconocerla: abajo, si alguna
+ * cuenta sigue teniéndola, se le cambia por una aleatoria.
  */
-const PASSWORD_INICIAL = process.env.SEED_PASSWORD ?? "pesca2026";
+const PASSWORD_PUBLICADA = "pesca2026";
+
+/** Contraseña de las cuentas nuevas. Sin `SEED_PASSWORD`, una que no sabe nadie. */
+const PASSWORD_INICIAL = process.env.SEED_PASSWORD ?? randomBytes(32).toString("hex");
 
 // ---------------------------------------------------------------------------
 // Capturas de ejemplo
@@ -1654,23 +1667,43 @@ async function sembrarDemo(
 async function main() {
   console.log("Sembrando datos...\n");
 
-  // --- Usuarios (no se pisan si ya existen: puede haberse cambiado la clave) --
+  // --- Usuarios ------------------------------------------------------------
+  //
+  // Ni la contraseña ni el rol de una cuenta que ya existe se tocan: pueden
+  // haberse cambiado a conciencia, y el seed corre en cada arranque. La única
+  // excepción es la contraseña que estuvo publicada, que se retira.
   const passwordHash = await hash(PASSWORD_INICIAL, 12);
+  const creados: string[] = [];
   for (const u of USUARIOS) {
     const existente = await prisma.usuario.findUnique({ where: { email: u.email } });
     if (existente) {
-      // La contraseña no se toca, pero el rol sí: si el seed dice que es
-      // admin, que lo sea aunque la cuenta ya existiera.
-      if (existente.rol !== u.rol) {
-        await prisma.usuario.update({ where: { id: existente.id }, data: { rol: u.rol } });
-        console.log(`  usuario ${u.email} ya existe, ahora es ${u.rol}`);
-      } else {
-        console.log(`  usuario ${u.email} ya existe, no se toca`);
+      if (await compare(PASSWORD_PUBLICADA, existente.passwordHash)) {
+        await prisma.usuario.update({
+          where: { id: existente.id },
+          data: { passwordHash: await hash(randomBytes(32).toString("hex"), 12) },
+        });
+        console.log(
+          `  ATENCIÓN: ${u.email} tenía la contraseña que estaba escrita en el` +
+            "\n  repositorio. Se le ha puesto una aleatoria, así que ya no se puede" +
+            "\n  entrar con ella. Para tener acceso a /admin: regístrate en /registro" +
+            "\n  con tu correo y ejecuta «npm run admin -- tu@correo.com».",
+        );
+        continue;
       }
+      console.log(`  usuario ${u.email} ya existe, no se toca`);
       continue;
     }
     await prisma.usuario.create({ data: { ...u, passwordHash } });
+    creados.push(u.email);
     console.log(`  usuario ${u.email} creado`);
+  }
+
+  // La contraseña solo se enseña si se acaba de crear alguna cuenta con ella y
+  // además es la aleatoria, en cuyo caso no hay otra forma de saberla. Si viene
+  // de SEED_PASSWORD no se imprime: quien la puso ya la sabe, y esto acaba en
+  // el registro del contenedor en cada arranque.
+  if (creados.length > 0 && !process.env.SEED_PASSWORD) {
+    console.log(`  contraseña de ${creados.join(" y ")}: ${PASSWORD_INICIAL}`);
   }
 
   // --- Provincias ----------------------------------------------------------
@@ -1899,9 +1932,6 @@ async function main() {
   console.log(`  ${ARTICULOS.length} artículos del blog`);
 
   console.log("\nListo.");
-  console.log(
-    `Usuarios: ${USUARIOS.map((u) => u.email).join(", ")} — contraseña inicial: "${PASSWORD_INICIAL}"`,
-  );
 }
 
 main()
