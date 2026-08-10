@@ -2,13 +2,13 @@
  * Las provincias andaluzas que todavía son un armazón.
  *
  * Cádiz salió de aquí: está trabajada al nivel de Sevilla y vive en
- * `cadiz.ts`. **Córdoba y Jaén también han salido, aunque sigan en este
+ * `cadiz.ts`. **Córdoba, Jaén y Huelva también han salido, aunque sigan en este
  * fichero**: las dos tienen su listado de áreas delimitadas comprobado, ficha
  * de especies propia embalse por embalse, y se publican al sembrar. Lo que
- * dice este comentario vale para las otras CUATRO: Huelva, Málaga, Granada y
+ * dice este comentario vale para las otras TRES: Málaga, Granada y
  * Almería.
  *
- * **Ninguna de esas cuatro se publica al sembrar.** Esto es un armazón,
+ * **Ninguna de esas tres se publica al sembrar.** Esto es un armazón,
  * no una guía terminada, y hay que saber qué fiabilidad tiene cada cosa antes
  * de tocarla:
  *
@@ -285,6 +285,69 @@ export const AREAS_DELIMITADAS_EEI_JAEN =
   "al agua: hay que extraerlos y sacrificarlos en el momento. Según la " +
   "Resolución de 19 de diciembre de 2019 y la Orden de 13 de enero de 2023.";
 
+// ---------------------------------------------------------------------------
+// Áreas delimitadas para especies exóticas invasoras · Huelva
+// ---------------------------------------------------------------------------
+//
+// La lista del black bass en Huelva es larga —más de treinta masas de agua— y
+// los SEIS embalses de esta guía están dentro: Andévalo, Chanza, Aracena,
+// Zufre, Piedras y Jarrama. Es la primera provincia en la que no hay ninguno
+// fuera, así que aquí no hace falta el aviso de «este no está en el área».
+//
+// El lucio es al revés que en las otras tres: en Huelva NO hay ninguna masa de
+// agua delimitada. Ni una. Así que un lucio capturado en cualquier sitio de la
+// provincia hay que sacarlo del agua y sacrificarlo.
+//
+// Fuente: Resolución de 19 de diciembre de 2019 y Orden de 13 de enero de 2023.
+
+/**
+ * La nota de los seis embalses de Huelva.
+ *
+ * Va una sola porque aquí los seis están en la misma situación, cosa que no
+ * pasaba en Córdoba ni en Jaén. Lo que cambia respecto a aquellas es el lucio:
+ * allí había que mirar embalse por embalse, y aquí la respuesta es la misma en
+ * toda la provincia y es que no.
+ */
+const HU_BASS_SIN_LUCIO =
+  "Está dentro del área delimitada para black bass: se puede pescar y " +
+  "devolver al agua. El lucio no, y en Huelva no es cuestión de qué embalse: " +
+  "no hay NINGUNA masa de agua de la provincia delimitada para el lucio, así " +
+  "que si cae uno hay que sacarlo del agua y sacrificarlo. La trucha arcoíris, " +
+  "igual: en Huelva no hay zona autorizada, solo se devuelve en cotos de " +
+  "trucha arcoíris y este no lo es.";
+
+/** Lo que hay que saber antes de mojar el sedal en Huelva. */
+export const NOTAS_LEGALES_HUELVA =
+  "Huelva se rige por la orden de vedas de pesca continental de Andalucía. Es " +
+  "obligatorio llevar licencia de pesca continental andaluza en vigor. Los " +
+  "embalses del norte están dentro o en el entorno del parque natural de la " +
+  "Sierra de Aracena y Picos de Aroche, que tiene normativa propia de acceso, " +
+  "circulación y acampada además de la de pesca. Y como en el resto de " +
+  "Andalucía, la carpa no se puede pescar en aguas trucheras ni en refugios " +
+  "de pesca: comprueba en qué agua estás exactamente antes de tirar.";
+
+export const AREAS_DELIMITADAS_EEI_HUELVA =
+  "Black bass: la lista de Huelva es larga y los seis embalses de esta guía " +
+  "están dentro. Comprende Candoncillo, Silillos I y II, Nerva (Charca la " +
+  "Isla), Jarrama, Zumajo, Corumbel, Beas, Odiel-Perejil (Odiel), Campofrío, " +
+  "Asturiano-Olivarga, Sierra León (Puerto León), Cerro del Andévalo, " +
+  "Calabazar, San Miguel, San Bartolomé, La Joya, La Cueva de la Mora, Las " +
+  "Umbrías, Cabezas Rubias (Aguas Miel), Campanario, Piedras, Los Machos, " +
+  "Chanza, Andévalo, Aracena, Zufre, Tamujoso, Mina de Soloviejo, Campillo, " +
+  "Francisco Zorrero (Zalamea), Riscoso y Castillo de las Guardas (pantano " +
+  "viejo y nuevo). Lucio: NINGUNA masa de agua de Huelva. Cualquier lucio " +
+  "capturado en la provincia hay que extraerlo del agua y sacrificarlo. Carpa " +
+  "común: las masas y cursos de agua continentales de Andalucía donde esté " +
+  "presente, salvo las aguas no aptas para la especie y las sometidas a " +
+  "restricciones; no se puede pescar en aguas trucheras ni en refugios de " +
+  "pesca. Trucha arcoíris: no hay zona autorizada en Huelva, solo los cotos de " +
+  "trucha arcoíris autorizados. Fuera de esas zonas, los ejemplares capturados " +
+  "no se pueden devolver al agua: hay que extraerlos y sacrificarlos en el " +
+  "momento, retirarlos del medio natural y transportarlos solo muertos. La " +
+  "pesca está además sujeta a las restricciones particulares de cada embalse, " +
+  "refugio de pesca y espacio natural protegido. Según la Resolución de 19 de " +
+  "diciembre de 2019 y la Orden de 13 de enero de 2023.";
+
 export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
   // -------------------------------------------------------------------------
   // Huelva
@@ -310,9 +373,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "media",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: HU_BASS_SIN_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} ${NIVEL_VARIABLE}`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -337,9 +400,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "media",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: HU_BASS_SIN_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} ${NIVEL_VARIABLE}`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -366,9 +429,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "media",
     tieneSombra: true,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: HU_BASS_SIN_LUCIO,
     avisosSanitarios:
       "Al ser embalse de abastecimiento puede haber restricciones de acceso " +
       "y de navegación. Compruébalo antes de salir de casa.",
@@ -394,9 +457,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "dificil",
     tieneSombra: true,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: HU_BASS_SIN_LUCIO,
     avisosSanitarios: ORILLA_CON_PENDIENTE,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -420,9 +483,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "facil",
     tieneSombra: false,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: HU_BASS_SIN_LUCIO,
     avisosSanitarios: SOL_Y_AGUA,
     mejorEpoca: TEMPORADA_LARGA,
     urlNivelAgua: null,
@@ -447,9 +510,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "media",
     tieneSombra: true,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: HU_BASS_SIN_LUCIO,
     avisosSanitarios:
       "Zona apartada y con cobertura de móvil irregular: avisa a alguien de " +
       "dónde vas.",

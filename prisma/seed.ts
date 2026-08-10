@@ -29,10 +29,12 @@ import { prisma } from "../src/lib/prisma";
 import { ARTICULOS } from "./articulos";
 import {
   AREAS_DELIMITADAS_EEI_CORDOBA,
+  AREAS_DELIMITADAS_EEI_HUELVA,
   AREAS_DELIMITADAS_EEI_JAEN,
   DESCRIPCIONES_ANDALUCIA,
   ESPECIES_POR_SITIO_ANDALUCIA,
   NOTAS_LEGALES_CORDOBA,
+  NOTAS_LEGALES_HUELVA,
   NOTAS_LEGALES_JAEN,
   SITIOS_ANDALUCIA,
 } from "./andalucia";
@@ -115,7 +117,12 @@ const PROVINCIAS: ProvinciaSeed[] = [
   // Sitios y descripción sí llevan: lo que falta es el listado de áreas
   // delimitadas para especies exóticas invasoras de cada provincia, que sale
   // del boletín y no se deduce. Ver el comentario de cabecera de andalucia.ts.
-  { slug: "huelva", nombre: "Huelva", comunidad: "Andalucía", latitud: 37.6, longitud: -6.9, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.huelva },
+  // Huelva, publicada con su listado comprobado. Es la primera provincia en
+  // la que los seis embalses están DENTRO del área del black bass, así que
+  // ninguno lleva el aviso de «este no». Con el lucio pasa lo contrario que en
+  // las otras: no hay ni una sola masa de agua delimitada en toda la
+  // provincia, así que ahí la respuesta no depende del embalse.
+  { slug: "huelva", nombre: "Huelva", comunidad: "Andalucía", latitud: 37.6, longitud: -6.9, publicada: true, descripcion: DESCRIPCIONES_ANDALUCIA.huelva, areasDelimitadasEEI: AREAS_DELIMITADAS_EEI_HUELVA, notasLegales: NOTAS_LEGALES_HUELVA, urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA },
   // Cádiz ya con su listado de áreas delimitadas, así que sin el aviso en
   // rojo. Ojo: allí la delimitación cambia según la especie —el black bass
   // tiene diez embalses y el lucio uno— y por eso el texto va por especie.
