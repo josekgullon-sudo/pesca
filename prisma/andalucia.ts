@@ -1389,12 +1389,75 @@ const ESPECIES_JAEN: Record<string, FilaSitioEspecie[]> = {
   ],
 };
 
+/**
+ * Huelva, con ficha propia embalse por embalse.
+ *
+ * Se escribe ANTES de tener su listado de áreas delimitadas, y por eso la
+ * provincia sigue sin publicar: esto es la parte que no depende de la orden de
+ * vedas —qué hay en cada agua y cómo es cada sitio—, y así el día que llegue
+ * el listado solo hay que pegar la parte legal.
+ *
+ * La provincia se parte en dos: la sierra de Aracena al norte —Aracena, Zufre,
+ * Jarrama—, con agua limpia, encinar y barbo por todas partes; y el Andévalo
+ * al oeste —Andévalo, Chanza, Piedras—, embalses grandes de abastecimiento en
+ * un paisaje mucho más abierto y con menos sombra.
+ *
+ * Lo que NO lleva ninguna de estas notas es si el black bass se puede devolver
+ * al agua. Eso lo dice el listado de áreas delimitadas, no yo, y hasta que
+ * llegue las fichas siguen diciendo que no se ha comprobado.
+ */
+const ESPECIES_HUELVA: Record<string, FilaSitioEspecie[]> = {
+  andevalo: [
+    ["black-bass", 4, "alta", "spinning", "Embalse enorme y con kilómetros de orilla: aquí el problema no es que no haya, es elegir dónde empezar."],
+    ["carpa-comun", 4, "alta", "fondo", "La captura de partida, bien repartida por todas las colas."],
+    ["barbo", 3, "media", "feeder", "Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable. En las orillas de poco fondo no te deja pescar abajo."],
+    ["alburno", 3, "media", "", "Bandos cerca de superficie. Donde saltan, hay bass debajo."],
+  ],
+  chanza: [
+    ["black-bass", 3, "media", "spinning", "Menos machacado que el Andévalo por lo apartado que está, y eso se nota."],
+    ["carpa-comun", 4, "alta", "fondo", "Lo más seguro del embalse."],
+    ["barbo", 3, "media", "feeder", "Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable."],
+    ["alburno", 3, "media", "", "Bandos en superficie."],
+  ],
+  aracena: [
+    ["barbo", 4, "alta", "feeder", "El pez de la sierra de Aracena: agua limpia y fresca. Devolución obligatoria."],
+    ["boga-de-rio", 3, "media", "", "Propia de aguas así de limpias. Devolución obligatoria."],
+    ["carpa-comun", 3, "media", "fondo", "En las colas y en las orillas tendidas."],
+    ["black-bass", 2, "baja", "spinning", "Lo hay, pero con el agua tan clara hay que afinar mucho más que en el Andévalo."],
+    ["cangrejo-rojo-americano", 2, "baja", "", "No pescable."],
+  ],
+  zufre: [
+    ["barbo", 4, "alta", "feeder", "Domina el embalse. Encajonado entre dehesa, con agua fresca. Devolución obligatoria."],
+    ["carpa-comun", 3, "media", "fondo", "Donde el fondo se suaviza y en las colas."],
+    ["boga-de-rio", 3, "media", "", "Devolución obligatoria."],
+    ["black-bass", 2, "baja", "spinning", "Presente, pero es un embalse de barbo antes que de bass."],
+    ["cangrejo-rojo-americano", 3, "media", "", "No pescable."],
+  ],
+  piedras: [
+    ["carpa-comun", 4, "alta", "fondo", "El más cercano a la costa de los tres del oeste, y el de la carpa más fácil."],
+    ["black-bass", 3, "media", "spinning", "En los bordes con estructura y en las colas."],
+    ["barbo", 3, "media", "feeder", "Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable. Constante en fondo de fango."],
+    ["carpin", 2, "baja", "fondo", "Cae con anzuelo pequeño mientras buscas carpa."],
+  ],
+  jarrama: [
+    ["barbo", 4, "alta", "feeder", "Sierra de Aracena en estado puro: agua limpia y barbo. Devolución obligatoria."],
+    ["boga-de-rio", 3, "media", "", "Devolución obligatoria."],
+    ["carpa-comun", 3, "media", "fondo", "En las zonas de menos profundidad."],
+    ["black-bass", 2, "baja", "spinning", "El más discreto de los tres de sierra para el bass."],
+    ["cangrejo-rojo-americano", 2, "baja", "", "No pescable."],
+  ],
+};
+
 export const ESPECIES_POR_SITIO_ANDALUCIA: Record<string, FilaSitioEspecie[]> =
   Object.fromEntries(
     SITIOS_ANDALUCIA.map((s) => [
       s.slug,
       ESPECIES_CORDOBA[s.slug] ??
         ESPECIES_JAEN[s.slug] ??
+        ESPECIES_HUELVA[s.slug] ??
         (SIERRA.has(s.slug) ? COMUN_EMBALSE_SIERRA : COMUN_EMBALSE_INTERIOR),
     ]),
   );
