@@ -31,38 +31,74 @@ export type ArticuloSemilla = {
 export const ARTICULOS: ArticuloSemilla[] = [
   {
     slug: "licencia-de-pesca-andalucia",
-    titulo: "Licencia de pesca en Andalucía: qué necesitas y qué multa hay",
+    // El título lleva el año a propósito. Es lo que se busca —«licencia de
+    // pesca andalucía 2026»— y además obliga a acordarse: si el año del título
+    // no coincide con el de las tarifas de abajo, el artículo está caducado y
+    // se nota de un vistazo.
+    titulo: "Licencia de pesca en Andalucía 2026: precio, duración y cómo sacarla",
     entradilla:
-      "Sí hace falta, y también seguro de responsabilidad civil. Qué llevar encima, cómo se saca, y cómo se calcula la sanción si te pillan sin ella.",
+      "Desde 8,14 € al año, y se puede sacar por 1, 3 o 5 años. Hace falta también seguro de responsabilidad civil, que va aparte. Precios, exenciones y qué pasa si te pillan sin ella.",
     provincia: "sevilla",
     diasAtras: 21,
     contenido: `Sí. Para pescar en aguas continentales de Andalucía —embalses, ríos, canales— hace falta la **licencia de pesca continental** en vigor, y hay que llevarla encima. No vale con haberla sacado: si no la puedes enseñar, es como no tenerla.
 
-Y hace falta una segunda cosa que mucha gente no sabe: **seguro de responsabilidad civil** del pescador. Se pide junto con la licencia y sin él tampoco puedes pescar.
+Y hace falta una segunda cosa que mucha gente no sabe: **seguro de responsabilidad civil** del pescador. No va incluido en la licencia y se contrata aparte.
+
+## Cuánto cuesta
+
+Estas son las tarifas de la licencia básica de pesca continental de Andalucía:
+
+- **1 año**: 8,14 €
+- **3 años**: 24,42 €
+- **5 años**: 40,70 €
+
+Sacarla por tres o por cinco años no sale más barato por año: es exactamente la tarifa anual multiplicada. Lo que te ahorras es volver a hacer el trámite.
+
+Aparte está la **licencia interautonómica**, que sirve para pescar en varias comunidades: **25 €** y solo se expide por un año. A cambio incluye la licencia básica y los recargos de trucha y de medios auxiliares sin pagarlos por separado, así que si pescas trucha o fuera de Andalucía puede compensar aunque cueste el triple.
+
+> Tarifas de 2026, actualizadas por la Ley de Presupuestos de 2026 y el Decreto-ley 2/2026. Comprobadas el 10 de agosto de 2026 en el [Portal de Caza y Pesca de la Junta](https://www.juntadeandalucia.es/organismos/sostenibilidadmedioambienteyeconomiaazul/areas/flora-fauna-silvestres/caza-pesca.html). **Antes de pagar, míralo ahí**: las tasas se actualizan con cada ley de presupuestos.
+
+## Desde cuándo cuenta
+
+**No va por año natural**, que es lo que casi todo el mundo da por hecho. Al tramitarla eliges tú la fecha de inicio y el periodo de validez, así que una licencia de un año sacada en agosto te vale hasta agosto del siguiente, no hasta el 31 de diciembre.
+
+La interautonómica es la excepción: ahí es **un año desde el día en que se expide**, sin elegir.
+
+## Quién no paga, o paga menos
+
+- **Mayores de 65 años**: exentos del pago. Ojo, exentos de pagar, no de tenerla: sigue siendo obligatoria, y se expide por el periodo máximo.
+- **Menores de 16 años**: 50 % de bonificación sobre la licencia básica.
+- **Ingreso Mínimo Vital o Renta Mínima de Inserción Social de Andalucía**: exentos del pago cumpliendo las condiciones establecidas.
+
+Tres cosas que conviene saber porque se dan por supuestas y no son así:
+
+- La bonificación de menores **no se aplica a los recargos ni a la licencia temporal**, solo a la básica.
+- **Nada de esto vale para la interautonómica**: esos 25 € se pagan enteros.
+- En los beneficios fiscales de 2026 **no aparece** una bonificación específica por discapacidad ni por familia numerosa. Si es tu caso, pregunta en la Delegación Territorial antes de dar por hecho que no la hay.
+
+## El seguro, que va aparte
+
+Esto es lo que más gente se salta. El seguro de responsabilidad civil **no está incluido en los 8,14 €**: es obligatorio y se contrata por tu cuenta con una aseguradora. Durante la pesca tienes que poder enseñar el justificante junto con la licencia y el DNI.
+
+La Junta no publica ninguna tarifa porque no es una tasa suya. Como orientación, los seguros específicos de pesca suelen andar **entre 10 y 20 € al año** según coberturas y compañía —eso es un precio de mercado aproximado, no una cifra oficial—.
+
+## Dónde se saca
+
+La licencia la expide la Junta de Andalucía y se tramita por internet o en las oficinas de la Delegación Territorial, desde el [Portal de Caza y Pesca](https://www.juntadeandalucia.es/organismos/sostenibilidadmedioambienteyeconomiaazul/areas/flora-fauna-silvestres/caza-pesca.html).
 
 ## Qué necesitas llevar cuando sales
 
 - La licencia de pesca continental de Andalucía, en vigor.
-- El seguro de responsabilidad civil.
+- El justificante del seguro de responsabilidad civil.
 - Tu DNI o documento identificativo.
 
 Si vas a un coto o a un tramo con régimen especial, además el permiso correspondiente de ese tramo. Eso va aparte de la licencia.
 
-## Dónde se saca
-
-La licencia la expide la Junta de Andalucía y se tramita por internet o en las oficinas de la Delegación Territorial. En el [Portal de Caza y Pesca de la Junta de Andalucía](https://www.juntadeandalucia.es/organismos/sostenibilidadmedioambienteyeconomiaazul/areas/flora-fauna-silvestres/caza-pesca.html) están el trámite, la vigencia y lo que cuesta.
-
-No pongo aquí ni el precio ni la duración a propósito: son datos que cambian y un artículo desactualizado sobre esto no ayuda, confunde. En el portal está siempre lo vigente.
-
-## Si vienes de otra comunidad
-
-La licencia es autonómica. Hay comunidades con acuerdos de reciprocidad entre ellas, pero **no lo des por hecho**: comprueba antes de coger el coche si la tuya vale en Andalucía, porque la mayoría de las veces no.
-
 ## ¿Cuánto es la multa por pescar sin licencia?
 
-No te voy a dar una cifra, y te explico por qué: los importes de las sanciones se actualizan, y un número desactualizado en una web de pesca es peor que ningún número. Lo que sí se puede explicar es **cómo se calcula**, que es lo que de verdad te dice a qué te expones.
+Aquí sí que no te voy a dar una cifra, y la razón es distinta de la del precio. El precio es un número único y publicado; **la multa no lo es**: se mueve dentro de una horquilla y depende de cómo fue la cosa. Una cifra suelta te haría creer que sabes a qué te expones cuando no.
 
-Pescar sin licencia es una infracción administrativa, y en la normativa andaluza de flora y fauna las infracciones van **por grados**: leves, graves y muy graves. Cada grado tiene su horquilla de importe, y dentro de la horquilla la cuantía concreta se gradúa según las circunstancias.
+Pescar sin licencia es una infracción administrativa, y en la normativa andaluza de flora y fauna las infracciones van **por grados**: leves, graves y muy graves. Cada grado tiene su horquilla, y dentro de ella la cuantía se gradúa según las circunstancias.
 
 Lo que agrava una denuncia, y esto es lo importante:
 
@@ -72,9 +108,7 @@ Lo que agrava una denuncia, y esto es lo importante:
 - **Dónde estabas.** En espacio natural protegido pesa más.
 - **Si hubo intención o solo descuido.**
 
-Por eso una misma frase —«pescar sin licencia»— puede acabar en una cosa o en otra muy distinta. Y por eso lo que sale al buscar «cuánto es la multa» suele ser una cifra suelta, de una comunidad que no es la tuya y de un año que ya pasó.
-
-**Dónde está el importe vigente**: en la normativa andaluza de flora y fauna silvestres y en la orden de vedas de la temporada, las dos accesibles desde el [Portal de Caza y Pesca de la Junta](https://www.juntadeandalucia.es/organismos/sostenibilidadmedioambienteyeconomiaazul/areas/flora-fauna-silvestres/caza-pesca.html). Si ya tienes una denuncia encima, el importe y el grado vienen escritos en el propio boletín de denuncia.
+Por eso una misma frase —«pescar sin licencia»— puede acabar en una cosa o en otra muy distinta. Si ya tienes una denuncia encima, el importe y el grado vienen escritos en el propio boletín de denuncia.
 
 ## Lo que de verdad se sanciona
 
@@ -88,7 +122,6 @@ Las tres se evitan mirando dos cosas antes de salir: qué especie tienes delante
 
 > La información de esta web es orientativa. Antes de cada salida, comprueba la orden de vedas vigente en el portal oficial: es la única fuente que manda.`,
   },
-
   {
     slug: "especies-invasoras-que-hacer",
     titulo: "Has pescado un black bass: ¿lo devuelves o no?",
