@@ -29,9 +29,11 @@ import { prisma } from "../src/lib/prisma";
 import { ARTICULOS } from "./articulos";
 import {
   AREAS_DELIMITADAS_EEI_CORDOBA,
+  AREAS_DELIMITADAS_EEI_JAEN,
   DESCRIPCIONES_ANDALUCIA,
   ESPECIES_POR_SITIO_ANDALUCIA,
   NOTAS_LEGALES_CORDOBA,
+  NOTAS_LEGALES_JAEN,
   SITIOS_ANDALUCIA,
 } from "./andalucia";
 import {
@@ -123,7 +125,11 @@ const PROVINCIAS: ProvinciaSeed[] = [
   // Ojo con La Colada: no aparece en ninguna de las listas de la resolución,
   // así que allí la respuesta es la contraria y su ficha lo dice.
   { slug: "cordoba", nombre: "Córdoba", comunidad: "Andalucía", latitud: 38.0, longitud: -4.8, publicada: true, descripcion: DESCRIPCIONES_ANDALUCIA.cordoba, areasDelimitadasEEI: AREAS_DELIMITADAS_EEI_CORDOBA, notasLegales: NOTAS_LEGALES_CORDOBA, urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA },
-  { slug: "jaen", nombre: "Jaén", comunidad: "Andalucía", latitud: 38.0, longitud: -3.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.jaen },
+  // Jaén, publicada con su listado comprobado. Dos avisos que no tiene
+  // ninguna otra: La Bolera y Quiebrajano no salen en ninguna lista, y la
+  // trucha arcoíris no se puede pescar en TODA la provincia pese a que circula
+  // una lista de 2019 con aguas donde se soltó, que se lee al revés.
+  { slug: "jaen", nombre: "Jaén", comunidad: "Andalucía", latitud: 38.0, longitud: -3.4, publicada: true, descripcion: DESCRIPCIONES_ANDALUCIA.jaen, areasDelimitadasEEI: AREAS_DELIMITADAS_EEI_JAEN, notasLegales: NOTAS_LEGALES_JAEN, urlOrdenDeVedas: URL_PORTAL_CAZA_Y_PESCA },
   { slug: "granada", nombre: "Granada", comunidad: "Andalucía", latitud: 37.3, longitud: -3.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.granada },
   { slug: "almeria", nombre: "Almería", comunidad: "Andalucía", latitud: 37.2, longitud: -2.4, publicada: false, descripcion: DESCRIPCIONES_ANDALUCIA.almeria },
 ];

@@ -2,12 +2,13 @@
  * Las provincias andaluzas que todavía son un armazón.
  *
  * Cádiz salió de aquí: está trabajada al nivel de Sevilla y vive en
- * `cadiz.ts`. **Córdoba también ha salido, aunque siga en este fichero**: ya
- * tiene su listado de áreas delimitadas comprobado, ficha de especies propia
- * embalse por embalse y se publica al sembrar. Lo que dice este comentario
- * vale para las otras CINCO.
+ * `cadiz.ts`. **Córdoba y Jaén también han salido, aunque sigan en este
+ * fichero**: las dos tienen su listado de áreas delimitadas comprobado, ficha
+ * de especies propia embalse por embalse, y se publican al sembrar. Lo que
+ * dice este comentario vale para las otras CUATRO: Huelva, Málaga, Granada y
+ * Almería.
  *
- * **Ninguna de esas cinco se publica al sembrar.** Esto es un armazón,
+ * **Ninguna de esas cuatro se publica al sembrar.** Esto es un armazón,
  * no una guía terminada, y hay que saber qué fiabilidad tiene cada cosa antes
  * de tocarla:
  *
@@ -178,6 +179,111 @@ export const AREAS_DELIMITADAS_EEI_CORDOBA =
   "pueden devolver al agua: hay que extraerlos y sacrificarlos en el momento. " +
   "Según la Resolución de 19 de diciembre de 2019 y la Orden de 13 de enero " +
   "de 2023.";
+
+// ---------------------------------------------------------------------------
+// Áreas delimitadas para especies exóticas invasoras · Jaén
+// ---------------------------------------------------------------------------
+//
+// Black bass: Tranco de Beas, Guadalén, El Dañador, Giribaile, Guadalmena,
+// La Fernandina (Panzacola), Rumblar, Zocueca, Encinarejo, Jándula y Víboras.
+// Lucio: Guadalmena, La Fernandina, Giribaile, Zocueca y Rumblar.
+// Trucha arcoíris: ver el aviso de abajo. Es el caso delicado de esta
+// provincia.
+//
+// De los seis embalses de esta guía, DOS no salen en ninguna lista: La Bolera
+// y Quiebrajano. Ahí la respuesta es la contraria y hay que decirla entera.
+//
+// Fuente: Resolución de 19 de diciembre de 2019 y Orden de 13 de enero de 2023.
+
+/**
+ * La trucha arcoíris en Jaén, que es donde más fácil es equivocarse.
+ *
+ * La resolución de 2019 recoge una lista de aguas de Jaén donde hubo sueltas
+ * de trucha arcoíris antes de 2007 —La Bolera, Peralta, La Toba, Cañamares y
+ * más—. Esa lista sigue publicada, y leerla sin la orden al lado lleva a la
+ * conclusión contraria a la correcta: que en esas aguas se puede pescar.
+ *
+ * La orden vigente solo permite pescarla en los cotos de trucha arcoíris de su
+ * Anexo II, y **en Jaén no hay ninguno**. Así que en toda la provincia una
+ * trucha arcoíris capturada hay que sacarla del agua y sacrificarla, salga
+ * donde salga.
+ */
+const JA_TRUCHA =
+  " Y con la trucha arcoíris, ojo: en Jaén NO hay ningún coto autorizado, así " +
+  "que si cae una hay que sacarla del agua y sacrificarla. Hay listas antiguas " +
+  "de aguas donde se soltó trucha arcoíris hace veinte años que siguen " +
+  "publicadas y se leen al revés de lo que dicen: aquello era dónde se soltó, " +
+  "no dónde se puede pescar.";
+
+/** Giribaile y Rumblar: delimitados para las dos. */
+const JA_BASS_Y_LUCIO =
+  "Está dentro del área delimitada para black bass y para lucio: los dos se " +
+  "pueden pescar y devolver al agua." + JA_TRUCHA;
+
+/** Delimitado solo para black bass. Un lucio aquí hay que sacrificarlo. */
+const JA_SOLO_BASS =
+  "Está dentro del área delimitada para black bass: se puede pescar y " +
+  "devolver al agua. El lucio no —en Jaén solo está delimitado en Giribaile, " +
+  "Rumblar, Guadalmena, La Fernandina y Zocueca—, así que si cae uno hay que " +
+  "sacarlo del agua y sacrificarlo." + JA_TRUCHA;
+
+/** El Tranco, que además está metido en el parque natural. */
+const JA_TRANCO =
+  "Está dentro del área delimitada para black bass: se puede pescar y " +
+  "devolver al agua. El lucio no está delimitado aquí: si cae uno hay que " +
+  "sacarlo del agua y sacrificarlo. Y estás dentro del parque natural de " +
+  "Cazorla, Segura y Las Villas, donde muchos tramos de río son aguas " +
+  "trucheras o refugios de pesca con sus propias reglas: mira en qué agua " +
+  "estás exactamente antes de tirar." + JA_TRUCHA;
+
+/**
+ * Los dos que no salen en ninguna lista.
+ *
+ * Es donde más importa no callarse: en los otros cuatro la duda juega a favor
+ * del pez, y aquí la respuesta es la contraria.
+ */
+const JA_FUERA_DE_AREA =
+  "NO está dentro de ninguna de las áreas delimitadas de Jaén. Si capturas " +
+  "black bass, lucio o trucha arcoíris aquí, hay obligación de sacarlos del " +
+  "agua y sacrificarlos: no se pueden devolver.";
+
+/** La Bolera, que además sale en la lista vieja de sueltas de trucha. */
+const JA_BOLERA =
+  JA_FUERA_DE_AREA +
+  " Cuidado con lo que se lee por ahí de este embalse: aparece en la lista de " +
+  "aguas donde se soltó trucha arcoíris antes de 2007, y eso no es lo mismo " +
+  "que estar autorizado. En Jaén no hay ningún coto de trucha arcoíris, así " +
+  "que aquí tampoco se puede devolver. Estás además en el entorno del parque " +
+  "natural de Cazorla, Segura y Las Villas, con tramos que son aguas trucheras " +
+  "o refugios de pesca.";
+
+/** Lo que hay que saber antes de mojar el sedal en Jaén. */
+export const NOTAS_LEGALES_JAEN =
+  "Jaén se rige por la orden de vedas de pesca continental de Andalucía. Es " +
+  "obligatorio llevar licencia de pesca continental andaluza en vigor. Media " +
+  "provincia está dentro o en el entorno del parque natural de Cazorla, Segura " +
+  "y Las Villas, que tiene normativa propia de acceso, circulación y acampada. " +
+  "Y es la provincia con más aguas trucheras y refugios de pesca de Andalucía: " +
+  "hay tramos declarados en el Guadalquivir, el Guadalentín, el Segura, el " +
+  "Zumeta y el Madera, entre otros. Dentro de un refugio no se pesca, y sus " +
+  "límites no coinciden con los del embalse ni con los del pueblo.";
+
+export const AREAS_DELIMITADAS_EEI_JAEN =
+  "Black bass: embalses de El Tranco de Beas, Guadalén, El Dañador, Giribaile, " +
+  "Guadalmena, La Fernandina (Panzacola), Rumblar, Zocueca, Encinarejo, " +
+  "Jándula y Víboras. Lucio: solo Guadalmena, La Fernandina (Panzacola), " +
+  "Giribaile, Zocueca y Rumblar. Carpa común: las masas y cursos de agua " +
+  "continentales de Andalucía donde esté presente, siempre que no sean aguas " +
+  "trucheras ni refugios de pesca; en Jaén eso excluye buena parte de la " +
+  "sierra de Cazorla, Segura y Las Villas. Trucha arcoíris: NINGUNA. La orden " +
+  "vigente solo la permite en los cotos de trucha arcoíris de su Anexo II y en " +
+  "Jaén no hay ninguno, así que en toda la provincia hay que sacrificarla. " +
+  "Circula una lista de la resolución de 2019 con aguas de Jaén donde se " +
+  "soltó trucha arcoíris antes de 2007 —La Bolera, Peralta, La Toba, " +
+  "Cañamares y otras—: eso es dónde se soltó, no dónde se puede pescar. Fuera " +
+  "de las zonas delimitadas, los ejemplares capturados no se pueden devolver " +
+  "al agua: hay que extraerlos y sacrificarlos en el momento. Según la " +
+  "Resolución de 19 de diciembre de 2019 y la Orden de 13 de enero de 2023.";
 
 export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
   // -------------------------------------------------------------------------
@@ -578,9 +684,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "media",
     tieneSombra: true,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: JA_TRANCO,
     avisosSanitarios:
       "Parque natural: hay normativa propia de acceso, acampada, navegación " +
       "y fuego, aparte de la de pesca. Mírala antes de ir.",
@@ -607,9 +713,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "media",
     tieneSombra: false,
     navegable: true,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: JA_BASS_Y_LUCIO,
     avisosSanitarios: `${SOL_Y_AGUA} ${NIVEL_VARIABLE}`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -633,9 +739,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "media",
     tieneSombra: false,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: JA_SOLO_BASS,
     avisosSanitarios: `${SOL_Y_AGUA} ${NIVEL_VARIABLE}`,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -660,9 +766,9 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     dificultadAcceso: "facil",
     tieneSombra: false,
     navegable: false,
-    esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    esAreaDelimitadaEEI: true,
+    eeiComprobado: true,
+    notasLegales: JA_BASS_Y_LUCIO,
     avisosSanitarios: SOL_Y_AGUA,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -687,8 +793,8 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     tieneSombra: true,
     navegable: false,
     esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    eeiComprobado: true,
+    notasLegales: JA_BOLERA,
     avisosSanitarios:
       "Zona de montaña: en invierno hace frío de verdad y puede haber hielo " +
       "en la carretera a primera hora.",
@@ -715,8 +821,8 @@ export const SITIOS_ANDALUCIA: SitioAndalucia[] = [
     tieneSombra: true,
     navegable: false,
     esAreaDelimitadaEEI: false,
-    eeiComprobado: false,
-    notasLegales: SIN_COMPROBAR,
+    eeiComprobado: true,
+    notasLegales: JA_FUERA_DE_AREA,
     avisosSanitarios: ORILLA_CON_PENDIENTE,
     mejorEpoca: PRIMAVERA_Y_OTONO,
     urlNivelAgua: null,
@@ -1223,11 +1329,72 @@ const ESPECIES_CORDOBA: Record<string, FilaSitioEspecie[]> = {
   ],
 };
 
+/**
+ * Jaén, con ficha propia embalse por embalse. Mismo motivo que Córdoba: la
+ * provincia se publica, y siete páginas repitiendo las mismas seis frases no
+ * son una guía.
+ *
+ * Aquí los seis se parten claramente en dos mundos: los del Guadalquivir y sus
+ * afluentes al oeste —Giribaile, Guadalén, Rumblar—, que son de bass y de
+ * lucio y andan por el olivar; y los de sierra al este —Tranco, La Bolera,
+ * Quiebrajano—, con agua fría y clara y barbo por todas partes.
+ *
+ * El lucio va donde la resolución lo delimita: esa resolución delimita «las
+ * áreas ocupadas por» estas especies, así que si está delimitado es que está.
+ */
+const ESPECIES_JAEN: Record<string, FilaSitioEspecie[]> = {
+  "tranco-de-beas": [
+    ["black-bass", 4, "alta", "spinning", "El embalse de bass de la sierra, y de los conocidos de Andalucía. Agua clara entre pinares: cuenta con afinar el hilo y bajar el tamaño."],
+    ["barbo", 4, "alta", "feeder", "El Guadalquivir joven baja con barbo. Devolución obligatoria."],
+    ["carpa-comun", 3, "media", "fondo", "Sobre todo en las colas y en las zonas de menos fondo."],
+    ["boga-de-rio", 3, "media", "", "Propia de estas aguas limpias. Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 3, "media", "", "No pescable."],
+  ],
+  giribaile: [
+    ["black-bass", 4, "alta", "spinning", "Mucha orilla y mucha estructura. De los buenos de la provincia."],
+    ["lucio", 3, "media", "spinning", "Delimitado aquí, se puede devolver. En las colas y donde hay vegetación."],
+    ["carpa-comun", 4, "alta", "fondo", "La captura segura, bien repartida por todo el embalse."],
+    ["barbo", 3, "media", "feeder", "El Guadalimar trae barbo. Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable. Te vacía el anzuelo si pescas a fondo."],
+    ["alburno", 3, "media", "", "Bandos en superficie, y detrás el bass."],
+  ],
+  guadalen: [
+    ["black-bass", 4, "alta", "spinning", "Delimitado aquí. Busca los cambios de nivel que deja el riego y la madera sumergida."],
+    ["carpa-comun", 4, "alta", "fondo", "Lo que más cae cuando el bass no quiere saber nada."],
+    ["barbo", 3, "media", "feeder", "Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable."],
+    ["alburno", 3, "media", "", "Bandos cerca de superficie."],
+  ],
+  rumblar: [
+    ["black-bass", 4, "alta", "spinning", "Entre olivares y con orillas de piedra: la estructura está a la vista."],
+    ["lucio", 3, "media", "spinning", "Delimitado aquí, se puede devolver. En las zonas de menos fondo."],
+    ["carpa-comun", 4, "alta", "fondo", "Bien repartida."],
+    ["barbo", 3, "media", "feeder", "Devolución obligatoria."],
+    ["cangrejo-rojo-americano", 4, "alta", "", "No pescable."],
+    ["alburno", 3, "media", "", "Bandos en superficie."],
+  ],
+  "la-bolera": [
+    ["barbo", 4, "alta", "feeder", "Domina el embalse: agua fría y limpia de la sierra de Cazorla. Devolución obligatoria."],
+    ["boga-de-rio", 3, "media", "", "Propia de aguas limpias como esta. Devolución obligatoria."],
+    ["carpa-comun", 3, "media", "fondo", "En las colas y donde el fondo se suaviza."],
+    ["black-bass", 2, "baja", "spinning", "Aquí NO está en área delimitada: si cae, hay que sacrificarlo. Lee la ficha antes de ir a por él."],
+    ["cangrejo-rojo-americano", 2, "baja", "", "No pescable. Menos que en los embalses de campiña."],
+  ],
+  quiebrajano: [
+    ["barbo", 4, "alta", "feeder", "El pez de este embalse. Agua de sierra y poco más que buscar. Devolución obligatoria."],
+    ["boga-de-rio", 3, "media", "", "Devolución obligatoria."],
+    ["carpa-comun", 3, "media", "fondo", "En las orillas tendidas."],
+    ["black-bass", 2, "baja", "spinning", "Aquí NO está en área delimitada: si cae, hay que sacrificarlo."],
+    ["cangrejo-rojo-americano", 2, "baja", "", "No pescable."],
+  ],
+};
+
 export const ESPECIES_POR_SITIO_ANDALUCIA: Record<string, FilaSitioEspecie[]> =
   Object.fromEntries(
     SITIOS_ANDALUCIA.map((s) => [
       s.slug,
       ESPECIES_CORDOBA[s.slug] ??
+        ESPECIES_JAEN[s.slug] ??
         (SIERRA.has(s.slug) ? COMUN_EMBALSE_SIERRA : COMUN_EMBALSE_INTERIOR),
     ]),
   );
