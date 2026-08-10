@@ -33,6 +33,12 @@ export type FilaBoletin = {
   capacidadHm3: number;
   volumenHm3: number;
   fecha: Date;
+  /**
+   * Qué porcentaje suele llevar este embalse por estas fechas, sacado de los
+   * años anteriores del propio boletín. En `null` cuando no hay histórico
+   * suficiente para decirlo. Ver `historico-embalses.ts`.
+   */
+  medianaHistorica?: number | null;
 };
 
 /**
@@ -68,6 +74,12 @@ export function crearBuscador(filas: FilaBoletin[]) {
         capacidadHm3: partes.reduce((a, p) => a + p.capacidadHm3, 0),
         volumenHm3: partes.reduce((a, p) => a + p.volumenHm3, 0),
         fecha: partes.reduce((a, p) => (p.fecha > a ? p.fecha : a), partes[0].fecha),
+        // Sin mediana histórica a propósito: sumar dos porcentajes «normales»
+        // no da el porcentaje normal del conjunto, y para hacerlo bien harían
+        // falta los volúmenes históricos de cada presa, no sus porcentajes. El
+        // complejo se queda sin la comparación, que es mejor que con una mal
+        // hecha.
+        medianaHistorica: null,
       };
     }
 

@@ -99,6 +99,33 @@ function Periodos({
   );
 }
 
+/**
+ * Cómo se le explica a alguien de dónde sale la nota del agua.
+ *
+ * Con histórico se dice comparado con lo suyo, que es lo único que distingue
+ * de verdad: en agosto casi todos los embalses andaluces van por encima del
+ * 60 % y el porcentaje pelado los iguala a todos. Sin histórico se dice el
+ * porcentaje y se avisa de hasta dónde llega lo que la nota afirma.
+ */
+function notaDelAgua(
+  nombre: string,
+  pct: number,
+  mediana: number | null | undefined,
+): string {
+  const p = Math.round(pct);
+  if (mediana === null || mediana === undefined) {
+    return `${nombre} está al ${p} %. No hay bastantes años de histórico para decir si eso es mucho o poco para estas fechas, así que solo baja nota si está muy vaciado.`;
+  }
+  const m = Math.round(mediana);
+  const d = Math.round(pct - mediana);
+  if (Math.abs(d) < 5) {
+    return `${nombre} está al ${p} %, que es más o menos lo suyo para estas fechas (suele ir al ${m} %).`;
+  }
+  return d > 0
+    ? `${nombre} está al ${p} % y por estas fechas suele ir al ${m} %: lleva ${d} puntos más de lo normal.`
+    : `${nombre} está al ${p} % y por estas fechas suele ir al ${m} %: lleva ${Math.abs(d)} puntos menos de lo normal, así que el agua estará más lejos de la orilla de lo que esperas.`;
+}
+
 function Barra({ etiqueta, valor, maximo, nota }: { etiqueta: string; valor: number; maximo: number; nota: string }) {
   return (
     <div>
@@ -129,6 +156,7 @@ export function Calendario({
   paramsExtra,
   clima,
   nivelPorcentaje = null,
+  nivelMedianaHistorica = null,
   nombreSitio,
 }: {
   punto: Punto;
@@ -145,6 +173,8 @@ export function Calendario({
   clima?: Clima | null;
   /** Cuánta agua lleva. En `null`, esa pata sale del reparto de la nota. */
   nivelPorcentaje?: number | null;
+  /** Lo que suele llevar por estas fechas, para comparar con lo suyo. */
+  nivelMedianaHistorica?: number | null;
   nombreSitio: string;
 }) {
   // Se construye con URLSearchParams y no pegando cadenas: con un `?sitio=x`
@@ -164,6 +194,7 @@ export function Calendario({
       i: indiceDePesca(d, {
         enTemporada: buenos ? buenos.includes(mesDelDia) : null,
         nivelPorcentaje,
+        nivelMedianaHistorica,
       }),
     };
   };
@@ -292,7 +323,7 @@ export function Calendario({
               etiqueta="Nivel del agua"
               valor={deHoy.i.desglose.nivel}
               maximo={MAXIMOS_DESGLOSE.nivel}
-              nota={`${nombreSitio} está al ${Math.round(nivelPorcentaje)} %. Solo baja nota si está muy vaciado: entre el 60 % y el 100 % no cambia.`}
+              nota={notaDelAgua(nombreSitio, nivelPorcentaje, nivelMedianaHistorica)}
             />
           )}
         </section>

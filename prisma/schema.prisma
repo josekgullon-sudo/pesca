@@ -159,6 +159,17 @@ model Sitio {
   nivelFecha      DateTime?
   /// De dónde salió, para poder citarlo en la ficha.
   nivelFuente String?
+  /// Qué porcentaje suele llevar ESTE embalse por estas mismas fechas, según
+  /// los años anteriores del propio boletín.
+  ///
+  /// El porcentaje a secas ordena mal: en agosto casi todos los embalses
+  /// andaluces andan entre el 60 % y el 100 %, y un ranking por «cuánta agua
+  /// lleva» los deja empatados diciendo lo mismo de uno que va sobrado y de
+  /// otro que está vaciado a base de bien. Lo que distingue es compararlo con
+  /// él mismo.
+  ///
+  /// En null cuando no hay bastantes años para decir qué es lo normal.
+  nivelMedianaHistorica Float?
   /// Nombre del embalse en el boletín, que no coincide con el nuestro.
   /// «Embalse José Torán» allí es «JOSE TORAN». Se guarda una vez comprobado
   /// para no depender de adivinarlo en cada actualización.

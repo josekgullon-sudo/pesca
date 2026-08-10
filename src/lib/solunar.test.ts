@@ -232,6 +232,46 @@ describe("índice de pesca", () => {
     }
   });
 
+  it("con histórico, lo que cuenta es cómo va respecto a lo suyo", () => {
+    // Los dos al 62 %. El primero suele estar al 40 % por estas fechas y va
+    // sobrado; el segundo suele estar al 85 % y tiene el agua veinte puntos
+    // por debajo de donde la esperas. Sin histórico serían el mismo número.
+    const nota = (mediana: number) =>
+      indiceDePesca(d, {
+        enTemporada: true,
+        nivelPorcentaje: 62,
+        nivelMedianaHistorica: mediana,
+      }).total;
+
+    assert.ok(nota(40) > nota(85), "el histórico no estaba cambiando nada");
+  });
+
+  it("el histórico desempata a dos embalses que el porcentaje pelado igualaba", () => {
+    // Este es el motivo de todo el trabajo: en agosto casi todos los embalses
+    // andaluces andan por encima del 60 %, y sin esto diecinueve de veintitrés
+    // salían con la misma nota.
+    const nota = (p: number, mediana?: number) =>
+      indiceDePesca(d, {
+        enTemporada: true,
+        nivelPorcentaje: p,
+        nivelMedianaHistorica: mediana,
+      }).total;
+
+    assert.equal(nota(72), nota(94), "sin histórico empatan, que es el problema");
+    assert.notEqual(nota(72, 55), nota(94, 97), "con histórico deberían separarse");
+  });
+
+  it("una mediana absurda no rompe la nota", () => {
+    for (const m of [0, -5, 200, Number.NaN]) {
+      const i = indiceDePesca(d, {
+        enTemporada: true,
+        nivelPorcentaje: 62,
+        nivelMedianaHistorica: m,
+      });
+      assert.ok(i.total >= 0 && i.total <= 100, `mediana ${m}: ${i.total}`);
+    }
+  });
+
   it("la luna puntúa más en luna nueva y llena que en los cuartos", () => {
     const nota = (mes: number, dia: number) =>
       indiceDePesca(

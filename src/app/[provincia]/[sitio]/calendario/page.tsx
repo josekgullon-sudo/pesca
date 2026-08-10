@@ -25,6 +25,7 @@ async function cargar(provinciaSlug: string, slug: string, esAdmin: boolean) {
       longitud: true,
       mejorEpoca: true,
       nivelPorcentaje: true,
+      nivelMedianaHistorica: true,
       provincia: { select: { slug: true, nombre: true, publicada: true } },
     },
   });
@@ -126,6 +127,7 @@ export default async function CalendarioSitio({
         punto={{ latitud: sitio.latitud, longitud: sitio.longitud }}
         mejorEpoca={sitio.mejorEpoca}
         nivelPorcentaje={sitio.nivelPorcentaje}
+        nivelMedianaHistorica={sitio.nivelMedianaHistorica}
         anio={anio}
         mes={mes}
         hoy={hoy}

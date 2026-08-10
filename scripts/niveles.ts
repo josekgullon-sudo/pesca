@@ -196,6 +196,14 @@ function interpretar(datos: Uint8Array): FilaBoletin[] {
   return filas;
 }
 
+/** «+22 pts sobre lo normal (suele ir al 40 %)», o por qué no se puede decir. */
+function respectoALoNormal(pct: number, mediana?: number | null): string {
+  if (mediana === null || mediana === undefined) return "sin histórico";
+  const d = pct - mediana;
+  const signo = d >= 0 ? "+" : "";
+  return `${signo}${d.toFixed(0)} pts sobre lo normal (suele ir al ${mediana.toFixed(0)} %)`;
+}
+
 async function main() {
   const args = process.argv.slice(2);
   // Se imprime antes que nada. Si no sale ni esta línea, el problema está en
@@ -263,12 +271,17 @@ async function main() {
   }
 
   console.log("EMPAREJADOS");
+  console.log(
+    "  La última columna compara con lo que suele llevar ESE embalse por\n" +
+      "  estas mismas fechas, según los años anteriores del propio boletín.\n",
+  );
   for (const e of emparejados) {
     console.log(
       `  ${e.nombre.padEnd(40)} ${e.fila.nombre.padEnd(26)} ` +
         `${e.pct.toFixed(1).padStart(6)}%  ` +
         `${Math.round(e.fila.volumenHm3)}/${Math.round(e.fila.capacidadHm3)} hm³  ` +
-        `${e.fila.fecha.toISOString().slice(0, 10)}`,
+        `${e.fila.fecha.toISOString().slice(0, 10)}  ` +
+        respectoALoNormal(e.pct, e.fila.medianaHistorica),
     );
   }
 
@@ -301,6 +314,10 @@ async function main() {
         nivelPorcentaje: e.pct,
         nivelFecha: e.fila.fecha,
         nivelFuente: FUENTE_NOMBRE,
+        // Lo que suele llevar por estas fechas. Puede venir a null —hacen
+        // falta cinco años de histórico— y entonces se borra el que hubiera,
+        // en vez de dejar colgado el del año pasado.
+        nivelMedianaHistorica: e.fila.medianaHistorica ?? null,
         capacidadHm3: e.fila.capacidadHm3,
         nombreEnBoletin: e.fila.nombre,
       },

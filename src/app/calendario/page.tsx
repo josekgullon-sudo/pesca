@@ -32,6 +32,28 @@ export const metadata: Metadata = metadatosDePagina({
   ruta: "/calendario",
 });
 
+/**
+ * Por qué este embalse está donde está en la lista.
+ *
+ * Sin esto, ver uno al 75 % por delante de otro al 94 % parece un error. Lo
+ * que ordena no es cuánta agua lleva, sino cuánta lleva **comparado con lo que
+ * suele llevar por estas fechas**: casi todos los embalses andaluces van por
+ * encima del 60 % en agosto y el porcentaje pelado los iguala a todos.
+ */
+function resumenDelAgua(
+  pct: number | null,
+  mediana: number | null,
+): string {
+  if (pct === null) return "sin dato de nivel";
+  const p = Math.round(pct);
+  if (mediana === null) return `al ${p} % · sin histórico para comparar`;
+  const d = Math.round(pct - mediana);
+  if (Math.abs(d) < 5) return `al ${p} % · lo normal para estas fechas`;
+  return d > 0
+    ? `al ${p} % · ${d} puntos por encima de lo normal`
+    : `al ${p} % · ${Math.abs(d)} puntos por debajo de lo normal`;
+}
+
 export default async function PaginaCalendario({
   searchParams,
 }: {
@@ -52,6 +74,7 @@ export default async function PaginaCalendario({
         longitud: true,
         mejorEpoca: true,
         nivelPorcentaje: true,
+        nivelMedianaHistorica: true,
         provincia: { select: { slug: true, nombre: true } },
       },
     }),
@@ -105,6 +128,7 @@ export default async function PaginaCalendario({
         nota: indiceDePesca(d, {
           enTemporada: meses.includes(mesDeHoy),
           nivelPorcentaje: s.nivelPorcentaje,
+          nivelMedianaHistorica: s.nivelMedianaHistorica,
         }).total,
         distanciaKm: ubicacion ? distanciaKm(ubicacion, s) : null,
       };
@@ -165,9 +189,7 @@ export default async function PaginaCalendario({
                         parece que sea malo, cuando lo que pasa es que no se
                         sabe. */}
                     <span className="block text-xs text-texto-suave">
-                      {s.nivelPorcentaje === null
-                        ? "sin dato de nivel"
-                        : `al ${Math.round(s.nivelPorcentaje)} % de capacidad`}
+                      {resumenDelAgua(s.nivelPorcentaje, s.nivelMedianaHistorica)}
                     </span>
                   </span>
                   <span
@@ -192,6 +214,7 @@ export default async function PaginaCalendario({
         punto={punto}
         mejorEpoca={elegido?.mejorEpoca ?? ""}
         nivelPorcentaje={elegido?.nivelPorcentaje ?? null}
+        nivelMedianaHistorica={elegido?.nivelMedianaHistorica ?? null}
         anio={anio}
         mes={mes}
         hoy={hoy}

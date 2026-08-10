@@ -15,6 +15,7 @@ export function ResumenSolunar({
   longitud,
   mejorEpoca,
   nivelPorcentaje = null,
+  nivelMedianaHistorica = null,
   hoy,
   enlaceCalendario,
   titulo = "Cuándo ir hoy",
@@ -24,6 +25,8 @@ export function ResumenSolunar({
   mejorEpoca: string;
   /** Cuánta agua lleva. En `null`, esa pata sale del reparto de la nota. */
   nivelPorcentaje?: number | null;
+  /** Lo que suele llevar por estas fechas, para comparar con lo suyo. */
+  nivelMedianaHistorica?: number | null;
   /** Medianoche local de hoy. */
   hoy: Date;
   enlaceCalendario: string;
@@ -42,6 +45,7 @@ export function ResumenSolunar({
   const i = indiceDePesca(d, {
     enTemporada: meses.includes(mesDeHoy),
     nivelPorcentaje,
+    nivelMedianaHistorica,
   });
 
   const color =

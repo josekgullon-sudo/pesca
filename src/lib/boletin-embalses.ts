@@ -19,6 +19,7 @@
 import { unzipSync } from "fflate";
 import MDBReader from "mdb-reader";
 import { interpretarFecha, type FilaBoletin } from "./niveles";
+import { medianasParaEstasFechas, type Medicion } from "./historico-embalses";
 
 /** Es la misma fila que emparejamos después; el tipo vive en `niveles.ts`. */
 export type FilaEmbalse = FilaBoletin;
@@ -165,8 +166,12 @@ export function leerBoletin(zip: Uint8Array): {
   const datos = tabla.getData({ columns: columnas }) as Record<string, unknown>[];
   radiografia.ejemplo = datos[0];
 
-  // Una fila por embalse y semana: nos quedamos con la más reciente de cada uno.
+  // Una fila por embalse y semana: nos quedamos con la más reciente de cada
+  // uno, y de paso guardamos el histórico en crudo para sacar después lo que
+  // es normal en estas mismas fechas. Se recorre una sola vez: son setecientas
+  // mil filas y este script corre en un VPS pequeño.
   const ultima = new Map<string, FilaEmbalse>();
+  const historico: Medicion[] = [];
 
   for (const fila of datos) {
     const nombre = String(fila[elegida.cols.nombre] ?? "").trim();
@@ -176,6 +181,8 @@ export function leerBoletin(zip: Uint8Array): {
 
     const fecha = elegida.cols.fecha ? aFecha(fila[elegida.cols.fecha]) : null;
     if (!fecha) continue;
+
+    historico.push({ nombre, fecha, porcentaje: (volumenHm3 / capacidadHm3) * 100 });
 
     const previa = ultima.get(nombre);
     // Más reciente gana. Y si empatan en fecha —un mismo embalse puede venir
@@ -190,5 +197,15 @@ export function leerBoletin(zip: Uint8Array): {
     }
   }
 
-  return { filas: [...ultima.values()], radiografia };
+  const medianas = medianasParaEstasFechas(
+    historico,
+    new Map([...ultima].map(([n, f]) => [n, f.fecha])),
+  );
+
+  const filas = [...ultima.values()].map((f) => ({
+    ...f,
+    medianaHistorica: medianas.get(f.nombre) ?? null,
+  }));
+
+  return { filas, radiografia };
 }

@@ -461,16 +461,38 @@ const MAX = { luz: 30, luna: 30, temporada: 20, nivel: 20 } as const;
 /**
  * Qué nota se le pone al nivel del embalse.
  *
- * Solo se moja donde hay algo que decir de verdad. Un embalse muy vaciado en
- * verano deja las orillas de siempre a cien metros del agua, y lo que queda es
- * poco fondo, caliente y con menos oxígeno: eso lo firma cualquiera que haya
- * ido. Entre el 60 % y el 100 %, en cambio, no hay una diferencia que se pueda
- * defender, así que ahí no se inventa ninguna y puntúan igual.
+ * Hay dos formas de puntuarlo y la buena es la segunda.
  *
- * Lo que esto NO dice es que un embalse lleno pesque más que otro medio lleno.
- * Dice que uno bajo mínimos pesca peor que él mismo cuando está lleno.
+ * **Con histórico** —cuando se sabe qué porcentaje suele llevar ESTE embalse
+ * por estas mismas fechas— se compara consigo mismo. Es lo único que de verdad
+ * distingue: en agosto casi todos los embalses andaluces andan entre el 60 % y
+ * el 100 %, así que ordenarlos por el porcentaje a secas los deja empatados y
+ * dice lo mismo de uno que va sobrado y de otro que está vaciado a base de
+ * bien. Uno al 62 % que suele estar al 40 % va largo; otro al 62 % que suele
+ * estar al 85 % tiene el agua veinte puntos por debajo de donde la esperas, y
+ * eso se nota en la orilla.
+ *
+ * **Sin histórico** queda el porcentaje pelado, y ahí solo se moja donde hay
+ * algo que decir: un embalse muy vaciado en verano deja las orillas de siempre
+ * lejos del agua y lo que queda es poco fondo y caliente. Entre el 60 % y el
+ * 100 % no hay una diferencia defendible, así que no se inventa ninguna.
+ *
+ * Lo que esto NO dice, en ninguno de los dos casos, es que un embalse lleno
+ * pesque más que otro medio lleno. Dice que un embalse pesca peor de lo
+ * habitual cuando lleva menos agua de la habitual.
  */
-export function notaDelNivel(porcentaje: number): number {
+export function notaDelNivel(
+  porcentaje: number,
+  medianaHistorica?: number | null,
+): number {
+  if (medianaHistorica !== null && medianaHistorica !== undefined && medianaHistorica > 0) {
+    // Cuántos puntos porcentuales por encima o por debajo de lo suyo. Se
+    // recorta a ±25 porque más allá ya no cambia la respuesta: a veinticinco
+    // puntos por debajo de lo normal el embalse ya está irreconocible.
+    const desvio = Math.max(-25, Math.min(25, porcentaje - medianaHistorica));
+    return Math.round(MAX.nivel * ((desvio + 25) / 50));
+  }
+
   const p = Math.max(0, Math.min(100, porcentaje));
   if (p >= 60) return MAX.nivel;
   if (p >= 30) return Math.round(MAX.nivel * (0.5 + (p - 30) / 60));
@@ -502,6 +524,11 @@ export function indiceDePesca(
      * por ser pequeño.
      */
     nivelPorcentaje?: number | null;
+    /**
+     * Lo que suele llevar por estas fechas. Cuando está, el nivel se puntúa
+     * comparándolo consigo mismo en vez de con una escala fija.
+     */
+    nivelMedianaHistorica?: number | null;
   } = {},
 ): Indice {
   // --- Luz: solape de los periodos con las dos horas de penumbra ---
@@ -535,7 +562,9 @@ export function indiceDePesca(
 
   const sabeNivel =
     opciones.nivelPorcentaje !== null && opciones.nivelPorcentaje !== undefined;
-  const nivel = sabeNivel ? notaDelNivel(opciones.nivelPorcentaje!) : 0;
+  const nivel = sabeNivel
+    ? notaDelNivel(opciones.nivelPorcentaje!, opciones.nivelMedianaHistorica)
+    : 0;
 
   // Lo que no se sabe no puntúa cero: sale del reparto y el resto se reescala
   // a 100. Si no, el calendario general —donde no hay embalse elegido— y un
