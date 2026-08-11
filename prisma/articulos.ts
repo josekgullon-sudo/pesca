@@ -667,4 +667,247 @@ Pescando a fondo con maíz o lombriz te van a robar el cebo una y otra vez, sobr
 
 Tienes la ficha completa, con dónde está y su situación legal, en [cangrejo rojo americano](/especies/cangrejo-rojo-americano). Y si lo que quieres es saber qué hacer con las otras invasoras —black bass, lucio, carpa, trucha arcoíris—, eso va justo al revés y lo tienes en [has pescado un black bass: ¿lo devuelves o no?](/blog/especies-invasoras-que-hacer).`,
   },
+
+  // -------------------------------------------------------------------------
+  // Guías de provincia
+  //
+  // Una por provincia publicada. Entran por «dónde pescar en X», que es la
+  // búsqueda con la que la gente empieza, y reparten hacia las fichas de los
+  // embalses, que es donde está el detalle.
+  //
+  // Cada una cuenta la peculiaridad legal de SU provincia, y eso es lo que no
+  // tiene ninguna otra web: que en Huelva no hay ni una masa de agua
+  // delimitada para el lucio, que La Colada se queda fuera del área en
+  // Córdoba, que en Jaén circula una lista de sueltas de trucha de 2007 que se
+  // lee al revés de lo que dice.
+  // -------------------------------------------------------------------------
+  {
+    slug: "donde-pescar-en-cordoba",
+    titulo: "Dónde pescar en Córdoba: guía de los siete embalses",
+    entradilla:
+      "Del mayor de Andalucía a los pequeños de Los Pedroches. Cuál elegir según lo que busques, y el que se queda fuera del área del black bass.",
+    provincia: "cordoba",
+    diasAtras: 4,
+    contenido: `Córdoba se entiende con dos ríos y una excepción. El Guadiato baja por Sierra Morena dejando embalses, el Guadalquivir recoge lo demás, y en el sur, aparte de todo, está Iznájar.
+
+## Iznájar, que juega en otra liga
+
+[Iznájar](/cordoba/iznajar) es el embalse más grande de Andalucía: 920 hm³ sobre el Genil, en el punto donde se tocan Córdoba, Granada y Málaga. Le llaman el lago de Andalucía y se le nota nada más llegar.
+
+Eso tiene una consecuencia práctica que conviene entender antes de ir: **con esa lámina, desde orilla solo tocas una parte mínima**. Es sitio de barca. Si vas a pie, elige un brazo concreto y trabájalo, en vez de intentar abarcar.
+
+Carpa por todas partes, barbo en las colas del Genil y black bass en las paredes de roca y en los brazos largos. Y viento con facilidad, que en una lámina así se nota.
+
+## El Guadiato: los de bass y lucio
+
+Aquí están los tres que interesan a quien va buscando depredador.
+
+[La Breña II](/cordoba/la-brena-ii) es el segundo más grande de la provincia y el más particular: muy profundo, con paredes casi verticales y agua clara. Eso obliga a cambiar el chip —bajar la presentación, afinar el bajo— y deja pocas orillas tendidas donde pescar cómodo a fondo.
+
+[Puente Nuevo](/cordoba/puente-nuevo) y [Guadalmellato](/cordoba/guadalmellato) son los otros dos. El segundo es el más cómodo si sales de Córdoba capital, y no por eso está peor.
+
+Los tres tienen algo que en el resto de la provincia no se puede hacer: **el lucio está delimitado**, así que ahí sí se puede pescar y devolver al agua. En los otros cuatro embalses, no.
+
+## Los Pedroches y la sierra
+
+[Sierra Boyera](/cordoba/sierra-boyera) y [La Colada](/cordoba/la-colada) son pequeños y están arriba, en el norte. Sierra Boyera es poco profundo y en cuanto baja el nivel se complica mucho: mira cuánta agua lleva antes de hacer los kilómetros.
+
+[Bembézar](/cordoba/bembezar) es otra cosa. Está metido en el parque natural de Hornachuelos, con agua limpia de Sierra Morena, y es un embalse de **barbo** antes que de bass. Si te gusta el feeder, este es el sitio.
+
+## Lo que hay que saber de La Colada
+
+Y aquí va lo importante, porque es de las cosas que no se ven venir.
+
+De los siete embalses de esta guía, seis están dentro del área delimitada para el black bass. **[La Colada](/cordoba/la-colada) no.** No aparece en ninguna de las listas de la resolución.
+
+Eso cambia por completo qué hacer con una captura: un black bass pescado en La Colada **no se puede devolver al agua**. Hay obligación de sacarlo y sacrificarlo. En los otros seis, se devuelve con normalidad.
+
+Y en [Bembézar](/cordoba/bembezar) hay un matiz parecido: está dentro del área, **pero fuera de su zona declarada Refugio de Pesca**. Dentro del refugio no vale, y los límites del refugio no son los del embalse.
+
+## Cómo elegir
+
+- **A por black bass**: La Breña II, Puente Nuevo o Guadalmellato.
+- **Y si además quieres lucio**: esos mismos tres, que son los únicos donde se devuelve.
+- **Barbo**: Bembézar, sin discusión.
+- **Con barca**: Iznájar.
+- **Cerca de la capital**: Guadalmellato.
+- **Un día tranquilo y de carpa**: Sierra Boyera, si lleva agua.
+
+En la [guía de Córdoba](/cordoba) tienes cada uno con sus especies, su acceso, cuánta agua lleva hoy y a cuánto te pilla desde tu código postal.
+
+## Antes de salir
+
+Hace falta [licencia de pesca continental andaluza](/blog/licencia-de-pesca-andalucia) en vigor y seguro de responsabilidad civil.
+
+Y lo de las áreas delimitadas, que es lo que más gente se salta y lo que peor sale: el listado va por provincia, cambia con la orden de vedas y **no se parece al de la provincia de al lado**. Está explicado en [qué hacer con un black bass](/blog/especies-invasoras-que-hacer), y el enlace al portal oficial está en la propia página de la provincia.`,
+  },
+  {
+    slug: "donde-pescar-en-jaen",
+    titulo: "Dónde pescar en Jaén: los seis embalses y la trampa de la trucha",
+    entradilla:
+      "Del Tranco de Beas en plena Cazorla a los embalses del olivar. Cuál elegir, dónde se devuelve el lucio, y por qué una lista de 2007 que circula por internet dice lo contrario de lo que parece.",
+    provincia: "jaen",
+    diasAtras: 3,
+    contenido: `Jaén se parte en dos mundos y no se parecen en nada. Al este, la sierra de Cazorla, Segura y Las Villas: agua fría, pinares y barbo. Al oeste, el olivar y los embalses del Guadalquivir y sus afluentes, que son los de black bass y lucio.
+
+## La sierra
+
+[El Tranco de Beas](/jaen/tranco-de-beas) es el grande de la sierra —506 hm³— y de los embalses de black bass más conocidos de Andalucía. Está metido en el parque natural, con agua clara entre pinares.
+
+Que el agua sea clara no es un detalle bonito: **cambia cómo hay que pescar**. El pez te ve venir, así que afina el bajo, baja el tamaño del señuelo y trabaja despacio. Lo que te funciona en un embalse turbio de campiña aquí no vale.
+
+[La Bolera](/jaen/la-bolera), en Pozo Alcón, es más pequeño y es un embalse de **barbo**. Agua fría y limpia, y poco más que buscar. Y [Quiebrajano](/jaen/quiebrajano), en la Sierra Sur, es el de casa de la capital: pequeño, cómodo y con barbo también.
+
+## El olivar
+
+[Giribaile](/jaen/giribaile) es el grande de esta parte —491 hm³ sobre el Guadalimar—, con mucha orilla y mucha estructura. De los mejores de la provincia para el bass.
+
+[Guadalén](/jaen/guadalen) y [Rumblar](/jaen/rumblar) completan el trío. El Rumblar, sobre Baños de la Encina, tiene orillas de piedra donde la estructura está a la vista, que para quien empieza con el spinning es de agradecer.
+
+## Dónde se devuelve el lucio
+
+En Jaén el lucio está delimitado en cinco masas de agua de la provincia, y de las nuestras solo en dos: **[Giribaile](/jaen/giribaile) y [Rumblar](/jaen/rumblar)**. Ahí se pesca y se devuelve.
+
+En el resto —Tranco, Guadalén, La Bolera, Quiebrajano— un lucio hay que sacarlo del agua y sacrificarlo.
+
+Y con el black bass, ojo con dos: **[La Bolera](/jaen/la-bolera) y [Quiebrajano](/jaen/quiebrajano) no están dentro del área delimitada**. Un bass pescado ahí tampoco se devuelve.
+
+## La trampa de la trucha arcoíris
+
+Esta merece su propio apartado porque es la que más fácil se malinterpreta, y he visto la lista circulando.
+
+La resolución de 2019 publica una relación de aguas de Jaén donde **se soltó** trucha arcoíris antes de 2007: La Bolera, Peralta, La Toba, Cañamares y unas cuantas más. Esa lista sigue publicada y se encuentra sin esfuerzo.
+
+Leerla sola lleva a la conclusión contraria a la correcta. **No es una lista de aguas donde se puede pescar trucha arcoíris.** Es dónde se soltó hace veinte años.
+
+Lo que manda es la orden vigente, y esa solo permite pescarla en los cotos de trucha arcoíris de su Anexo II. **En Jaén no hay ninguno.** Así que en toda la provincia, una trucha arcoíris capturada hay que sacarla del agua y sacrificarla, salga donde salga y diga lo que diga aquella lista.
+
+## Aguas trucheras y refugios
+
+Jaén es la provincia de Andalucía con más tramos declarados aguas trucheras o refugios de pesca: hay en el Guadalquivir, el Guadalentín, el Segura, el Zumeta y el Madera, entre otros.
+
+Dentro de un refugio no se pesca. Y los límites de un refugio **no coinciden con los del embalse ni con los del término municipal**, así que no basta con saber a qué pantano vas: hay que saber en qué tramo estás.
+
+## Cómo elegir
+
+- **A por black bass**: Giribaile o el Tranco de Beas.
+- **Y si además quieres lucio**: Giribaile o Rumblar, los únicos donde se devuelve.
+- **Barbo**: La Bolera o Quiebrajano.
+- **Un día bonito**: el Tranco, en pleno Cazorla.
+- **Cerca de la capital**: Quiebrajano.
+
+En la [guía de Jaén](/jaen) tienes cada uno con sus especies, su acceso, cuánta agua lleva hoy y a cuánto te pilla.
+
+## Antes de salir
+
+[Licencia de pesca continental andaluza](/blog/licencia-de-pesca-andalucia) en vigor y seguro de responsabilidad civil. Y el listado de áreas delimitadas, que en esta provincia tiene más letra pequeña que en ninguna: está explicado en [qué hacer con un black bass](/blog/especies-invasoras-que-hacer).`,
+  },
+  {
+    slug: "donde-pescar-en-huelva",
+    titulo: "Dónde pescar en Huelva: la sierra de Aracena y el Andévalo",
+    entradilla:
+      "Seis embalses en dos paisajes que no se parecen. Cuál elegir según lo que busques, y por qué en Huelva la respuesta sobre el lucio no depende del embalse.",
+    provincia: "huelva",
+    diasAtras: 2,
+    contenido: `Huelva tiene dos zonas de pesca continental y no se parecen en nada: la sierra de Aracena al norte, y el Andévalo al oeste. Elegir entre una y otra es la primera decisión, y cambia más la jornada que el señuelo que lleves.
+
+## La sierra de Aracena
+
+Agua limpia, encinar, dehesa y **barbo por todas partes**. Es la zona de Huelva que más se parece a la Sierra Norte de Sevilla, y está a poco más de una hora de la capital sevillana, cosa que mucha gente de allí no sabe.
+
+[Aracena](/huelva/aracena) y [Zufre](/huelva/zufre) son los dos principales. Zufre está encajonado entre dehesa y es de los sitios más bonitos para pasar el día. [Jarrama](/huelva/jarrama), entre Aroche y Cortegana, es el más apartado de los tres y el más tranquilo.
+
+Los tres son embalses de barbo antes que de bass. Hay bass, pero con el agua tan clara hay que afinar bastante más que en el Andévalo.
+
+## El Andévalo
+
+Aquí cambia el paisaje por completo: mucho más abierto, mucha menos sombra y embalses grandes de abastecimiento.
+
+[El Andévalo](/huelva/andevalo) es el gigante —634 hm³, de los mayores de Andalucía— con kilómetros de orilla. El problema aquí no es que no haya pesca: es elegir por dónde empezar. Escoge un brazo y trabájalo.
+
+[Chanza](/huelva/chanza) está pegado a la frontera portuguesa y es el más apartado de todos, que se traduce en menos gente y menos presión de pesca. Y [Piedras](/huelva/piedras), en Cartaya, es el más cercano a la costa y el de la carpa más fácil.
+
+En los tres el black bass está bien asentado, y en verano el sol es un factor real: aquí no hay dónde meterse. Gorra, agua y las horas de luz baja.
+
+## Lo del lucio, que en Huelva es distinto
+
+Si vienes de leer sobre Córdoba o Jaén, esto te va a chocar, y por eso conviene decirlo claro.
+
+En aquellas provincias hay que mirar embalse por embalse: el lucio está delimitado en unos sí y en otros no. **En Huelva no es cuestión de qué embalse.** No hay ninguna masa de agua de la provincia delimitada para el lucio. Ni una.
+
+Así que la respuesta es la misma en todo el territorio: un lucio capturado en Huelva hay que sacarlo del agua y sacrificarlo. Da igual dónde estés.
+
+Con el black bass es al revés y para bien: **los seis embalses de esta guía están dentro del área delimitada**, así que se pesca y se devuelve con normalidad en todos ellos. Huelva es la única provincia de las publicadas donde no hay que ir mirando cuál sí y cuál no.
+
+Y la trucha arcoíris no tiene zona autorizada en la provincia: solo se devuelve en cotos de trucha arcoíris, y aquí no hay.
+
+## El parque natural
+
+Los embalses del norte están dentro o en el entorno del parque natural de la Sierra de Aracena y Picos de Aroche, que tiene normativa propia de acceso, circulación y acampada además de la de pesca. No es lo mismo aparcar donde te apetezca que hacerlo donde se puede.
+
+## Cómo elegir
+
+- **Barbo y un día bonito**: Zufre o Aracena.
+- **A por black bass**: Andévalo o Chanza.
+- **Tranquilidad**: Jarrama o Chanza, los dos más apartados.
+- **Carpa fácil**: Piedras.
+- **Desde Sevilla y sin madrugar mucho**: Aracena o Zufre, poco más de una hora.
+- **Sombra en verano**: la sierra. En el Andévalo no hay.
+
+En la [guía de Huelva](/huelva) tienes cada uno con sus especies, su acceso, cuánta agua lleva hoy y a cuánto te pilla desde tu código postal.
+
+## Antes de salir
+
+[Licencia de pesca continental andaluza](/blog/licencia-de-pesca-andalucia) en vigor y seguro de responsabilidad civil. Y aunque en Huelva el black bass esté delimitado en los seis, el resto de reglas siguen aplicando: [qué hacer con un black bass](/blog/especies-invasoras-que-hacer) lo explica.`,
+  },
+  {
+    slug: "se-puede-comer-el-barbo",
+    titulo: "¿Se puede comer el barbo? En Andalucía, no te lo puedes llevar",
+    entradilla:
+      "Es de las cosas que más se preguntan y la respuesta corta sorprende: da igual si está bueno, porque el barbo es de devolución obligatoria y tiene que volver al agua.",
+    provincia: null,
+    especie: "barbo",
+    diasAtras: 1,
+    contenido: `Es una de las preguntas que más se hacen, y casi siempre se responde hablando de cocina cuando la respuesta que importa es otra.
+
+> **En las aguas continentales de Andalucía el barbo es de devolución obligatoria.** Tiene que volver al agua, así que la pregunta de si se come no llega a plantearse.
+
+## Por qué
+
+El barbo gitano (*Luciobarbus sclateri*) es una especie **autóctona** de las cuencas del sur de la península. No es como el black bass o la carpa, que vinieron de fuera: el barbo es de aquí, lleva aquí siempre y es parte de lo que hace que un río del sur sea un río del sur.
+
+Y está en retroceso, por lo de siempre: presas que cortan sus migraciones de desove, tramos que se quedan secos en verano y competencia de especies introducidas. De ahí que la norma sea devolverlo.
+
+Eso lo pone en el grupo contrario al de las invasoras, y conviene tenerlo claro porque las dos reglas conviven en el mismo embalse y son opuestas:
+
+- **Barbo, boga y trucha común**: devolución obligatoria. Al agua siempre.
+- **Black bass, lucio, carpa y trucha arcoíris**: fuera de las áreas delimitadas, obligación de sacrificarlos.
+
+Llevarse un barbo y devolver un black bass fuera de su área son las dos infracciones que más se cometen sin querer, y son exactamente la misma equivocación al revés.
+
+## Cómo devolverlo bien
+
+Devolver no es soltar de cualquier manera. Un pez devuelto mal se muere igual, solo que más tarde y sin que nadie lo vea.
+
+- **Manos mojadas.** El barbo lleva una capa de mucosidad que lo protege; con las manos secas se la arrancas.
+- **El menor tiempo fuera del agua.** Si vas a hacer la foto, tenla pensada antes de sacarlo.
+- **Anzuelo sin muerte** si puedes, y unas pinzas para desanzuelar sin desgarrar.
+- **Sujétalo hasta que se vaya solo.** En el agua, de cara a la corriente si la hay, hasta que se suelte él.
+
+Está todo más desarrollado en [cómo devolver un pez al agua](/blog/devolver-un-pez-al-agua).
+
+## Y si aun así te lo estás preguntando
+
+Puestos a hablar de la carne: el barbo tiene fama de tener muchas espinas y de saber a fango en aguas templadas y quietas. Nunca ha sido pescado de mesa apreciado en el sur, y esa fama es una de las razones por las que nadie se opone a devolverlo.
+
+Hay además un motivo de salud que no depende de la ley. Los ciprínidos son peces de fondo y acumulan lo que hay en el sedimento. En aguas con contaminación por metales pesados eso importa de verdad, y esta guía marca esos sitios con un aviso sanitario en la propia ficha del embalse. Cuando veas uno, no consumas nada de lo que saques de ahí.
+
+## Dónde hay barbo
+
+En casi todos los embalses y ríos de la guía, y en algunos es la captura principal: Bembézar en Córdoba, La Bolera y Quiebrajano en Jaén, Zufre y Aracena en Huelva, el Huesna y El Pintado en Sevilla.
+
+Tienes la ficha completa en [barbo](/especies/barbo), con dónde está y con qué se pesca, y todos los sitios en [dónde pescar](/donde-pescar).
+
+> Las normas de veda, talla y devolución cambian con cada orden anual. Comprueba la vigente en el portal oficial antes de salir: es la única que manda.`,
+  },
 ];
