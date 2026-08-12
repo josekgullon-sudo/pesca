@@ -22,7 +22,7 @@ export function SubirFoto({
   nombre,
   tieneFoto,
 }: {
-  tipo: "especie" | "sitio" | "articulo";
+  tipo: "especie" | "sitio" | "articulo" | "aparejo";
   slug: string;
   nombre: string;
   tieneFoto: boolean;

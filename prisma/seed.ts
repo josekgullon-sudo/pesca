@@ -1104,6 +1104,11 @@ type AparejoSeed = {
   tipo: "vinilo" | "senuelo_duro" | "cebo_natural" | "engodo" | "montaje";
   descripcion: string;
   precioAproxEur: number | null;
+  /**
+   * Cómo se monta, paso a paso. Es lo primero que se pregunta de un señuelo y
+   * hasta ahora no estaba escrito en ninguna parte.
+   */
+  comoMontar?: string;
 };
 
 const APAREJOS: AparejoSeed[] = [
@@ -1117,6 +1122,15 @@ const APAREJOS: AparejoSeed[] = [
       "en casi cualquier condición, sobre todo con agua clara y sol. Se monta a " +
       "cabeza plomada o en texas rig. Si solo puedes llevar uno, lleva este.",
     precioAproxEur: 5,
+    comoMontar: `Se monta a cabeza plomada, que es la forma más simple y la que hay que aprender primero.
+
+1. Elige el peso de la cabeza plomada por la profundidad: 5-7 g para menos de tres metros, 10-14 g si quieres bajar más o hay viento.
+2. Apoya el vinilo al lado del anzuelo para ver por dónde tiene que salir la punta, y márcalo con la uña.
+3. Clava la punta por el centro de la cabeza del vinilo y empuja recto, siguiendo la curva del anzuelo, hasta sacarla por donde marcaste.
+4. **Que quede recto.** Un vinilo torcido gira sobre sí mismo al recoger, retuerce el hilo y no lo ataca nada. Míralo por arriba antes de tirar: si no está alineado, sácalo y móntalo otra vez.
+5. Anúdalo directo al fluorocarbono. Si hay mucha estructura, un metro de bajo de 0,25-0,30.
+
+**Cómo se trabaja**: lanza, deja que baje contando los segundos, y recoge despacio con tirones cortos parando de vez en cuando. La picada casi siempre llega en la parada.`,
   },
   {
     slug: "vinilo-shad-blanco",
@@ -1126,6 +1140,11 @@ const APAREJOS: AparejoSeed[] = [
       "Para agua con algo de turbidez o días nublados. El blanco se ve desde " +
       "lejos e imita bien al alburno, que es de lo que come el bass aquí.",
     precioAproxEur: 5,
+    comoMontar: `Igual que el verde sandía: cabeza plomada, punta saliendo por el centro y el vinilo recto.
+
+La diferencia está en cuándo usarlo, no en cómo montarlo. Con agua turbia o cielo cubierto, el blanco se ve desde más lejos.
+
+Un truco que funciona aquí: con agua sucia, sube el peso de la cabeza y recoge más despacio. Lo que no se ve, se busca por vibración.`,
   },
   {
     slug: "vinilo-shad-chartreuse",
@@ -1136,6 +1155,11 @@ const APAREJOS: AparejoSeed[] = [
       "en embalses de campiña. Cuando el agua está sucia, este color es de los " +
       "pocos que se ven.",
     precioAproxEur: 5,
+    comoMontar: `Mismo montaje a cabeza plomada.
+
+El chartreuse es el color de agua muy turbia, de las horas de poca luz y de después de una lluvia. Es el que se ve cuando ya no se ve nada.
+
+Si en un embalse tienes que elegir entre este y el verde sandía, mira el agua: si al meter la mano hasta el codo no la ves, chartreuse.`,
   },
   {
     slug: "vinilo-senko-negro",
@@ -1146,6 +1170,9 @@ const APAREJOS: AparejoSeed[] = [
       "caer y el propio vinilo se contonea. El negro recorta muy bien contra la " +
       "luz. Mano de santo cuando el bass no quiere nada.",
     precioAproxEur: 6,
+    comoMontar: `Mismo montaje wacky que el de purpurina, y también funciona en texas rig cuando hay mucha estructura.
+
+El negro es para agua muy sucia y para las últimas horas del día: no se ve por su color, se ve por la silueta contra la luz de arriba. Por eso es el que mejor va a última hora.`,
   },
   {
     slug: "vinilo-senko-sandia-purpurina",
@@ -1156,6 +1183,17 @@ const APAREJOS: AparejoSeed[] = [
       "manda destellos discretos. Para agua clara y peces desconfiados, montado " +
       "en texas rig y trabajado muy despacio.",
     precioAproxEur: 6,
+    comoMontar: `Este NO va a cabeza plomada. Va en **wacky** o en **texas rig**, y el wacky es el que engancha más peces y el más fácil de montar.
+
+**Wacky, que es la forma más tonta y la que mejor funciona:**
+
+1. Clava el anzuelo —uno de wacky o un circular del 1/0— justo por la mitad del vinilo, atravesándolo de lado a lado.
+2. Ya está. No hay plomo.
+3. Para que no se rompa a la segunda picada, pon una gomita de wacky por el centro y clava el anzuelo bajo la goma en vez de en el vinilo.
+
+**Cómo se trabaja**: lánzalo y no hagas nada. Déjalo caer solo, moviéndose de lado a lado. La mayoría de las picadas llegan en esa caída, así que no pierdas de vista el hilo: si se va de lado o se para antes de tiempo, clava.
+
+Es aburridísimo de pescar y es de lo que más bass da en agua clara.`,
   },
   // --- Señuelos duros ---
   {
@@ -1168,6 +1206,16 @@ const APAREJOS: AparejoSeed[] = [
       "sobre vegetación o piedra, es lo más divertido que se puede hacer con " +
       "una caña.",
     precioAproxEur: 9,
+    comoMontar: `Sin montaje, pero con dos detalles que cambian todo.
+
+1. **Nudo de bucle**, para que el popper pueda levantar la cabeza. Con nudo apretado no suena.
+2. Bajo de fluorocarbono corto o directo a trenzado. Aquí no hace falta que sea invisible: el pez ataca la silueta contra el cielo.
+
+**Cómo se trabaja**: lanza, espera a que se queden los círculos, y da un tirón seco y corto de puntera. Pausa larga. Otro tirón. La pausa es lo importante y es lo que casi nadie aguanta.
+
+**Y lo más difícil**: cuando ataque, no claves. Espera a notar el peso del pez en la caña. Clavar al ver la explosión es la forma más segura de sacarle el señuelo de la boca.
+
+Amanecer y atardecer. A mediodía no.`,
   },
   {
     slug: "paseante-superficie",
@@ -1178,6 +1226,17 @@ const APAREJOS: AparejoSeed[] = [
       "recogerlo a tirones rítmicos. Cubre más agua que el popper y es mejor " +
       "para buscar peces activos en zonas amplias y con algo de rizo.",
     precioAproxEur: 10,
+    comoMontar: `Sin montaje: nudo de bucle y a trabajarlo con la puntera.
+
+**El «walk the dog»**, que es de lo que va este señuelo:
+
+1. Punta de la caña hacia abajo, apuntando al agua.
+2. Tirones cortos y rítmicos de puntera, dejando el hilo un poco flojo entre uno y otro.
+3. El señuelo va zigzagueando de lado a lado.
+
+Lo que lo estropea es el hilo tenso: si tiras con el hilo tirante, el paseante va recto en vez de zigzaguear. **La flojedad es lo que hace el movimiento.**
+
+Aguanta más viento y más ola que el popper, y cubre más agua. Si tienes que elegir uno de superficie para un embalse grande, este.`,
   },
   {
     slug: "crankbait-pequeno",
@@ -1188,6 +1247,13 @@ const APAREJOS: AparejoSeed[] = [
       "peinar rápido una orilla y localizar peces. Va bien rozando la piedra: " +
       "los golpes contra el fondo provocan picadas.",
     precioAproxEur: 8,
+    comoMontar: `No hay montaje: viene armado de fábrica. Lo que sí hay que hacer bien es el nudo.
+
+1. **Nudo de bucle** (rapala o similar), no un nudo apretado al anillo. El crankbait necesita moverse libre; con un nudo apretado pierde acción.
+2. Si lleva anilla, mejor todavía: anuda a la anilla y deja el señuelo suelto.
+3. Comprueba los anzuelos triples antes de guardar. Un triple abierto o romo pierde peces.
+
+**Cómo se trabaja**: recogida continua, sin tirones. Cada modelo baja a una profundidad y ahí está la gracia: elige uno que toque el fondo o roce la piedra. **El golpe contra el fondo es lo que provoca la picada**, no el señuelo en sí. Si no notas que toca nada, estás pescando en el vacío.`,
   },
   {
     slug: "spinnerbait-blanco",
@@ -1198,6 +1264,13 @@ const APAREJOS: AparejoSeed[] = [
       "engancha, así que se puede pasar por encima de ramas y vegetación donde " +
       "no entra otra cosa. Muy bueno con agua turbia y para lucio.",
     precioAproxEur: 8,
+    comoMontar: `Viene montado. Lo único que hay que revisar es que la pala gire libre y que el brazo no se haya doblado: un spinnerbait con el brazo torcido nada de lado y no lo ataca nada. Se endereza con los dedos.
+
+**Cómo se trabaja**: recogida continua. Tiene que notarse la vibración de la pala en la mano; si no la notas, o va demasiado rápido o demasiado despacio.
+
+Es el señuelo de **pasar por encima de la porquería**: hierba, ramas, madera sumergida. El brazo protege el anzuelo, así que puedes meterlo donde un crankbait se quedaría enganchado a la primera. Y ahí es donde está el pez.
+
+Días grises, agua con algo de color y viento: sus tres condiciones.`,
   },
   // --- Montajes ---
   {
@@ -1210,6 +1283,19 @@ const APAREJOS: AparejoSeed[] = [
       "vegetación sin engancharse. El montaje básico para pescar bass en la " +
       "estructura.",
     precioAproxEur: 4,
+    comoMontar: `El montaje antienganche. Con esto se pesca donde no se puede pescar de otra forma.
+
+1. Pasa el hilo por el **plomo bala**, con la punta mirando hacia la caña.
+2. Detrás del plomo, una perla de plástico si quieres oír el golpeteo. Opcional.
+3. Anuda un **anzuelo offset** del 2/0 al 4/0 según el tamaño del vinilo.
+4. Clava la punta del anzuelo en la cabeza del vinilo, un centímetro, y sácala.
+5. Gira el anzuelo 180° y mete la parte curva dentro de la cabeza del vinilo.
+6. Clava la punta en el lomo y **déjala justo debajo de la piel, sin sacarla**. Eso es lo que lo hace antienganche.
+7. Estíralo: tiene que quedar recto.
+
+**Cómo se trabaja**: lánzalo a la estructura, deja que baje, y arrástralo por el fondo con tirones cortos, parando. Cuando notes que se ha metido entre ramas, no tires fuerte: afloja y sacúdelo.
+
+Si el plomo va suelto, el vinilo cae más despacio y más natural. Si lo fijas con un tope de goma, el conjunto entra mejor en la vegetación espesa. Las dos cosas valen y no es lo mismo.`,
   },
   {
     slug: "cabeza-plomada",
@@ -1221,6 +1307,15 @@ const APAREJOS: AparejoSeed[] = [
       "profundidad trabaja: ligera para agua somera, pesada para el fondo en " +
       "verano.",
     precioAproxEur: 3,
+    comoMontar: `Es el montaje más simple que existe y el primero que hay que dominar.
+
+1. Elige el peso por la profundidad y el viento: 5 g para poco fondo, 10-14 g para bajar o con viento.
+2. Clava la punta por el centro de la cabeza del vinilo.
+3. Empuja recto siguiendo la curva del anzuelo y saca la punta por el lomo del vinilo.
+4. **Comprueba que está recto** mirándolo desde arriba. Torcido, gira y retuerce el hilo.
+5. Anuda directo al bajo.
+
+Ventaja: baja rápido, se nota el fondo y se lanza lejos. Inconveniente: el anzuelo va al aire, así que en madera o en piedra se engancha. Para eso está el texas.`,
   },
   {
     slug: "montaje-fondo-corredizo",
@@ -1232,6 +1327,18 @@ const APAREJOS: AparejoSeed[] = [
       "el pez se lleva el cebo sin notar el peso del plomo. El montaje de toda " +
       "la vida para carpa y barbo.",
     precioAproxEur: 4,
+    comoMontar: `El montaje de la carpa y el barbo, y el que hay que saber si vas a pescar a fondo.
+
+1. Pasa el hilo por el **plomo corredizo** —una oliva de 20-40 g—.
+2. Detrás, una perla de goma para que el plomo no golpee el nudo.
+3. Anuda un **emerillón**, que hace de tope.
+4. Al emerillón, un bajo de 30-50 cm más fino que la línea madre, con el anzuelo.
+
+Que el plomo corra es lo importante: cuando el pez coge el cebo y se va, **arrastra el hilo sin notar el peso**. Con el plomo fijo lo suelta antes de que te enteres.
+
+Que el bajo sea más fino tampoco es capricho: si te enganchas, rompe por ahí y pierdes el anzuelo en vez de todo el montaje con el plomo dentro del agua.
+
+**Cómo se trabaja**: lanza, deja el hilo semitenso y espera. Con avisador o con la puntera de la caña marcando. La picada de la carpa a fondo no es sutil.`,
   },
   // --- Cebos naturales ---
   {
@@ -1243,6 +1350,15 @@ const APAREJOS: AparejoSeed[] = [
       "en el anzuelo. El cebo número uno para carpa, y también entra el barbo. " +
       "Dos o tres granos en el anzuelo y unos puñados al agua para cebar.",
     precioAproxEur: 1,
+    comoMontar: `Del bote a la orilla, sin más preparación.
+
+1. Dos o tres granos en el anzuelo, del 8 al 12, atravesados por la parte dura.
+2. Deja la punta del anzuelo asomando. Escondida en el maíz no clava.
+3. Tira un puñado al agua donde vas a pescar, y repite cada media hora.
+
+Con carpas grandes, el **pelo** es mejor: el maíz va colgando de un hilillo detrás del anzuelo, no clavado en él. El pez se lo lleva a la boca sin notar el metal y se clava solo.
+
+Barato, limpio y de lo que más pesca. Si empiezas, empieza por aquí.`,
   },
   {
     slug: "lombriz-de-tierra",
@@ -1253,6 +1369,15 @@ const APAREJOS: AparejoSeed[] = [
       "Imbatible para barbo. Se puede coger del propio jardín o comprar en la " +
       "tienda. Guárdala en tierra húmeda y a la sombra.",
     precioAproxEur: 3,
+    comoMontar: `El cebo universal, y el que casi nadie monta bien.
+
+1. Anzuelo del 6 al 10.
+2. **No la ensartes entera y estirada.** Clávala una o dos veces por el centro y deja los dos extremos sueltos y moviéndose.
+3. Eso es lo que la hace pescar: el movimiento.
+
+Si te roban el cebo sin picar, casi siempre es cangrejo rojo. Sube el anzuelo de tamaño, sepárate del fango o cámbiate a maíz.
+
+Cae de todo: barbo, carpa, carpín, y algún bass despistado.`,
   },
   {
     slug: "masilla-pan-matalahuva",
@@ -1263,6 +1388,16 @@ const APAREJOS: AparejoSeed[] = [
       "hacer una pasta. Cebo clásico andaluz para carpa y barbo. Se hace en " +
       "casa por céntimos y el olor a anís llega lejos en el agua.",
     precioAproxEur: 1,
+    comoMontar: `Se hace en casa en cinco minutos y no cuesta nada.
+
+1. Miga de pan del día anterior, sin corteza.
+2. Unas gotas de agua y amasa hasta que quede una bola pegajosa que no se te quede en los dedos.
+3. Una cucharadita de matalahúva (anís en grano) molida, y amasa otra vez.
+4. Guárdala en una bolsa cerrada para que no se seque.
+
+**Para montarla**: una bola del tamaño de una avellana apretada alrededor del anzuelo, tapándolo entero. Se deshace sola en el agua y va soltando olor.
+
+Aguanta poco en el agua, así que hay que recebar a menudo. A cambio, en aguas donde todo el mundo pesca con maíz, esto es algo distinto.`,
   },
   {
     slug: "pan",
@@ -1273,6 +1408,13 @@ const APAREJOS: AparejoSeed[] = [
       "sirve para pescar carpas en superficie en verano, que es una pesca muy " +
       "visual. Lo más barato que existe.",
     precioAproxEur: 1,
+    comoMontar: `El más barato de todos y el que mejor va en verano.
+
+**En superficie**: un trozo de miga apretado en el anzuelo, sin plomo, y déjalo flotando. Tira unos trozos alrededor. Ver a la carpa subir a por él es de lo mejor que hay.
+
+**A fondo**: la corteza clavada en el anzuelo flota, así que con un montaje de fondo el cebo queda levantado unos centímetros sobre el fango. Eso es exactamente lo que quieres cuando el fondo es blando.
+
+Se deshace enseguida: recambia a menudo y no lances con fuerza o se te va el cebo por el camino.`,
   },
   // --- Engodos ---
   {
@@ -1285,6 +1427,16 @@ const APAREJOS: AparejoSeed[] = [
       "lance y se deshagan en el fondo. Cebar el puesto media hora antes cambia " +
       "la jornada.",
     precioAproxEur: 5,
+    comoMontar: `Mezcla seca que se moja en la orilla, no antes.
+
+1. Echa el engodo seco en un barreño.
+2. Añade agua **poco a poco**, amasando con la mano. Nunca al revés.
+3. Tiene que quedar en el punto de que una bola apretada aguante en la mano y se deshaga al llegar al fondo. Si se deshace en el aire, falta agua; si se queda como plastilina, te has pasado.
+4. Déjalo reposar diez minutos y vuelve a amasar.
+
+**Cómo se usa**: cinco o seis bolas del tamaño de una naranja al empezar, en el mismo punto, y luego una cada quince o veinte minutos.
+
+En río o con corriente, hazlo más compacto o se te va aguas abajo antes de tocar el fondo.`,
   },
   {
     slug: "pellets-halibut",
@@ -1296,6 +1448,15 @@ const APAREJOS: AparejoSeed[] = [
       "para carpa grande y barbo. Se pueden usar también como cebo con banda " +
       "de goma.",
     precioAproxEur: 6,
+    comoMontar: `Pellet grande para barbo grande, y para que el cangrejo rojo no te lo desmonte.
+
+1. Los pellets no se clavan: van al **pelo**, colgando detrás del anzuelo.
+2. Pasa un stop de goma por el pelo y el pellet perforado detrás. Si no viene perforado, se taladra o se sujeta con una banda elástica.
+3. Anzuelo del 8 al 12, corto y fuerte.
+
+**Cómo se usa**: unos pocos pellets sueltos alrededor y a esperar. Se deshacen despacio, así que aguantan mucho más que la masilla y el cangrejo tiene más difícil llevárselos.
+
+Es el cebo de El Pintado y del Huesna, donde el barbo va grande.`,
   },
   {
     slug: "canamo-tostado",
@@ -1306,6 +1467,15 @@ const APAREJOS: AparejoSeed[] = [
       "carpa. Mantiene al pez hozando en el puesto mucho rato porque los granos " +
       "son diminutos y no lo sacian. Se echa a puñados, mezclado con el engodo.",
     precioAproxEur: 4,
+    comoMontar: `Engodo, no cebo: no va al anzuelo, va al agua.
+
+1. Pon el cáñamo en remojo 12-24 horas.
+2. Hiérvelo 20-30 minutos, hasta que los granos se abran y se vea el germen blanco.
+3. Déjalo enfriar en su agua, que también huele.
+
+**Cómo se usa**: un par de puñados en la zona donde vas a pescar antes de empezar, y refuerza cada media hora con menos cantidad. El cáñamo mantiene a la carpa y al barbo rebuscando en el fondo sin llenarlos, que es justo lo que quieres.
+
+Encima del cáñamo, pesca con maíz o con masilla. El engodo los junta; el cebo del anzuelo es el que tiene que destacar.`,
   },
 ];
 
@@ -1815,7 +1985,10 @@ async function main() {
 
   // --- Aparejos ------------------------------------------------------------
   for (const a of APAREJOS) {
-    await prisma.aparejo.upsert({ where: { slug: a.slug }, create: a, update: a });
+    // La foto no se toca: se sube a mano desde /admin y el seed corre en cada
+    // arranque. Si `a` la incluyera, cada reinicio la borraría.
+    const datos = { ...a, comoMontar: a.comoMontar ?? "" };
+    await prisma.aparejo.upsert({ where: { slug: a.slug }, create: datos, update: datos });
   }
   console.log(`  ${APAREJOS.length} aparejos`);
 

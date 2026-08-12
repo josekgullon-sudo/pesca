@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
  * nombre de quien las subió. El listado sí, que es el que enseña la actividad.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [provincias, sitios, especies, articulos] = await Promise.all([
+  const [provincias, sitios, especies, articulos, aparejos] = await Promise.all([
     prisma.provincia.findMany({
       where: { publicada: true },
       select: { slug: true, updatedAt: true },
@@ -33,6 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: { publicada: true },
       select: { slug: true, updatedAt: true },
     }),
+    prisma.aparejo.findMany({ select: { slug: true } }),
   ]);
 
   const fijas: MetadataRoute.Sitemap = [
@@ -44,6 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: urlAbsoluta("/donde-pescar"), changeFrequency: "weekly", priority: 0.7 },
     { url: urlAbsoluta("/mapa"), changeFrequency: "weekly", priority: 0.5 },
     { url: urlAbsoluta("/especies"), changeFrequency: "monthly", priority: 0.8 },
+    { url: urlAbsoluta("/aparejos"), changeFrequency: "monthly", priority: 0.8 },
     // Cambia de nota cada día, y es de las páginas a las que la gente vuelve.
     { url: urlAbsoluta("/calendario"), changeFrequency: "daily", priority: 0.9 },
     { url: urlAbsoluta("/ranking"), changeFrequency: "daily", priority: 0.7 },
@@ -92,6 +94,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.6,
       },
     ]),
+    // Las fichas de señuelo. Cada una responde a una búsqueda distinta —«cómo
+    // montar un texas rig», «para qué sirve un spinnerbait»— y por eso van al
+    // sitemap una a una y no solo el listado.
+    ...aparejos.map((a) => ({
+      url: urlAbsoluta(`/aparejos/${a.slug}`),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
     ...especies.map((e) => ({
       url: urlAbsoluta(`/especies/${e.slug}`),
       lastModified: e.updatedAt,

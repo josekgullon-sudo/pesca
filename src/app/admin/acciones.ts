@@ -41,11 +41,16 @@ export async function subirFoto(
     return { error: "Solo un administrador puede cambiar las fotos." };
   }
 
-  const tipo = texto(fd, "tipo"); // "especie" | "sitio" | "articulo"
+  const tipo = texto(fd, "tipo"); // "especie" | "sitio" | "articulo" | "aparejo"
   const slug = texto(fd, "slug");
   const archivo = fd.get("foto");
 
-  if (tipo !== "especie" && tipo !== "sitio" && tipo !== "articulo") {
+  if (
+    tipo !== "especie" &&
+    tipo !== "sitio" &&
+    tipo !== "articulo" &&
+    tipo !== "aparejo"
+  ) {
     return { error: "No sé a qué le quieres cambiar la foto." };
   }
   if (!(archivo instanceof File) || archivo.size === 0) {
@@ -58,12 +63,17 @@ export async function subirFoto(
   const licencia = texto(fd, "licencia");
   const fuente = texto(fd, "fuente");
 
+  // De los señuelos, la foto buena es la que se hace uno de su propia caja:
+  // las del fabricante son suyas y en Wikimedia Commons casi no hay. Por eso
+  // se suben desde aquí y no las baja ningún script.
   const modelo =
     tipo === "especie"
       ? prisma.especie
       : tipo === "sitio"
         ? prisma.sitio
-        : prisma.articulo;
+        : tipo === "aparejo"
+          ? prisma.aparejo
+          : prisma.articulo;
 
   const anterior = await (
     modelo as { findUnique: (a: unknown) => Promise<{ imagenUrl: string | null } | null> }
@@ -75,7 +85,13 @@ export async function subirFoto(
   try {
     url = await guardarImagen(
       archivo,
-      tipo === "especie" ? "especies" : tipo === "sitio" ? "sitios" : "articulos",
+      tipo === "especie"
+        ? "especies"
+        : tipo === "sitio"
+          ? "sitios"
+          : tipo === "aparejo"
+            ? "aparejos"
+            : "articulos",
     );
   } catch (e) {
     return {

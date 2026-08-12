@@ -53,7 +53,12 @@ const TIPOS_ACEPTADOS = new Set([
 
 export class ErrorImagen extends Error {}
 
-export type CarpetaImagen = "uploads" | "especies" | "sitios" | "articulos";
+export type CarpetaImagen =
+  | "uploads"
+  | "especies"
+  | "sitios"
+  | "articulos"
+  | "aparejos";
 
 export const RAIZ_DATOS = path.join(process.cwd(), "datos");
 

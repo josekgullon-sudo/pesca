@@ -19,7 +19,7 @@ import { usePathname } from "next/navigation";
  */
 
 /** Rutas que tienen su propia pestaña. Lo demás cuelga de una provincia. */
-const RUTAS_PROPIAS = ["/calendario", "/especies", "/capturas", "/ranking", "/blog", "/entrar", "/registro", "/cuenta", "/normas", "/aviso-legal"];
+const RUTAS_PROPIAS = ["/calendario", "/especies", "/aparejos", "/capturas", "/ranking", "/blog", "/entrar", "/registro", "/cuenta", "/normas", "/aviso-legal"];
 
 /** El destino del mapa lo decide el servidor, igual que el de los sitios. */
 const MARCA_MAPA = "__mapa__";
@@ -75,6 +75,15 @@ const ENLACES: Enlace[] = [
     etiqueta: "Especies",
     icono: IconoPez,
     activo: (r) => r.startsWith("/especies"),
+  },
+  {
+    href: "/aparejos",
+    etiqueta: "Señuelos",
+    icono: IconoAnzuelo,
+    activo: (r) => r.startsWith("/aparejos"),
+    // En la barra de móvil no caben más: se llega desde la ficha de especie,
+    // desde la del embalse y desde el pie.
+    soloEscritorio: true,
   },
   {
     href: "/capturas",
@@ -288,6 +297,26 @@ function IconoPez({ activo }: PropsIcono) {
       <path d="M2.5 12c3-4.5 6.8-6.5 10.5-6.5S19.5 8 21.5 12c-2 4-5.3 6.5-8.5 6.5S5.5 16.5 2.5 12Z" />
       <path d="M21.5 12s.5-2.5.5-4c-1.5.5-3 2-3 2" />
       <circle cx="8" cy="10.5" r=".9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** Un anzuelo. Para la sección de señuelos y cebos. */
+function IconoAnzuelo({ activo }: PropsIcono) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15 3v10a5 5 0 0 1-10 0v-1" />
+      <path d="M12 3h6" />
+      <circle cx="5" cy="10" r="1.6" fill={activo ? "currentColor" : "none"} />
     </svg>
   );
 }

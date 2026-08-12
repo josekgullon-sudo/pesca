@@ -290,6 +290,19 @@ model Aparejo {
   descripcion    String
   precioAproxEur Float?
   imagenUrl      String?
+  /// Autoría y licencia de la foto, si viene de un tercero. Lo normal aquí es
+  /// que sea una foto propia del aparejo, que además es lo que distingue esto
+  /// de las mil webs que copian la misma imagen del fabricante.
+  imagenAutor    String?
+  imagenLicencia String?
+  imagenFuente   String?
+
+  /// Cómo se monta, paso a paso.
+  ///
+  /// Va en el modelo y no en un artículo del blog porque es lo primero que se
+  /// pregunta de un señuelo —«¿y esto cómo se monta?»— y tiene que estar en la
+  /// ficha del señuelo, no a tres clics. Vacío mientras no se haya escrito.
+  comoMontar String @default("")
 
   especies AparejoEspecie[]
   sitios   AparejoSitio[]
